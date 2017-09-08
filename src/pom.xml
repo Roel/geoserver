@@ -1916,18 +1916,15 @@
 
  <distributionManagement>
     <repository>
-      <id>boundless</id>
-      <name>Boundless Release Repository</name>
-      <url>https://repo.boundlessgeo.com/release/</url>
-      <uniqueVersion>false</uniqueVersion>
+  <id>release</id>
+  <url>${acd.repository.release.url}</url>
     </repository>
     <snapshotRepository>
-      <id>boundless</id>
-      <uniqueVersion>false</uniqueVersion>
-      <name>Boundless Snapshot Repository</name>
-      <url>https://repo.boundlessgeo.com/snapshot/</url>
+  <id>snapshot</id>
+  <url>${acd.repository.snapshot.url}</url>
     </snapshotRepository>
  </distributionManagement>
+
 
  <modules>
   <module>platform</module>
@@ -2010,9 +2007,17 @@
   <fmt.action>format</fmt.action>
   <fmt.skip>false</fmt.skip>
   <errorProneFlags></errorProneFlags>
+  <acd.issueManagement.url>https://www.milieuinfo.be/jira</acd.issueManagement.url>
+  <acd.ciManagement.system>Bamboo</acd.ciManagement.system>
+  <acd.ciManagement.url>https://www.milieuinfo.be/bamboo</acd.ciManagement.url>
+  <acd.repository.url>https://www.milieuinfo.be/artifactory</acd.repository.url>
+  <acd.repository.snapshot.url>${acd.repository.url}/snapshot</acd.repository.snapshot.url>
+  <acd.repository.release.url>${acd.repository.url}/release</acd.repository.release.url>
+  <acd.scm.maven-url>scm:svn:https://svn.milieuinfo.be/productie/svn</acd.scm.maven-url>
+
   <errorProne.version>2.3.2</errorProne.version>
   <javac.version>9+181-r4173-1</javac.version>
- </properties>
+</properties>
 
  <profiles>
   <!-- uml graphing -->
