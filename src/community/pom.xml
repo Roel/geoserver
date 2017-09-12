@@ -593,5 +593,15 @@
         <module>monitor-hibernate</module>
       </modules>
     </profile>
+    <profile>
+      <id>dov</id>
+      <modules>
+        <module>jdbcconfig</module>
+        <module>hz-cluster</module>
+        <module>jdbcstore</module>
+        <module>taskmanager</module>      
+     </modules>
+    </profile>
+
   </profiles>  
 </project>
