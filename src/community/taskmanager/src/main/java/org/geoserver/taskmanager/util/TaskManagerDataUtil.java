@@ -139,6 +139,7 @@ public class TaskManagerDataUtil {
         BatchElement batchElement = getOrCreateBatchElement(batch, task);
         if (!batch.getElements().contains(batchElement)) {
             batch.getElements().add(batchElement);
+            batchElement.setBatch(batch);
         }
         return batchElement;
     }
@@ -158,6 +159,7 @@ public class TaskManagerDataUtil {
         BatchElement batchElement = getOrCreateBatchElement(batch, task);
         batch.getElements().remove(batchElement);
         batch.getElements().add(position, batchElement);
+        batchElement.setBatch(batch);
         return batchElement;
     }
         
