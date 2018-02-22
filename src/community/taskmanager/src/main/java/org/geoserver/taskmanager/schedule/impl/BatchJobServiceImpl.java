@@ -53,7 +53,7 @@ public class BatchJobServiceImpl implements BatchJobService, ApplicationListener
     @Autowired
     TaskManagerFactory factory;
 
-    @Transactional
+    @Transactional("tmTransactionManager")
     protected void schedule(Batch batch) throws SchedulerException {
         JobKey jobKey = JobKey.jobKey(batch.getFullName());        
         
@@ -98,7 +98,7 @@ public class BatchJobServiceImpl implements BatchJobService, ApplicationListener
     }
     
     @Override
-    @Transactional
+    @Transactional("tmTransactionManager")
     public Batch saveAndSchedule(Batch batch) {
         batch = dao.save(batch);
         try {
@@ -110,7 +110,7 @@ public class BatchJobServiceImpl implements BatchJobService, ApplicationListener
     }
     
     @Override
-    @Transactional
+    @Transactional("tmTransactionManager")
     public Configuration saveAndSchedule(Configuration config) {
         config = dao.save(config);
 

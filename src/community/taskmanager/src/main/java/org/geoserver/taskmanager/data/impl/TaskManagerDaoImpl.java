@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@Transactional
+@Transactional("tmTransactionManager")
 public class TaskManagerDaoImpl implements TaskManagerDao {
     
     @Autowired
@@ -246,7 +246,8 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
     }
 
     @Override
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(transactionManager = "tmTransactionManager", 
+        propagation = Propagation.REQUIRES_NEW)
     public Configuration copyConfiguration(String configName) {
         ConfigurationImpl clone = (ConfigurationImpl) getConfiguration(configName);
         getSession().evict(clone);
@@ -281,5 +282,5 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
         }
         return clone;
     }
-
+    
 }
