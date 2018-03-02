@@ -32,6 +32,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.taskmanager.data.Attribute;
 import org.geoserver.taskmanager.data.Batch;
@@ -50,6 +52,7 @@ import org.geoserver.taskmanager.web.panel.BatchesPanel;
 import org.geoserver.taskmanager.web.panel.ButtonPanel;
 import org.geoserver.taskmanager.web.panel.DropDownPanel;
 import org.geoserver.taskmanager.web.panel.MultiLabelCheckBoxPanel;
+import org.geoserver.taskmanager.web.panel.NamePanel;
 import org.geoserver.taskmanager.web.panel.NewTaskPanel;
 import org.geoserver.taskmanager.web.panel.PanelListPanel;
 import org.geoserver.taskmanager.web.panel.SimpleAjaxSubmitLink;
@@ -273,8 +276,7 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                     @Override
                     protected boolean onSubmit(AjaxRequestTarget target,
                             Component contents) {
-                        if (configurationModel.getObject().getTasks().get(
-                                panel.getNameField().getModelObject()) != null) {
+                        if (getExistingTask(panel.getNameField().getModelObject()) != null) {
                             error(new ParamResourceModel("duplicateTaskName", getPage())
                                     .getString());
                             target.add(panel.getFeedbackPanel());
@@ -435,11 +437,64 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                 target.add(remove);
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             protected Component getComponentForProperty(String id, IModel<Task> itemModel,
-                    Property<Task> property) {
-                if (property.equals(TasksModel.PARAMETERS)) {
-                    final GeoServerTablePanel<Task> thisPanel = this;
+                    Property<Task> property) {           
+                final GeoServerTablePanel<Task> thisPanel = this;     
+                if (property.equals(TasksModel.NAME)) {                    
+                    IModel<String> nameModel = (IModel<String>) property.getModel(itemModel);
+                    return new SimpleAjaxSubmitLink(id, nameModel) {
+
+                        private static final long serialVersionUID = 2023797271780630795L;
+
+                        @Override
+                        protected void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                            dialog.setInitialWidth(400);
+                            dialog.setInitialHeight(100);                            
+                            dialog.setTitle(new ParamResourceModel("changeTaskName", getPage()));
+                            dialog.showOkCancel(target, new GeoServerDialog.DialogDelegate() {
+
+                                private static final long serialVersionUID = 7410393012930249966L;
+
+                                private NamePanel panel;
+                                
+                                @Override
+                                protected Component getContents(String id) {
+                                    panel = new NamePanel(id, nameModel);
+                                    panel.getTextField().add(
+                                       new IValidator<String>(){
+                                           private static final long serialVersionUID = 1L;
+
+                                           @Override
+                                           public void validate(IValidatable<String> validatable) {
+                                               Task existing = getExistingTask(validatable.getValue());
+                                               if (existing != null && !existing.equals(itemModel.getObject())) {
+                                                   validatable.error(new org.apache.wicket.validation.ValidationError(
+                                                           new ParamResourceModel("duplicateTaskName", getPage())
+                                                            .getString()));
+                                               }
+                                           }
+                                       });
+                                    return panel;
+                                }
+
+                                @Override
+                                protected boolean onSubmit(AjaxRequestTarget target,
+                                        Component contents) {
+                                    target.add(thisPanel);
+                                    return true;
+                                }
+                                
+                                @Override
+                                public void onError(final AjaxRequestTarget target, Form<?> form) {
+                                    target.add(panel.getFeedbackPanel());
+                                }
+                            });
+                        }
+                        
+                    };
+                } else if (property.equals(TasksModel.PARAMETERS)) {
                     return new SimpleAjaxSubmitLink(id, new IModel<String>() {
                         private static final long serialVersionUID = 519359570729184717L;
                         @Override public void detach() {}
@@ -624,6 +679,8 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                     if (doReturn) {
                         doReturn();
                     } else {
+                        oldTasks = new HashMap<>(configurationModel.getObject().getTasks());
+                        oldBatches = new HashMap<>(configurationModel.getObject().getBatches());
                         form.success(new ParamResourceModel("success", getPage()).getString());
                         target.add(batchesPanel);
                         ((MarkupContainer) batchesPanel.get("form:batchesPanel:listContainer:items")).removeAll();
@@ -648,7 +705,18 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                 addFeedbackPanels(target);
             }
         };
-    }   
+    }
+
+    private Task getExistingTask(String name) {
+        Task existing = configurationModel.getObject().getTasks().get(
+            name);
+        if (existing == null) {
+            //if we have deleted an old task with that name,
+            //but not yet clicked apply we cannot use name either.
+            existing = oldTasks.get(name);
+        }
+        return existing;
+    }
     
 
 }
