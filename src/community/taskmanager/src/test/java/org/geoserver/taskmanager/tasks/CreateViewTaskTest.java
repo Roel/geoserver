@@ -53,8 +53,8 @@ public class CreateViewTaskTest extends AbstractTaskManagerTest {
     private static final String WHERE = "gwl like 'BL%'";
     private static final int NUMBER_OF_RECORDS = 7;
     private static final int NUMBER_OF_COLUMNS = 1;
-
     private static final String VIEW_NAME_NEW_SCHEMA = "newschema.vw_grondwaterlichamen";
+    
     //attributes
     private static final String ATT_DB_NAME = "db";
     private static final String ATT_TABLE_NAME = "table_name";

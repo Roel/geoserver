@@ -26,7 +26,7 @@
     <bean class="org.geoserver.taskmanager.external.PostgisDbSourceImpl">
         <property name="name" value="mypostgresdb" />
         <property name="host" value="localhost" />
-        <property name="db" value="testsourcedb" />
+        <property name="db" value="mydb" />
         <property name="username" value="postgres" />
         <property name="password" value="postgres" />
     </bean>

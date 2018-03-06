@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collections;
 import java.util.Date;
 
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
@@ -64,22 +65,37 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
         dao.delete(batch);
         dao.delete(config);
     }
+    
 
     @Test
     public void testBatchElement() {
+        assertEquals(Collections.singletonList(config.getTasks().get("task")), 
+                dao.getTasksAvailableForBatch(batch));
+        
         Task task = config.getTasks().get("task");
         BatchElement el = util.addBatchElement(batch, task);
         batch = dao.save(batch);
         assertEquals(1, batch.getElements().size());  
+        assertEquals(Collections.emptyList(), 
+                dao.getTasksAvailableForBatch(batch));
+        
         el = batch.getElements().get(0);
+        
         //soft delete
         dao.remove(el);
         batch = dao.reload(batch);
         assertTrue(batch.getElements().isEmpty());  
+        assertEquals(Collections.singletonList(config.getTasks().get("task")), 
+                dao.getTasksAvailableForBatch(batch));
+        
         BatchElement el2 = util.addBatchElement(batch, task);
         assertEquals(el.getId(), el2.getId());
         batch = dao.save(batch);
         assertEquals(1, batch.getElements().size());  
+        assertEquals(Collections.emptyList(), 
+                dao.getTasksAvailableForBatch(batch));
+        
+        
         //hard delete
         dao.delete(batch.getElements().get(0));
         batch = dao.reload(batch);
@@ -116,6 +132,8 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
         task = util.init(config2.getTasks().get("task"));
         assertEquals(1, task.getBatchElements().size());
         assertFalse(config2.getBatches().get("my_batch").isEnabled());
+
+        dao.delete(config2);
     }
     
     @Test

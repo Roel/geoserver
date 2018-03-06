@@ -40,11 +40,12 @@ public abstract class AbstractTaskManagerTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        //set data directory
-        DATA_DIRECTORY = new MockData();
-        System.setProperty("GEOSERVER_DATA_DIR", 
-                DATA_DIRECTORY.getDataDirectoryRoot().toString());
-
+        if (DATA_DIRECTORY == null) {
+            //set data directory
+            DATA_DIRECTORY = new MockData();
+            System.setProperty("GEOSERVER_DATA_DIR", 
+                    DATA_DIRECTORY.getDataDirectoryRoot().toString());
+        }
     }
     
     protected boolean setupDataDirectory() throws Exception {

@@ -213,7 +213,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
     @SuppressWarnings("unchecked")
     @Override
     public List<BatchRun> getCurrentBatchRuns(final Batch batch) {
-        return (List<BatchRun>) (getSession().createCriteria(RunImpl.class) /*.setLockMode(LockMode.PESSIMISTIC_READ)*/
+        return (List<BatchRun>) (getSession().createCriteria(RunImpl.class)/*.setLockMode(LockMode.PESSIMISTIC_READ)*/
                 .createAlias("batchRun", "batchRun")
                 .createAlias("batchRun.batch", "batch")           
                 .add(Restrictions.eq("batch.id", batch.getId()))
