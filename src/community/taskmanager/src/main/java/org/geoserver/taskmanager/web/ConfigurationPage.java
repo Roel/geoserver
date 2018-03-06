@@ -161,11 +161,14 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                     TaskManagerBeans.get().getSecUtil().isAdminable(getSession().getAuthentication(), wi)) {
                 workspaces.add(wi.getName());
             }
-        }
-                
+        }                
+        boolean canBeNull = GeoServerApplication.get().getCatalog().getDefaultWorkspace() != null &&
+                TaskManagerBeans.get().getSecUtil().isAdminable(
+                getSession().getAuthentication(), 
+                GeoServerApplication.get().getCatalog().getDefaultWorkspace());
         form.add(new DropDownChoice<String>("workspace", 
                 new PropertyModel<String>(configurationModel, "workspace"), workspaces)
-                .setNullValid(true));
+                .setNullValid(canBeNull).setRequired(!canBeNull));
         
         TextField<String> name = new TextField<String>("description", 
                 new PropertyModel<String>(configurationModel, "description"));

@@ -4,6 +4,7 @@
  */
 package org.geoserver.taskmanager.web;
 
+import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.taskmanager.data.BatchElement;
 import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.data.Task;
@@ -12,6 +13,7 @@ import org.geoserver.taskmanager.web.model.ConfigurationsModel;
 import org.geoserver.taskmanager.web.panel.DropDownPanel;
 import org.geoserver.taskmanager.web.panel.MultiLabelCheckBoxPanel;
 import org.geoserver.web.ComponentAuthorizer;
+import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.GeoServerSecuredPage;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.GeoServerTablePanel;
@@ -140,6 +142,11 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                         error(new ParamResourceModel("stillRunning",
                                 AbstractConfigurationsPage.this, config.getName()).getString());
                         someCant = true;
+                    } else if (!TaskManagerBeans.get().getSecUtil().isAdminable(
+                        AbstractConfigurationsPage.this.getSession().getAuthentication(), config)) {
+                        error(new ParamResourceModel("noDeleteRights",
+                                AbstractConfigurationsPage.this, config.getName()).getString());
+                        someCant = true;
                     }
                 }
                 if (someCant) {
@@ -215,7 +222,7 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
         remove.setOutputMarkupId(true);
         remove.setEnabled(false);
         
-        // the removal button
+        // the copy button
         add(copy = new AjaxLink<Object>("copySelected") {
             private static final long serialVersionUID = 3581476968062788921L;
 
@@ -223,7 +230,13 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
             public void onClick(AjaxRequestTarget target) {
                 Configuration copy = TaskManagerBeans.get().getDao().copyConfiguration(
                         configurationsPanel.getSelection().get(0).getName());
-                
+                //make sure we can't copy with workspace we don't have access to
+                WorkspaceInfo wi = GeoServerApplication.get().getCatalog().getWorkspaceByName(copy.getWorkspace());
+                if (wi == null ||
+                    !TaskManagerBeans.get().getSecUtil().isAdminable(
+                            AbstractConfigurationsPage.this.getSession().getAuthentication(), wi)) {
+                    copy.setWorkspace(null);
+                }
                 setResponsePage(new ConfigurationPage(copy));
             }
         });

@@ -123,6 +123,12 @@ public class BatchesPanel extends Panel {
                         error(new ParamResourceModel("stillRunning",
                                 BatchesPanel.this, batch.getFullName()).getString());
                         someCant = true;
+                    } else if (!TaskManagerBeans.get().getSecUtil().isAdminable(
+                            ((GeoServerBasePage) getPage()).getSession().getAuthentication(),
+                            batch)) {
+                        error(new ParamResourceModel("noDeleteRights",
+                                BatchesPanel.this, batch.getName()).getString());
+                        someCant = true;
                     }
                 }
                 if (someCant) {

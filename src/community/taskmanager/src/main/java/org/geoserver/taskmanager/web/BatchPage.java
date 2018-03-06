@@ -112,10 +112,13 @@ public class BatchPage extends GeoServerSecuredPage {
                 workspaces.add(wi.getName());
             }
         }
-                
+        boolean canBeNull = GeoServerApplication.get().getCatalog().getDefaultWorkspace() != null &&
+                TaskManagerBeans.get().getSecUtil().isAdminable(
+                getSession().getAuthentication(), 
+                GeoServerApplication.get().getCatalog().getDefaultWorkspace());
         form.add(new DropDownChoice<String>("workspace", 
                 new PropertyModel<String>(batchModel, "workspace"), workspaces)
-                .setNullValid(true));
+                .setNullValid(canBeNull).setRequired(!canBeNull));
         
         form.add(new TextField<String>("description", 
                 new PropertyModel<String>(batchModel, "description")));
