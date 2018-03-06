@@ -46,9 +46,9 @@ public class RunImpl extends BaseImpl implements Run {
     @Enumerated
     private Status status = Status.RUNNING;
     
-    @Column(length = Integer.MAX_VALUE)
+    @Column
     @Lob
-    private String message;
+    private byte[] message;
 
     @ManyToOne
     @JoinColumn(name = "batchRun")
@@ -105,12 +105,12 @@ public class RunImpl extends BaseImpl implements Run {
 
     @Override
     public String getMessage() {
-        return message;
+        return message == null ? null : new String(message);
     }
 
     @Override
     public void setMessage(String message) {
-        this.message = message;
+        this.message = message == null ? null : message.getBytes();
     }
 
     @Override
