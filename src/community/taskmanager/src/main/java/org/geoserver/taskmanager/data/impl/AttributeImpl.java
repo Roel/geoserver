@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -31,8 +32,9 @@ public class AttributeImpl extends BaseImpl implements Attribute {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, columnDefinition="TEXT")
-    private String value;
+    @Column(nullable = false)
+    @Lob
+    private byte[] value;
     
     @ManyToOne
     @JoinColumn(name = "configuration")
@@ -50,12 +52,12 @@ public class AttributeImpl extends BaseImpl implements Attribute {
 
     @Override
     public String getValue() {
-        return value;
+        return value == null ? null : new String(value);
     }
 
     @Override
     public void setValue(String value) {
-        this.value = value;
+        this.value = value == null ? null : value.getBytes();
     }
 
     @Override
