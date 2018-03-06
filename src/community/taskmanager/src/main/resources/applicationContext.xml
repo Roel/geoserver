@@ -64,7 +64,7 @@
        <property name="order" value="1000" />
     </bean>
     
-    <bean id="taskManagerMenuAuthorizer" class="org.geoserver.web.AuthenticatedComponentAuthorizer" />
+    <bean id="taskManagerMenuAuthorizer" class="org.geoserver.web.WorkspaceAdminComponentAuthorizer" />
     
     <bean id="templatesPage" class="org.geoserver.web.MenuPageInfo">
        <property name="id" value="templatesPage"/>
