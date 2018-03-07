@@ -14,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -48,7 +47,6 @@ public class RunImpl extends BaseImpl implements Run {
     private Status status = Status.RUNNING;
     
     @Column
-    @Lob
     private byte[] message;
 
     @ManyToOne(cascade = CascadeType.MERGE)
