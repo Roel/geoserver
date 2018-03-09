@@ -1,8 +1,16 @@
+/* (c) 2017-2018 Open Source Geospatial Foundation - all rights reserved
+ * This code is licensed under the GPL 2.0 license, available at the root
+ * application directory.
+ */
 package org.geoserver.taskmanager.tasks;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.DataStoreInfo;
@@ -14,12 +22,14 @@ import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.data.Task;
 import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.geoserver.taskmanager.data.TaskManagerFactory;
+import org.geoserver.taskmanager.external.DbSource;
 import org.geoserver.taskmanager.schedule.BatchJobService;
+import org.geoserver.taskmanager.util.LookupService;
 import org.geoserver.taskmanager.util.TaskManagerDataUtil;
 import org.geoserver.taskmanager.util.TaskManagerTaskUtil;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -28,7 +38,12 @@ import org.quartz.TriggerBuilder;
 import org.quartz.Trigger.TriggerState;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore
+/**
+ * To run this test you should have a postgres running on localhost with database 'mydb' 
+ * (or configure in application context), initiated with create-source.sql.
+ * 
+ * @author Niels Charlier
+ */
 public class DbLocalPublicationTaskTest extends AbstractTaskManagerTest {
     
     //configure these constants
@@ -64,6 +79,9 @@ public class DbLocalPublicationTaskTest extends AbstractTaskManagerTest {
     
     @Autowired
     private TaskManagerTaskUtil taskUtil;
+
+    @Autowired
+    private LookupService<DbSource> dbSources;
     
     private Configuration config;
     
@@ -76,6 +94,14 @@ public class DbLocalPublicationTaskTest extends AbstractTaskManagerTest {
     
     @Before
     public void setupBatch() {
+        try (Connection conn = dbSources.get(DB_NAME).getDataSource().getConnection()) {
+            try (ResultSet res = conn.getMetaData().getTables(null, null, TABLE_NAME, null)) {
+                Assume.assumeTrue(res.next());
+            }
+        } catch (SQLException e) {
+            Assume.assumeTrue(false);
+        }
+        
         config = fac.createConfiguration();  
         config.setName("my_config");
         config.setWorkspace("some_ws");
@@ -101,8 +127,12 @@ public class DbLocalPublicationTaskTest extends AbstractTaskManagerTest {
 
     @After
     public void clearDataFromDatabase() {
-        dao.delete(batch);
-        dao.delete(config);
+        if (batch != null) {
+            dao.delete(batch);
+        }
+        if (config != null) {
+            dao.delete(config);
+        }
     }
     
     @Test

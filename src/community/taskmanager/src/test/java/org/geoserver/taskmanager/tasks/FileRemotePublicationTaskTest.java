@@ -25,8 +25,8 @@ import org.geoserver.taskmanager.util.LookupService;
 import org.geoserver.taskmanager.util.TaskManagerDataUtil;
 import org.geoserver.taskmanager.util.TaskManagerTaskUtil;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -43,7 +43,6 @@ import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
  * 
  * @author Niels Charlier
  */
-@Ignore
 public class FileRemotePublicationTaskTest extends AbstractTaskManagerTest {
 
     private static final String ATT_LAYER = "layer";
@@ -80,9 +79,11 @@ public class FileRemotePublicationTaskTest extends AbstractTaskManagerTest {
         DATA_DIRECTORY.addWcs11Coverages();
         return true;
     }
-                        
+    
     @Before
-    public void setupBatch() throws Exception {                
+    public void setupBatch() throws Exception { 
+        Assume.assumeTrue(extGeoservers.get("mygs").getRESTManager().getReader().existGeoserver());
+        
         config = fac.createConfiguration();  
         config.setName("my_config");
         config.setWorkspace("some_ws");
@@ -107,8 +108,12 @@ public class FileRemotePublicationTaskTest extends AbstractTaskManagerTest {
 
     @After
     public void clearDataFromDatabase() {
-        dao.delete(batch);
-        dao.delete(config);
+        if (batch != null) {
+            dao.delete(batch);
+        }
+        if (config != null) {
+            dao.delete(config);
+        }
     }
     
     @Test

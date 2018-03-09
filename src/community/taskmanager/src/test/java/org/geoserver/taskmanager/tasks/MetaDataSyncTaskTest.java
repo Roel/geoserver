@@ -24,8 +24,8 @@ import org.geoserver.taskmanager.util.LookupService;
 import org.geoserver.taskmanager.util.TaskManagerDataUtil;
 import org.geoserver.taskmanager.util.TaskManagerTaskUtil;
 import org.junit.After;
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -42,7 +42,6 @@ import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
  * 
  * @author Niels Charlier
  */
-@Ignore
 public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
 
     private static final String ATT_LAYER = "layer";
@@ -82,7 +81,9 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
     }
                         
     @Before
-    public void setupBatch() throws Exception {                
+    public void setupBatch() throws Exception {           
+        Assume.assumeTrue(extGeoservers.get("mygs").getRESTManager().getReader().existGeoserver());
+        
         config = fac.createConfiguration();  
         config.setName("my_config");
         config.setWorkspace("some_ws");
@@ -119,9 +120,15 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
 
     @After
     public void clearDataFromDatabase() {
-        dao.delete(batchCreate);
-        dao.delete(batchSync);
-        dao.delete(config);
+        if (batchCreate != null) {
+            dao.delete(batchCreate);
+        }
+        if (batchSync != null) {
+            dao.delete(batchSync);
+        }
+        if (config != null) {
+            dao.delete(config);
+        }
     }
     
     @Test
