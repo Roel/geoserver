@@ -137,27 +137,41 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
     }
     
     @Test
-    public void testBatchRun() {
+    public void testBatchRun() { 
+        assertTrue(dao.getCurrentBatchRuns(batch).isEmpty());
+        
         BatchRun br = fac.createBatchRun();
+        br.setBatch(batch);
         
         Run run = fac.createRun();
+        run.setBatchRun(br);
         run.setStart(new Date(1000));
         run.setEnd(new Date(2000));
-        run.setStatus(Status.COMMITTED);   
+        run.setStatus(Status.READY_TO_COMMIT);   
         br.getRuns().add(run);
         
         run = fac.createRun();
+        run.setBatchRun(br);
         run.setStart(new Date(2000));
         run.setEnd(new Date(3000));
-        run.setStatus(Status.NOT_COMMITTED);    
+        run.setStatus(Status.COMMITTING);    
         run.setMessage("foo");
         br.getRuns().add(run);
         
         run = fac.createRun();
+        run.setBatchRun(br);
         run.setStart(new Date(3000));
         run.setEnd(new Date(4000));
         run.setStatus(Status.COMMITTED);        
         br.getRuns().add(run);
+        
+        assertEquals(Status.COMMITTING, br.getStatus());
+        
+        br = dao.save(br);
+        assertEquals(1, dao.getCurrentBatchRuns(batch).size());
+
+        br = util.closeBatchRun(br, "foo");
+        assertEquals(0, dao.getCurrentBatchRuns(batch).size());
         
         assertEquals(new Date(1000), br.getStart());
         assertEquals(new Date(4000), br.getEnd());
