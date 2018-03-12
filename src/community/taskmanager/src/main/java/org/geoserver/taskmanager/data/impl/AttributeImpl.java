@@ -31,7 +31,7 @@ public class AttributeImpl extends BaseImpl implements Attribute {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length=8192)
     private byte[] value;
     
     @ManyToOne

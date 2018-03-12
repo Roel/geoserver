@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
 import org.geoserver.taskmanager.beans.DummyAction;
@@ -25,6 +25,7 @@ import org.geoserver.taskmanager.data.Parameter;
 import org.geoserver.taskmanager.data.Task;
 import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.geoserver.taskmanager.data.TaskManagerFactory;
+import org.geoserver.taskmanager.schedule.BatchContext;
 import org.geoserver.taskmanager.schedule.ParameterType;
 import org.geoserver.taskmanager.schedule.TaskContext;
 import org.geoserver.taskmanager.schedule.TaskException;
@@ -106,15 +107,37 @@ public class TaskManagerTaskUtilTest extends AbstractTaskManagerTest {
         TaskContext context = taskUtil.createContext(task1);
         assertEquals(task1, context.getTask());
         assertNotNull(context.getParameterValues());
-        assertNull(context.getBatchRun());
-        assertNull(context.getTempValues());
+        assertNull(context.getBatchContext());
         
-        context = taskUtil.createContext(task1, fac.createBatchRun(), 
-                new HashMap<Object, Object>());
+        BatchContext bContext = taskUtil.createContext(fac.createBatchRun());
+        bContext.put("foo", "bar");
+        context = taskUtil.createContext(task1, bContext);
         assertEquals(task1, context.getTask());
         assertNotNull(context.getParameterValues());
-        assertNotNull(context.getTempValues());
-        assertNotNull(context.getBatchRun());
+        assertNotNull(context.getBatchContext());
+        assertNotNull(context.getBatchContext().getBatchRun());
+        assertEquals("bar", context.getBatchContext().get("foo"));
+    }
+    
+    @Test
+    public void testBatchContext() throws TaskException {
+        final AtomicInteger counter = new AtomicInteger(0);
+        BatchContext bContext = taskUtil.createContext(fac.createBatchRun());
+        bContext.put("foo", "bar");
+        bContext.get("foo", new BatchContext.Dependency() {
+            @Override
+            public void revert() throws TaskException {
+                counter.set(counter.get() + 1);
+            }            
+        });
+        bContext.get("foo", new BatchContext.Dependency() {
+            @Override
+            public void revert() throws TaskException {
+                counter.set(counter.get() + 2);
+            }            
+        });
+        bContext.delete("foo");
+        assertEquals(3, counter.get());
     }
     
     @Test
@@ -193,8 +216,6 @@ public class TaskManagerTaskUtilTest extends AbstractTaskManagerTest {
         assertEquals(ValidationErrorType.INVALID_VALUE, errors.get(0).getType());
         assertEquals(ValidationErrorType.INVALID_PARAM, errors.get(1).getType());
         assertEquals(ValidationErrorType.MISSING, errors.get(2).getType());
-        
-        //TODO: validate batch (see init configs)
     }
     
     @Test

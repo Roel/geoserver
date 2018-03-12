@@ -62,7 +62,7 @@ public class TestTaskTypeImpl implements TaskType {
 
     @Override
     public TaskResult run(TaskContext ctx) throws TaskException {
-        String identifier = ctx.getBatchRun().getBatch().getFullName() 
+        String identifier = ctx.getBatchContext().getBatchRun().getBatch().getFullName() 
                 + ":" + ctx.getTask().getFullName();
         LOGGER.log(Level.INFO, "running task " + identifier);
         

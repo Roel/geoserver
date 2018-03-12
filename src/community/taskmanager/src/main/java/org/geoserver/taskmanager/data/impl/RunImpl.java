@@ -45,7 +45,7 @@ public class RunImpl extends BaseImpl implements Run {
     @Enumerated
     private Status status = Status.RUNNING;
     
-    @Column
+    @Column(length=8192)
     private byte[] message;
 
     @ManyToOne
