@@ -22,6 +22,7 @@ import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.MetadataLinkInfo;
 import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.catalog.StoreInfo;
+import org.geoserver.catalog.StyleInfo;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.taskmanager.external.ExtTypes;
 import org.geoserver.taskmanager.external.ExternalGS;
@@ -123,6 +124,10 @@ public class MetadataSyncTaskTypeImpl implements TaskType {
         layerEncoder.setDefaultStyle(layer.getDefaultStyle().getWorkspace() == null ? null : 
             layer.getDefaultStyle().getWorkspace().getName(), 
             layer.getDefaultStyle().getName());
+        for (StyleInfo si : layer.getStyles()) {
+            layerEncoder.addStyle(si.getWorkspace() != null ? si.getWorkspace() + ":" + si.getName()
+                            : si.getName());
+        }
 
         if (!restManager.getPublisher().configureLayer(ws, layer.getName(), layerEncoder)) {
             throw new TaskException("Failed to configure layer " + ws + ":" + resource.getName());

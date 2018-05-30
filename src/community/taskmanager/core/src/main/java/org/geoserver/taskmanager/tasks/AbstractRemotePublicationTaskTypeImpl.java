@@ -216,11 +216,11 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
             if (layer.getDefaultStyle() != null) {
                 layerEncoder.setDefaultStyle(wsName(layer.getDefaultStyle().getWorkspace()),
                         layer.getDefaultStyle().getName());
-                for (StyleInfo si : layer.getStyles()) {
-                    layerEncoder.addStyle(
-                            si.getWorkspace() != null ? si.getWorkspace() + ":" + si.getName()
-                                    : si.getName());
-                }
+            }
+            for (StyleInfo si : layer.getStyles()) {
+                layerEncoder.addStyle(
+                        si.getWorkspace() != null ? si.getWorkspace() + ":" + si.getName()
+                                : si.getName());
             }
             if (!restManager.getPublisher().configureLayer(ws, tempName, layerEncoder)) {
                 throw new TaskException(
