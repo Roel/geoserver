@@ -27,13 +27,13 @@ By default, Task Manager will create a H2 database in its configuration director
 
 The configuration directory also contains a Spring configuration file called `taskManager-applicationContext.xml` which allows more advanced configuration.
 
-TaskManager uses [Quartz Scheduler](http://www.quartz-scheduler.org). If you are running Task Manager in a clustered environment, you must configure Quartz to use a database as well as Task Manager. See the commented block in the spring configuration and the [Quartz documentation](http://www.quartz-scheduler.org/documentation/quartz-2.x/configuration/ConfigJDBCJobStoreClustering.html) for further instructions. The database used by Quartz may be the same as the Task Manager configuration database.
+TaskManager uses [Quartz Scheduler](http://www.quartz-scheduler.org). If you are running Task Manager in a clustered environment, you must configure Quartz to use a database as well as Task Manager. See the commented block in the Spring configuration and the [Quartz documentation](http://www.quartz-scheduler.org/documentation/quartz-2.x/configuration/ConfigJDBCJobStoreClustering.html) for further instructions. The database used by Quartz may be the same as the Task Manager configuration database.
 
 Furthermore, a property should be added to the `taskmanager.properties` file each of the nodes except for one: ``batchJobService.init=false``. This is necessary because otherwise all of the nodes will attempt to load all of the same batches in to the clustered quartz database at the same time at start-up, which is likely to cause issues. This initialisation needs to happen only once for the entire cluster.
 
 ### Databases
 
-Task Manager allows any number of databases to be used both as sources and targets for data transfer operations. These are configured via the Spring configuration file. Currently only PostGis is supported, either via JNDI or directly via JDBC.
+Task Manager allows any number of databases to be used both as sources and targets for data transfer operations. These are configured via the Spring configuration file. Currently only PostGIS is supported, either via JNDI or directly via JDBC.
 
 ```xml
 <bean class="org.geoserver.taskmanager.external.impl.PostgisDbSourceImpl"> 
@@ -131,19 +131,19 @@ From the [configurations](basic.md#configurations) page, new configurations can 
 
 ![configurations](img/configurations.png)
 
-When removing a configuration, you have to option to do a *clean-up*, which will attempt to remove all resources (database tables, files, layers) that were created by this configuration. If this (partially) fails, the configuration will still be removed and the user will be notified.
+When removing a configuration, you have to option to do a *clean-up*, which will attempt to remove all resources (database tables, files, layers) that were created by (tasks of) this configuration. If this (partially) fails, the configuration will still be removed and the user will be notified.
 
 Once you open a new or existing configuration, attributes, tasks and batches can be edited.
 
 ![workflow config 2](img/template-db-workflow-config2.png)
 
-The attribute table adjusts automatically based on the information in the tasks table; and only the values must be filled in. In the task table, the name and parameters of each task can be edited, and new tasks can be created. Tasks can only be removed if they are not part of a batch any longer. Batches can only be removed if they are not running anywhere. When removing a task, you have to option to do a *clean-up*, which will attempt to remove all resources (database tables, files, layers) that were created by this task. If this (partially) fails, the configuration will still be removed and the user will be notified. 
+The attribute table adjusts automatically based on the information in the tasks table; and only the values must be filled in. In the task table, the name and parameters of each task can be edited, and new tasks can be created. Tasks can only be removed if they are not part of a batch any longer. Batches can only be removed if they are not running anywhere. When removing a task, you have to option to do a *clean-up*, which will attempt to remove all resources (database tables, files, layers) that were created by this task. If this (partially) fails, the task will still be removed and the user will be notified. 
 
 Batches can be created and edited from here as well, however the configuration must exist in order to be able to do that (in case of a new configuration, you must click `apply` once before you can create new batches). New tasks must also be saved (again, via the `apply` button) before they can be added to a batch. In case that the [conditions](basic.md#batches) are met, batch runs can be started, and the status/history of current and past batch runs can be displayed. Current batch runs can be interrupted (which is not guaranteed to happen immediately).
 
 ### Batches
 
-From the [batches](basic.md#batches) page, new batches (not associated with a configuration) can be created, existing batches can be edited and removed. All existing batches - with or without configurations - are shown, unless they are special (if they start with a `@`) or if the configuration has not yet been completed (see [initializing templates](basic.md#initializing-templates)). 
+From the [batches](basic.md#batches) page, new independent batches (not associated with a configuration) can be created, existing batches can be edited and removed. All existing batches - independent as well as belonging to a configuration - are shown, unless they are special (if they start with a `@`) or if the configuration has not yet been completed (see [initializing templates](basic.md#initializing-templates)). 
 
 ![batches](img/batches.png)
 
