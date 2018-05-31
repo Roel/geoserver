@@ -493,7 +493,6 @@ public class TaskManagerTaskUtil {
                         if (value == null) {
                             validationErrors.add(new ValidationError(ValidationErrorType.MISSING_DEPENDENCY, 
                                     dependsOn.getName(), parameter.getKey(), taskType.getName()));
-                            continue;
                         }
                         dependsOnValues.add(value);
                     }

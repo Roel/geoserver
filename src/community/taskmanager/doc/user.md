@@ -13,7 +13,7 @@
 
 To install the GeoServer Task Manager extension:
 
-* Download the extension from the [GeoServer Download Page](http://geoserver.org/download). The file name is called `geoserver-*-taskmanager-plugin.zip`, where `*` is the version/snapshot name.
+* Download the extension from the [GeoServer Download Page](http://geoserver.org/download). The file name is called `geoserver-*-taskmanager-core-plugin.zip`, where `*` is the version/snapshot name. For [S3 support](#s3-file-service), also install the plugin with name `geoserver-*-taskmanager-s3-plugin.zip`, where `*` is the version/snapshot name.
 
 * Extract this file and place the JARs in ``WEB-INF/lib``.
 
@@ -33,7 +33,7 @@ Furthermore, a property should be added to the `taskmanager.properties` file eac
 
 ### Databases
 
-Task Manager allows any number of databases to be used both as sources and targets for data transfer operations. These are configured via the Spring configuration file. Currently only PostGis is supported.
+Task Manager allows any number of databases to be used both as sources and targets for data transfer operations. These are configured via the Spring configuration file. Currently only PostGis is supported, either via JNDI or directly via JDBC.
 
 ```xml
 <bean class="org.geoserver.taskmanager.external.impl.PostgisDbSourceImpl"> 
@@ -43,6 +43,20 @@ Task Manager allows any number of databases to be used both as sources and targe
 	<!-- optional --> <property name="schema" value="schema" /> 
 	<property name="username" value="username" />
 	<property name="password" value="password" /> 
+</bean>
+```
+
+```xml
+<bean class="org.geoserver.taskmanager.external.impl.PostgisJndiDbSourceImpl">
+  	<property name="name" value="geologie-werk-databank" />
+  	<property name="jndiName" value="java:/comp/env/jdbc/my-jndi-source" />
+  	<!-- optional --> <property name="schema" value="schema" /> 
+  	<!-- optional, if database has different jndi name on target geoserver servers -->  
+  	 <property name="targetJndiNames">
+  	 <map>
+  	    <entry key="mygs" value="java:/comp/env/jdbc/my-jndi-source-on-mygs" />
+  	 </map>
+  	</property>
 </bean>
 ```
 
@@ -63,12 +77,29 @@ Task Manager allows any number of external geoservers to be used as targets for 
 
 File Services are used to upload and access files such as raster layers. They are configured via the Spring configuration file.
 
+#### Regular File Service
+
+Regular file services provide support for rasters that are stored on the hard drive.
+
 ```xml
 <bean class="org.geoserver.taskmanager.fileservice.impl.FileServiceImpl">
     <property name="rootFolder" value="/tmp"/>
     <property name="name" value="Temporary Directory"/>
 </bean>
 ```
+
+#### S3 File Service
+
+S3 File Services provide support for rasters that are stored on an S3 compatible server.
+
+They do not need to be configured via the application context, but are taken from the properties file provided via the property `s3.properties.location` 
+(see [S3 DataStore](https://github.com/geotools/geotools/tree/master/modules/unsupported/s3-geotiff#geotiffs-hosted-on-other-amazon-s3-compatible-services).
+
+A service will be created for each service and each bucket. We must add one line per alias to the `s3.properties` file:
+
+`alias.s3.rootfolder=comma,separated,list,of,buckets`
+
+The above example will create five s3 file services: alias-comma, alias-separated, alias-list, alias-of and alias-buckets.
 
 ## Security
 
@@ -88,39 +119,63 @@ Currently GeoServer Task Manager can only be configured and operated from the Ge
 
 From the templates page, new templates can be created (or copied from existing templates), existing templates can be edited and removed. 
 
-Once you open a new or existing template, attributes, tasks and batches can be edited. The attribute table adjusts automatically based on the information in the tasks table; and only the values must be filled in. In the task table, the name and parameters of each task can be edited, and new tasks can be created. Batches can be created and edited from here as well, however the template must exist in order to be able to do that (in case of a new template, one must click `apply` once before creating new batches). Batches created or edited from here are not permanent until the template has been saved. 
+![templates](img/templates.png)
+
+Once you open a new or existing template, attributes, tasks and batches can be edited. The attribute table adjusts automatically based on the information in the tasks table; and only the values must be filled in. In the task table, the name and parameters of each task can be edited, and new tasks can be created. Batches can be created and edited from here as well, however the template must exist in order to be able to do that (in case of a new template, you must click `apply` once before you can create new batches). New tasks must also be saved (again, via the `apply` button) before they can be added to a batch.
+
+![template db workflow](img/template-db-workflow.png)
 
 ### Configurations
 
-From the configurations page, new configurations can be created from scratch or from templates (or copied from existing configurations), existing configurations can be edited and removed. 
+From the [configurations](basic.md#configurations) page, new configurations can be created from scratch or from templates (or copied from existing configurations), existing configurations can be edited and removed. 
 
-Once you open a new or existing configuration, attributes, tasks and batches can be edited. The attribute table adjusts automatically based on the information in the tasks table; and only the values must be filled in. In the task table, the name and parameters of each task can be edited, and new tasks can be created. Batches can be created and edited from here as well, however the configuration must exist in order to be able to do that (in case of a new configuration, one must click `apply` once before creating batches). Batches created or edited from here are not permanent until the template has been saved. Also, in case that the [[conditions]](basic.md#batches) are met, batch runs can be started, and the status/history of current and past batch runs can be displayed.
+![configurations](img/configurations.png)
 
+When removing a configuration, you have to option to do a *clean-up*, which will attempt to remove all resources (database tables, files, layers) that were created by this configuration. If this (partially) fails, the configuration will still be removed and the user will be notified.
 
+Once you open a new or existing configuration, attributes, tasks and batches can be edited.
+
+![workflow config 2](img/template-db-workflow-config2.png)
+
+The attribute table adjusts automatically based on the information in the tasks table; and only the values must be filled in. In the task table, the name and parameters of each task can be edited, and new tasks can be created. Tasks can only be removed if they are not part of a batch any longer. Batches can only be removed if they are not running anywhere. When removing a task, you have to option to do a *clean-up*, which will attempt to remove all resources (database tables, files, layers) that were created by this task. If this (partially) fails, the configuration will still be removed and the user will be notified. 
+
+Batches can be created and edited from here as well, however the configuration must exist in order to be able to do that (in case of a new configuration, you must click `apply` once before you can create new batches). New tasks must also be saved (again, via the `apply` button) before they can be added to a batch. In case that the [conditions](basic.md#batches) are met, batch runs can be started, and the status/history of current and past batch runs can be displayed. Current batch runs can be interrupted (which is not guaranteed to happen immediately).
 
 ### Batches
 
-From the batches page, new templates can be batches, existing batches can be edited and removed. Also, in case that the [[conditions]](basic.md#batches) are met, batch runs can be started, and the status/history of current and past batch runs can be displayed.
+From the [batches](basic.md#batches) page, new batches (not associated with a configuration) can be created, existing batches can be edited and removed. All existing batches - with or without configurations - are shown, unless they are special (if they start with a `@`) or if the configuration has not yet been completed (see [initializing templates](basic.md#initializing-templates)). 
+
+![batches](img/batches.png)
+
+In case that the [conditions](basic.md#batches) are met, batch runs can be started, and the status/history of current and past batch runs can be displayed. Current batch runs can be interrupted (which is not guaranteed to happen immediately).
+
+![batchruns](img/batchruns.png)
+
+![batchrun](img/batchrun.png)
+
+Once you open a new or existing batch, one can add or remove tasks from it and change the order of the tasks. You can also enable/disable the batch (if disabled, the batch is not scheduled) and choose the scheduling time. The user can choose between a daily schedule (with time), weekly (with day of week and time), monthly (with day of month and time) or specify a custom [cron expression](http://www.quartz-scheduler.org/documentation/quartz-2.x/tutorials/crontrigger.html).
+
+![batch synchronize](img/template-db-workflow-batch-sync.png)
 
 ## Task Types
 
-* [CopyTableTask] Copy a database table from one database to another. The user can specify a source database, source table name, target database and target table name. Supports commit/rollback by creating a temporary table.
+* `CopyTableTask` Copy a database table from one database to another. The user can specify a source database, source table name, target database and target table name. Supports commit/rollback by creating a temporary table.
 
-* [CreateViewTask] Create a view based on a single table. The user can specify the database, the table name, the selected fields and (optionally) a where condition. Supports commit/rollback by creating a temporary view.
+* `CreateViewTask` Create a view based on a single table. The user can specify the database, the table name, the selected fields and (optionally) a where condition. Supports commit/rollback by creating a temporary view.
 
-* [CreateComplexViewTask] Create a view based on a multiple tables. The user can specify the database and a whole query, where it can use any other configuration attribute in the form of '${placeholder}'. Supports commit/rollback by creating a temporary view.
+* `CreateComplexViewTask` Create a view based on a multiple tables. The user can specify the database and a whole query, where it can use any other configuration attribute in the form of '${placeholder}'. Supports commit/rollback by creating a temporary view.
 
-* [CopyFileTask] Copy a file from one file service to another. Commit/rollback is supported by a versioning system, where the version of the file is inserted into the file name. The location of the version number is specified in the path as `###`. On commit, the older version is removed. On rollback, the newer version is removed. The publication tasks will automatically publish the latest version.
+* `CopyFileTask` Copy a file from one file service to another. Commit/rollback is supported by a versioning system, where the version of the file is inserted into the file name. The location of the version number is specified in the path as `###`. On commit, the older version is removed. On rollback, the newer version is removed. The publication tasks will automatically publish the latest version.
 
-* [LocalDbPublicationTask] Publish a database layer locally. The user can specify database, table and a layer name. Supports commit/rollback by advertising or removing the layer it created.
+* `LocalDbPublicationTask` Publish a database layer locally. The user can specify database, table and a layer name. Supports commit/rollback by advertising or removing the layer it created.
 
-* [RemoteDbPublicationTask] Publish a database layer to another geoserver. The user can specify a target geoserver, a source layer and a target database. All information is taken from the source layer except for the target database which may be different. Supports commit/rollback through creating a temporary (unadvertised) layer.
+* `RemoteDbPublicationTask` Publish a database layer to another geoserver. The user can specify a target geoserver, a source layer and a target database. All information is taken from the source layer except for the target database which may be different. Supports commit/rollback through creating a temporary (unadvertised) layer.
 
-* [LocalFilePublicationTask] Publish a file layer locally (taster or shapefile). The user can specify a file service, a file (which can be uploaded unto the service) and a layer name. Supports commit/rollback by advertising or removing the layer it created.
+* `LocalFilePublicationTask` Publish a file layer locally (taster or shapefile). The user can specify a file service, a file (which can be uploaded unto the service) and a layer name. Supports commit/rollback by advertising or removing the layer it created.
 
-* [RemoteFilePublicationTask] Publish a file layer locally (taster or shapefile). The user can specify a target geoserver, a source layer and a target file service and path (optional). All information is taken from the source layer except for the file service and path which may be different. Supports commit/rollback through creating a temporary (unadvertised) layer.
+* `RemoteFilePublicationTask` Publish a file layer locally (taster or shapefile). The user can specify a target geoserver, a source layer and a target file service and path (optional). All information is taken from the source layer except for the file service and path which may be different. Supports commit/rollback through creating a temporary (unadvertised) layer.
 
-* [MetaDataSyncTask] Synchronise the metadata between a local layer and a layer on another geoserver (without re-publishing). The user can specify a target geoserver, a local and a remote layer. Does not support commit/rollback.
+* `MetaDataSyncTask` Synchronise the metadata between a local layer and a layer on another geoserver (without re-publishing). The user can specify a target geoserver, a local and a remote layer. Does not support commit/rollback.
 
 ## Import Tool
 
@@ -129,5 +184,67 @@ The import tool allows bulk creation of an unlimited amount of configurations on
 To invoke the import tool, ``POST`` your CSV file to ``http://{geoserver-host}/geoserver/taskmanager-import/{template}``
 
 ## Examples
+
+Consider the following setup.
+
+Three geoservers:
+
+* `work geoserver`: a geoserver only available in the local network, only used by administrators. New and updated data is published here as layers for the first time, to test both the validity of data and the publication configuration.
+
+* `internal geoserver`: a geoserver only available in the local network, for internal users.
+
+* `public geoserver`: a geoserver available on the internet, for the general public.
+
+Several databases:
+
+* `multiple source databases`: these are databases provided by partners that provide new and updated data. they are not used to directly publish on a geoserver.
+
+* `work database`: database used by the `work geoserver` where its vector data is stored.
+
+* `internal database`: database used by the `internal geoserver` where its vector data is stored.
+
+* `public database`: database used by the `public geoserver` where its vector data is stored.
+
+A typical workflow for a new layer goes as follows:
+
+1. A new table is copied from a `source database` to the `work database` and then published on the `work geoserver`
+
+2. After testing, the table is either copied to the `internal database` and published on the `internal geoserver` or copied to the `public database` and published on the `public geoserver`.
+
+3. Every week, data is synchronised between the three databases and metadata is synchronised between the two geoservers.
+
+Taskmanager should be installed only on the `work geoserver`. 
+Then we could make the following template:
+
+![template db workflow](img/template-db-workflow.png)
+
+with the following batches:
+
+![template db workflow batches](img/template-db-workflow-batches.png)
+
+The `@Initialize` batch:
+
+![batch initialize](img/template-db-workflow-batch-init.png)
+
+The `PublishRemotely` batch:
+
+![batch publish remotely](img/template-db-workflow-batch-pubrem.png)
+
+The `Synchronize` batch:
+
+![batch synchronize](img/template-db-workflow-batch-sync.png)
+
+When we now create a new configuration based on this template we choose a source database, table name and layer name:
+
+![workflow config](img/template-db-workflow-config.png)
+
+After clicking apply, the configuration is being initialized (the layer is created locally)...
+
+![initializing...](img/template-db-workflow-initializing.png)
+
+We can now fill in the rest of the details, save, and make the remote publication. The synchronization is scheduled weekly.
+
+![workflow config 2](img/template-db-workflow-config2.png)
+
 
 

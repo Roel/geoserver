@@ -18,6 +18,8 @@ public interface TaskType extends Named {
     
     /**
      * Return parameter info for this task type.
+     * It is recommended to use a LinkedHashMap and add the parameters in a intuitive order.
+     * This order will be preserved to present parameters to the user. 
      * 
      * @return the parameter info
      */
@@ -25,14 +27,14 @@ public interface TaskType extends Named {
     
     /**
      * Run a task, based on these parameter values.
-     * @param ctx TODO
+     * @param ctx task context
      * @return the task result
      */
     TaskResult run(TaskContext ctx) throws TaskException;
     
     /**
      * Do a clean-up for this task (for example, if this task publishes something, remove it).
-     * @param ctx TODO
+     * @param ctx task context
      * @throws TaskException 
      */
     void cleanup(TaskContext ctx) throws TaskException;

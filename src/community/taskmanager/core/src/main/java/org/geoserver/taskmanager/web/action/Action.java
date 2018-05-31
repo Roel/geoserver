@@ -19,9 +19,24 @@ import org.geoserver.taskmanager.web.ConfigurationPage;
  */
 public interface Action extends Named, Serializable {
     
-    void execute(ConfigurationPage onPage, AjaxRequestTarget target, IModel<String> valueModel, List<String> dependentValues);
+    /**
+     * Execute this action.
+     * 
+     * @param onPage the configuration page.
+     * @param target the target of the ajax request that executed this action.
+     * @param valueModel the value of the attribute, for reading and writing.
+     * @param dependsOnRawValues raw values of depending attributes. 
+     */
+    void execute(ConfigurationPage onPage, AjaxRequestTarget target, IModel<String> valueModel, List<String> dependsOnRawValues);
 
-    default boolean accept(String value, List<String> dependentValues) {
+    /**
+     * Check whether this action can be executed with current values.
+     * \
+     * @param value the value of the attribute.
+     * @param dependsOnRawValues raw values of depending attributes. 
+     * @return whether this action accepts these values.
+     */
+    default boolean accept(String value, List<String> dependsOnRawValues) {
         return true;
     }
 

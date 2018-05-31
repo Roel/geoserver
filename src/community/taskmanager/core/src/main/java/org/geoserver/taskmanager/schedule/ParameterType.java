@@ -122,8 +122,9 @@ public interface ParameterType {
     
     /**
      * List possible values for this parameter (when applicable).
+     * Include an empty string if custom value is also allowed.
      * 
-     * @param availableParameters all parameters and their values.
+     * @param dependsOnRawValues raw values of depending parameters.
      * @return list of possible values, null if not applicable.
      */
     public List<String> getDomain(List<String> dependsOnRawValues);
@@ -132,7 +133,7 @@ public interface ParameterType {
      * Validate and parse a parameter value for this parameter (at run time).
      * 
      * @param value the raw value.
-     * @param availableParameters all parameters and their raw values.
+     * @param dependsOnRawValues raw values of depending parameters.
      * @return the parsed value, NULL if the value is invalid.
      */
     public Object parse(String value, List<String> dependsOnRawValues);
@@ -141,7 +142,7 @@ public interface ParameterType {
      * Validate a parameter value (at configuration time).
      * 
      * @param value the raw value.
-     * @param availableParameters all parameters and their raw values.
+     * @param dependsOnRawValues raw values of depending parameters.
      * @return true if the value is considered valid at configuration time (may still be considered
      * invalid at parse time)
      */
