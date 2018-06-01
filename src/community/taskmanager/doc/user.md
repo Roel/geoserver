@@ -33,11 +33,11 @@ Furthermore, a property should be added to the `taskmanager.properties` file eac
 
 ### Databases
 
-Task Manager allows any number of databases to be used both as sources and targets for data transfer operations. These are configured via the Spring configuration file. Currently only PostGIS is supported, either via JNDI or directly via JDBC.
+Task Manager allows any number of databases to be used both as sources and targets for data transfer operations. These are configured via the Spring configuration file. Currently only PostGIS is fully supported, either via JNDI or directly via JDBC.
 
 ```xml
 <bean class="org.geoserver.taskmanager.external.impl.PostgisDbSourceImpl"> 
-  	<property name="name" value="testsourcedb"/> 
+  	<property name="name" value="mypostgisdb"/> 
 	<property name="host" value="hostname" /> 
 	<property name="db" value="dbname" /> 
 	<!-- optional --> <property name="schema" value="schema" /> 
@@ -48,7 +48,7 @@ Task Manager allows any number of databases to be used both as sources and targe
 
 ```xml
 <bean class="org.geoserver.taskmanager.external.impl.PostgisJndiDbSourceImpl">
-  	<property name="name" value="geologie-werk-databank" />
+  	<property name="name" value="mypostgisjndidb" />
   	<property name="jndiName" value="java:/comp/env/jdbc/my-jndi-source" />
   	<!-- optional --> <property name="schema" value="schema" /> 
   	<!-- optional, if database has different jndi name on target geoserver servers -->  
@@ -57,6 +57,17 @@ Task Manager allows any number of databases to be used both as sources and targe
   	    <entry key="mygs" value="java:/comp/env/jdbc/my-jndi-source-on-mygs" />
   	 </map>
   	</property>
+</bean>
+```
+
+There is also support for Informix, but it only works as a source database (not for publishing).
+
+```xml
+<bean class="org.geoserver.taskmanager.external.impl.InformixDbSourceImpl">
+  	<property name="driver" value="com.informix.jdbc.IfxDriver"/> 
+	<property name="connectionUrl" value="jdbc:informix-sqli://informix-server:1539" /> 
+	<property name="username" value="username" />
+	<property name="password" value="password" /> 
 </bean>
 ```
 
