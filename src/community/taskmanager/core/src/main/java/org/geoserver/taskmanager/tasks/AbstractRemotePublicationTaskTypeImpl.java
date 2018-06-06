@@ -231,7 +231,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
             // clean-up if necessary
             restManager.getPublisher().removeResource(ws, storeType, storeName, tempName);
             if (createStore) {
-                restManager.getPublisher().removeStore(ws, actualStoreName, storeType, true, Purge.ALL);
+                restManager.getPublisher().removeStore(ws, actualStoreName, storeType, true, Purge.NONE);
             }
             for (StyleInfo style : createStyles) {
                 restManager.getPublisher().removeStyleInWorkspace(wsName(style.getWorkspace()),
@@ -264,7 +264,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                             ? restManager.getReader().existsDatastore(ws, storeName)
                             : restManager.getReader().existsCoveragestore(ws, storeName)) {
                         if (!restManager.getPublisher().removeStore(ws, storeName, storeType, true,
-                            Purge.ALL)) {
+                            Purge.NONE)) {
                             throw new TaskException(
                                     "Failed to remove old store " + ws + ":" + storeName);
                         };
@@ -308,7 +308,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
 
                 if (createStore) {
                     if (!restManager.getPublisher().removeStore(ws, actualStoreName, storeType, true,
-                            Purge.ALL)) {
+                            Purge.NONE)) {
                         throw new TaskException("Failed to remove store " + ws + ":" + actualStoreName);
                     }
                 }
@@ -419,7 +419,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                 || !restManager.getPublisher().removeResource(ws, storeType, storeName, resource.getName())) {
                 throw new TaskException("Failed to remove layer " + ws + ":" + resource.getName());
             } 
-            if (!restManager.getPublisher().removeStore(ws, storeName, storeType, false, Purge.ALL)) {
+            if (!restManager.getPublisher().removeStore(ws, storeName, storeType, false, Purge.NONE)) {
                 if (neverReuseStore()) {
                     throw new TaskException("Failed to remove store " + ws + ":" + storeName);
                 } //else store is still in use
