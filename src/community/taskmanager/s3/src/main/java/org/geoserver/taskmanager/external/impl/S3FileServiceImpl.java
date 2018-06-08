@@ -13,6 +13,7 @@ import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.apache.commons.io.FileUtils;
 import org.geoserver.taskmanager.external.FileReference;
@@ -204,7 +205,22 @@ public class S3FileServiceImpl implements FileService {
         }
         GetObjectRequest objectRequest = new GetObjectRequest(rootFolder, filePath);
         try {
-            return getS3Client().getObject(objectRequest).getObjectContent();
+            final S3Object object = getS3Client().getObject(objectRequest);
+            final InputStream stream = object.getObjectContent();
+            return new InputStream() {
+
+                @Override
+                public int read() throws IOException {
+                    return stream.read();
+                }
+                
+                @Override
+                public void close() throws IOException {
+                    stream.close();
+                    object.close();
+                }
+                
+            };
         } catch (AmazonClientException e) {
             throw new IOException(e);
         }
