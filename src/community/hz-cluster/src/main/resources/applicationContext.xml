@@ -18,9 +18,9 @@
       <property name="rawCatalog" ref="rawCatalog"/>
    </bean>
 
-   <bean id="hzCacheProvider" class="org.geoserver.cluster.hazelcast.HzCacheProvider">
+<!--    <bean id="hzCacheProvider" class="org.geoserver.cluster.hazelcast.HzCacheProvider">
       <constructor-arg ref="xstreamPersisterFactory"/>
-   </bean>
+   </bean> -->
    
    <bean id="hzExtensionFilter" class="org.geoserver.cluster.hazelcast.HzExtensionFilter">
    </bean>
