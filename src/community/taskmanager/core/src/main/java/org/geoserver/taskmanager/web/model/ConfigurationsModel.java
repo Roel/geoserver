@@ -23,6 +23,8 @@ public class ConfigurationsModel extends GeoServerDataProvider<Configuration> {
 
     private Boolean templates;
     
+    private List<Configuration> list; 
+    
     public ConfigurationsModel(Boolean templates) {
         this.templates = templates;
     }
@@ -32,12 +34,18 @@ public class ConfigurationsModel extends GeoServerDataProvider<Configuration> {
         return Arrays.asList(WORKSPACE, NAME, DESCRIPTION);
     }
 
+    public void reset() {
+        list = null;
+    }
+
     @Override
     protected List<Configuration> getItems() {
-        List<Configuration> list = new ArrayList<Configuration>(
-                TaskManagerBeans.get().getDao().getConfigurations(templates));
-        list.removeIf(c -> !TaskManagerBeans.get().getSecUtil().isReadable(
-                SecurityContextHolder.getContext().getAuthentication(), c));
+        if (list == null) {
+            list = new ArrayList<Configuration>(
+                    TaskManagerBeans.get().getDao().getConfigurations(templates));
+            list.removeIf(c -> !TaskManagerBeans.get().getSecUtil().isReadable(
+                    SecurityContextHolder.getContext().getAuthentication(), c));
+        }
         return list;
     }
 

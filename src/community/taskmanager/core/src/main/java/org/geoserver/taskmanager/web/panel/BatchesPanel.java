@@ -215,6 +215,12 @@ public class BatchesPanel extends Panel {
                 remove.setEnabled(batchesPanel.getSelection().size() > 0);
                 target.add(remove);
             }
+            
+            @Override
+            public void onRender() {
+                batchesModel.reset();
+                super.onRender();
+            }
 
             @SuppressWarnings("unchecked")
             @Override
@@ -291,7 +297,6 @@ public class BatchesPanel extends Panel {
         }));
         batchesPanel.setOutputMarkupId(true);
     }
-
     
     private String formatFrequency(String frequency) {      
         if (frequency == null) {

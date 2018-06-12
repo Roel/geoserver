@@ -14,7 +14,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.sql.SQLException;
 
 import org.geoserver.catalog.CoverageInfo;
@@ -47,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import it.geosolutions.geoserver.rest.GeoServerRESTManager;
 import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
 import it.geosolutions.geoserver.rest.decoder.RESTLayer;
-import it.geosolutions.geoserver.rest.decoder.RESTStyle;
 
 /**
  * To run this test you should have a geoserver running on http://localhost:9090/geoserver.
