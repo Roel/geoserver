@@ -171,6 +171,7 @@ public class BatchJobServiceImpl implements BatchJobService, ApplicationListener
         }
                 
         for (Batch batch : dao.getAllBatches()) {
+            batch = dataUtil.init(batch);
             try {
                 schedule(batch);
             } catch (SchedulerException | IllegalArgumentException e) {
