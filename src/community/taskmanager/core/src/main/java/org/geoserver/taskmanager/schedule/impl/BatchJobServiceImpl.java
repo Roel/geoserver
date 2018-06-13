@@ -208,17 +208,22 @@ public class BatchJobServiceImpl implements BatchJobService, ApplicationListener
     }
     
     @Override
+    @Transactional("tmTransactionManager")
     public String scheduleNow(Batch batch) {
-        Trigger trigger = TriggerBuilder.newTrigger()
-                .forJob(batch.getId().toString())
-                .startNow()        
+        batch = dao.reload(batch);
+        if (batch.getElements().isEmpty()) {
+            LOGGER.log(Level.WARNING, "Ignoring manual empty batch run: " + batch.getFullName());
+            return null;
+        }
+        
+        Trigger trigger = TriggerBuilder.newTrigger().forJob(batch.getId().toString()).startNow()
                 .build();
         try {
             scheduler.scheduleJob(trigger);
         } catch (SchedulerException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        
+
         return trigger.getKey().getName();
     }
         

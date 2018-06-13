@@ -381,6 +381,7 @@ public class TaskManagerDataUtil {
     @Transactional("tmTransactionManager")    
     public Batch init(Batch b) {
         b = dao.reload(b);
+        Hibernate.initialize(b.getElements()); 
         Hibernate.initialize(b.getBatchRuns()); 
         return b;
     }

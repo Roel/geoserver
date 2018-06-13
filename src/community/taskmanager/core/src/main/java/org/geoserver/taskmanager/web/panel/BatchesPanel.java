@@ -268,7 +268,6 @@ public class BatchesPanel extends Panel {
                     };
                 } else if (property == BatchesModel.RUN) {
                     if (itemModel.getObject().getId() == null || 
-                            itemModel.getObject().getElements().isEmpty() ||
                             (configurationModel != null && configurationModel.getObject().isTemplate()) ||
                             !TaskManagerBeans.get().getSecUtil().isWritable(
                                     ((GeoServerSecuredPage) getPage()).getSession().getAuthentication(), 

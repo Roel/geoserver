@@ -26,8 +26,6 @@ import org.geoserver.taskmanager.data.Batch;
 import org.geoserver.taskmanager.data.BatchElement;
 import org.geoserver.taskmanager.data.BatchRun;
 import org.geoserver.taskmanager.data.Configuration;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 
@@ -48,11 +46,10 @@ public class BatchImpl extends BaseImpl implements Batch {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
     
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = BatchElementImpl.class, mappedBy = "batch", 
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = BatchElementImpl.class, mappedBy = "batch", 
             cascade = CascadeType.ALL)
     @OrderBy("index, id")
     @Filter(name="activeElementFilter")
-    @Fetch(FetchMode.SUBSELECT)
     private List<BatchElement> elements = new ArrayList<BatchElement>();
     
     @Column
@@ -82,7 +79,8 @@ public class BatchImpl extends BaseImpl implements Batch {
     @Column(nullable = false)
     private Long removeStamp = 0L;
 
-    @OneToMany(targetEntity = BatchRunImpl.class, mappedBy = "batch", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = BatchRunImpl.class, 
+            mappedBy = "batch", cascade = CascadeType.ALL)
     @OrderBy("id")
     private List<BatchRun> batchRuns = new ArrayList<BatchRun>();
     

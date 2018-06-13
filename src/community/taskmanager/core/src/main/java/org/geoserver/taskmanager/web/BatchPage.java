@@ -76,6 +76,7 @@ public class BatchPage extends GeoServerSecuredPage {
                 batchModel.getObject())) {
             throw new RestartResponseException(UnauthorizedPage.class); 
         } 
+        batchModel.setObject(TaskManagerBeans.get().getDataUtil().init(batchModel.getObject()));
         this.batchModel = batchModel;
         oldElements = new ArrayList<>(batchModel.getObject().getElements());
         setReturnPage(parentPage);
