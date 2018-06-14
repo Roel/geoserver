@@ -689,12 +689,12 @@ public class Resources {
 
         private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
             stream.defaultReadObject();
-            delegate = path == null ? null : Resources.fromPath(path);
+            delegate = Resources.fromPath(path);
         }
 
         public SerializableResourceWrapper(Resource delegate) {
             this.delegate = delegate;
-            path = delegate == null ? null : delegate.path();
+            path = delegate.path();
         }
 
         @Override
@@ -799,6 +799,9 @@ public class Resources {
     public static Resource serializable(Resource resource) {
         if (resource instanceof Serializable) {
             return resource;
+        }
+        if (resource == null) {
+            return null;
         }
         return new SerializableResourceWrapper(resource);
     }
