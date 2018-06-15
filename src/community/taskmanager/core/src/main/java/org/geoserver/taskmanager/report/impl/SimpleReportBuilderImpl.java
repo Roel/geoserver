@@ -41,7 +41,7 @@ public class SimpleReportBuilderImpl implements ReportBuilder {
         StringBuilder reportTitle = new StringBuilder("Report: Batch " + batchRun.getBatch().getFullName() + " ");
         Type type;
         
-        switch (batchRun.getRuns().get(batchRun.getRuns().size() - 1).getStatus()) {
+        switch (batchRun.getStatus()) {
         case FAILED: 
         case NOT_COMMITTED: 
         case /* shouldn't happen */ READY_TO_COMMIT:
