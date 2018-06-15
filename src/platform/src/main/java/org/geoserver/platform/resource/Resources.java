@@ -749,7 +749,8 @@ public class Resources {
 
         @Override
         public Resource parent() {
-            return new SerializableResourceWrapper(delegate.parent());
+            return delegate.parent() == null ? null:
+                    new SerializableResourceWrapper(delegate.parent());
         }
 
         @Override
