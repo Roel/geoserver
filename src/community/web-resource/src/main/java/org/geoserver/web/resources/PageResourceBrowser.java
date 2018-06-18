@@ -4,7 +4,6 @@
  */
 package org.geoserver.web.resources;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -36,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * The ResourceBrowser page.
@@ -46,34 +44,12 @@ import java.util.regex.Pattern;
  */
 public class PageResourceBrowser extends GeoServerSecuredPage {
     
-    public class StyleClassRemover extends AttributeModifier {
-
-        public StyleClassRemover(final String cssClass) {
-            super("class", Model.of(cssClass));
-        }
-
-        @Override
-        protected String newValue(final String currentValue, final String valueToRemove) {
-            if (currentValue == null) {
-                return "";
-            }
-
-            final String patternString = "(^|\\s+)" + Pattern.quote(valueToRemove) + "(?!\\S)";
-            return Pattern.compile(patternString, Pattern.CASE_INSENSITIVE).matcher(currentValue).replaceAll("");
-        }
-    }
-    
     private static final long serialVersionUID = 3979040405548783679L;
         
     /**
      * Behaviour for disabled button
      */
     private static final AttributeAppender DISABLED_BEHAVIOR = new AttributeAppender("class", new Model<String>("disabled"), " ");
-    
-    /**
-     * Behaviour for enabled button
-     */
-    private static final AttributeAppender ENABLED_BEHAVIOR = new AttributeAppender("class", new Model<String>("disabled"), " ");
 
     /**
      * The extension that are recognised as simple text resources (and can be edited with simple text editor).
@@ -554,7 +530,7 @@ public class PageResourceBrowser extends GeoServerSecuredPage {
         if (enabled != button.isEnabled()) {
             button.setEnabled(enabled);
             if (enabled) {
-                button.add(ENABLED_BEHAVIOR);
+                button.remove(DISABLED_BEHAVIOR);
             } else {
                 button.add(DISABLED_BEHAVIOR);
             }
