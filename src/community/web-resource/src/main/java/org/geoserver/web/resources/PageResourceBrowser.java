@@ -7,7 +7,6 @@ package org.geoserver.web.resources;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
-import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -21,6 +20,7 @@ import org.geoserver.platform.resource.Resource;
 import org.geoserver.platform.resource.ResourceStore;
 import org.geoserver.platform.resource.Resources;
 import org.geoserver.web.GeoServerSecuredPage;
+import org.geoserver.web.treeview.ClassAppender;
 import org.geoserver.web.treeview.TreeNode;
 import org.geoserver.web.treeview.TreeView;
 import org.geoserver.web.wicket.GeoServerDialog;
@@ -49,7 +49,7 @@ public class PageResourceBrowser extends GeoServerSecuredPage {
     /**
      * Behaviour for disabled button
      */
-    private static final AttributeAppender DISABLED_BEHAVIOR = new AttributeAppender("class", new Model<String>("disabled"), " ");
+    private static final ClassAppender DISABLED_BEHAVIOR = new ClassAppender(new Model<String>("disabled"));
 
     /**
      * The extension that are recognised as simple text resources (and can be edited with simple text editor).
