@@ -273,7 +273,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                 if (!restManager.getPublisher().configureResource(ws, storeType, storeName,
                         tempName, re)) {
                     throw new TaskException(
-                            "Failed to rename resource " + ws + ":" + tempName  + " to " + storeName);
+                            "Failed to rename resource " + ws + ":" + tempName  + " to " + resource.getName());
                 }
                 
                 // advertise the layer
