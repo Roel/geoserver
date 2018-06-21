@@ -11,43 +11,49 @@ import org.geoserver.taskmanager.util.TaskManagerBeans;
 import org.geoserver.web.GeoServerSecuredPage;
 
 public class InitConfigurationPage extends GeoServerSecuredPage {
-    
+
     private static final long serialVersionUID = -1979472322459593225L;
-    
-    private IModel<Configuration> configurationModel;    
-    
+
+    private IModel<Configuration> configurationModel;
+
     public InitConfigurationPage(IModel<Configuration> configurationModel) {
         this.configurationModel = configurationModel;
     }
-    
+
     @Override
     public void onInitialize() {
         super.onInitialize();
-        
-        final String schedulerReference = TaskManagerBeans.get().getBjService().scheduleNow(
-                InitConfigUtil.getInitBatch(configurationModel.getObject()));
-        
-        if (schedulerReference == null) { //empty batch
-            setResponsePage(new ConfigurationPage(
-                    InitConfigUtil.unwrap(configurationModel.getObject())));
-        } else {    
-            add(new AbstractAjaxTimerBehavior(Duration.seconds(1)) {
-    
-                private static final long serialVersionUID = -8006498530965431853L;
-    
-                @Override
-                protected void onTimer(AjaxRequestTarget target) {
-                    BatchRun br = TaskManagerBeans.get().getDao().getBatchRunBySchedulerReference(
-                            schedulerReference);
-                    
-                    if (br != null && br.getStatus().isClosed()) {
-                        // reload page
-                        setResponsePage(new ConfigurationPage(
-                                InitConfigUtil.unwrap(configurationModel.getObject())));
-                    }
-                }
-            });
+
+        final String schedulerReference =
+                TaskManagerBeans.get()
+                        .getBjService()
+                        .scheduleNow(InitConfigUtil.getInitBatch(configurationModel.getObject()));
+
+        if (schedulerReference == null) { // empty batch
+            setResponsePage(
+                    new ConfigurationPage(InitConfigUtil.unwrap(configurationModel.getObject())));
+        } else {
+            add(
+                    new AbstractAjaxTimerBehavior(Duration.seconds(1)) {
+
+                        private static final long serialVersionUID = -8006498530965431853L;
+
+                        @Override
+                        protected void onTimer(AjaxRequestTarget target) {
+                            BatchRun br =
+                                    TaskManagerBeans.get()
+                                            .getDao()
+                                            .getBatchRunBySchedulerReference(schedulerReference);
+
+                            if (br != null && br.getStatus().isClosed()) {
+                                // reload page
+                                setResponsePage(
+                                        new ConfigurationPage(
+                                                InitConfigUtil.unwrap(
+                                                        configurationModel.getObject())));
+                            }
+                        }
+                    });
         }
     }
-
 }

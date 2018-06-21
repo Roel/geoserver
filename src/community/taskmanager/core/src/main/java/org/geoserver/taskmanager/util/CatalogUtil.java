@@ -5,6 +5,10 @@
 
 package org.geoserver.taskmanager.util;
 
+import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder;
+import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
+import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
+import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import org.apache.wicket.util.io.IOUtils;
 import org.geoserver.catalog.CoverageDimensionInfo;
 import org.geoserver.catalog.CoverageInfo;
@@ -41,19 +44,13 @@ import org.geotools.util.logging.Logging;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder;
-import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
-import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
-import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
-
 @Service
-public class CatalogUtil {        
+public class CatalogUtil {
 
     private static final Logger LOGGER = Logging.getLogger(CatalogUtil.class);
 
-    @Autowired
-    protected GeoServerDataDirectory geoServerDataDirectory;
-    
+    @Autowired protected GeoServerDataDirectory geoServerDataDirectory;
+
     private CatalogUtil() {}
 
     public static GSResourceEncoder syncMetadata(ResourceInfo resource) {
@@ -100,76 +97,92 @@ public class CatalogUtil {
                 re.setMetadataString(entry.getKey(), entry.getValue().toString());
             }
         }
-        re.setProjectionPolicy(resource.getProjectionPolicy() == null ? ProjectionPolicy.NONE
-                : ProjectionPolicy.valueOf(resource.getProjectionPolicy().toString()));
+        re.setProjectionPolicy(
+                resource.getProjectionPolicy() == null
+                        ? ProjectionPolicy.NONE
+                        : ProjectionPolicy.valueOf(resource.getProjectionPolicy().toString()));
         if (resource.getNativeBoundingBox() != null) {
-            re.setNativeBoundingBox(resource.getNativeBoundingBox().getMinX(),
-                resource.getNativeBoundingBox().getMinY(),
-                resource.getNativeBoundingBox().getMaxX(),
-                resource.getNativeBoundingBox().getMaxY(), resource.getSRS());
+            re.setNativeBoundingBox(
+                    resource.getNativeBoundingBox().getMinX(),
+                    resource.getNativeBoundingBox().getMinY(),
+                    resource.getNativeBoundingBox().getMaxX(),
+                    resource.getNativeBoundingBox().getMaxY(),
+                    resource.getSRS());
         }
         if (resource.getLatLonBoundingBox() != null) {
-            re.setLatLonBoundingBox(resource.getLatLonBoundingBox().getMinX(),
-                resource.getLatLonBoundingBox().getMinY(),
-                resource.getLatLonBoundingBox().getMaxX(),
-                resource.getLatLonBoundingBox().getMaxY(), resource.getSRS());
+            re.setLatLonBoundingBox(
+                    resource.getLatLonBoundingBox().getMinX(),
+                    resource.getLatLonBoundingBox().getMinY(),
+                    resource.getLatLonBoundingBox().getMaxX(),
+                    resource.getLatLonBoundingBox().getMaxY(),
+                    resource.getSRS());
         }
-    
+
         // dimensions, must happen after setName or strange things happen (gs-man bug)
         if (resource instanceof CoverageInfo) {
             CoverageInfo coverage = (CoverageInfo) resource;
             for (CoverageDimensionInfo di : coverage.getDimensions()) {
-                ((GSCoverageEncoder) re).addCoverageDimensionInfo(di.getName(), di.getDescription(),
-                        Double.toString(di.getRange().getMinimum()),
-                        Double.toString(di.getRange().getMaximum()), di.getUnit(),
-                        di.getDimensionType() == null ? null : di.getDimensionType().identifier());
+                ((GSCoverageEncoder) re)
+                        .addCoverageDimensionInfo(
+                                di.getName(),
+                                di.getDescription(),
+                                Double.toString(di.getRange().getMinimum()),
+                                Double.toString(di.getRange().getMaximum()),
+                                di.getUnit(),
+                                di.getDimensionType() == null
+                                        ? null
+                                        : di.getDimensionType().identifier());
             }
         }
-        
+
         return re;
     }
 
     public static String wsName(WorkspaceInfo ws) {
         return ws == null ? null : ws.getName();
     }
-    
-    public File createStyleZipFile(StyleInfo style) throws TaskException {        
+
+    public File createStyleZipFile(StyleInfo style) throws TaskException {
         try {
             Style parsedStyle = geoServerDataDirectory.parsedStyle(style);
             Set<Resource> pictures = new HashSet<Resource>();
-            parsedStyle.accept(new AbstractStyleVisitor() {
-                @Override
-                public void visit(ExternalGraphic exgr) {
-                    if (exgr.getOnlineResource() == null) {
-                        return;
-                    }
-    
-                    URI uri = exgr.getOnlineResource().getLinkage();
-                    if (uri == null) {
-                        return;
-                    }
-    
-                    Resource resPicture = null;
-                    try {
-                        resPicture = uriToResource(uri);
-                        if (resPicture != null && resPicture.getType() != Type.UNDEFINED) {
-                            pictures.add(resPicture);
+            parsedStyle.accept(
+                    new AbstractStyleVisitor() {
+                        @Override
+                        public void visit(ExternalGraphic exgr) {
+                            if (exgr.getOnlineResource() == null) {
+                                return;
+                            }
+
+                            URI uri = exgr.getOnlineResource().getLinkage();
+                            if (uri == null) {
+                                return;
+                            }
+
+                            Resource resPicture = null;
+                            try {
+                                resPicture = uriToResource(uri);
+                                if (resPicture != null && resPicture.getType() != Type.UNDEFINED) {
+                                    pictures.add(resPicture);
+                                }
+                            } catch (IllegalArgumentException | MalformedURLException e) {
+                                LOGGER.log(
+                                        Level.WARNING,
+                                        "Error attemping to process SLD resource",
+                                        e);
+                            }
                         }
-                    } catch (IllegalArgumentException|MalformedURLException e) {
-                        LOGGER.log(Level.WARNING, "Error attemping to process SLD resource", e);
-                    } 
-                }
-            });
-            
+                    });
+
             File zipFile = File.createTempFile("style", ".zip");
-            try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile));) { 
+            try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFile)); ) {
                 Resource resStyle = geoServerDataDirectory.style(style);
                 ZipEntry zipEntry = new ZipEntry(resStyle.name());
                 out.putNextEntry(zipEntry);
                 try (InputStream in = resStyle.in()) {
                     IOUtils.copy(in, out);
                 }
-                out.closeEntry();                
+                out.closeEntry();
                 for (Resource resPicture : pictures) {
                     zipEntry = new ZipEntry(resPicture.name());
                     out.putNextEntry(zipEntry);
@@ -177,23 +190,21 @@ public class CatalogUtil {
                         IOUtils.copy(in, out);
                     }
                     out.closeEntry();
-                }                
+                }
                 return zipFile;
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new TaskException(e);
-        } 
+        }
     }
 
     private Resource uriToResource(URI uri) throws MalformedURLException {
-        if(uri.getScheme()!=null && !uri.getScheme().equals("file")) {
+        if (uri.getScheme() != null && !uri.getScheme().equals("file")) {
             return null;
-        } else if(uri.getScheme().equals("file") && uri.isAbsolute() && !uri.isOpaque()) {
+        } else if (uri.getScheme().equals("file") && uri.isAbsolute() && !uri.isOpaque()) {
             return Files.asResource(new File(uri.toURL().getFile()));
         } else {
             return geoServerDataDirectory.get(uri.getSchemeSpecificPart());
         }
     }
-
-
 }

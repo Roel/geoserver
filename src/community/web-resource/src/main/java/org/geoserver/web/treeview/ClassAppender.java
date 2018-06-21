@@ -14,16 +14,15 @@ public class ClassAppender extends AttributeAppender {
     public ClassAppender(IModel<?> appendModel) {
         super("class", appendModel, " ");
     }
-    
+
     @Override
     public boolean equals(Object other) {
-        return other instanceof ClassAppender &&
-                ((ClassAppender) other).getReplaceModel().equals(getReplaceModel());
+        return other instanceof ClassAppender
+                && ((ClassAppender) other).getReplaceModel().equals(getReplaceModel());
     }
-    
+
     @Override
     public int hashCode() {
         return this.getReplaceModel().hashCode();
     }
-
 }
