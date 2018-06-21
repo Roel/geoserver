@@ -407,6 +407,9 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
     )
     public Configuration copyConfiguration(String configName) {
         ConfigurationImpl clone = (ConfigurationImpl) getConfiguration(configName);
+        for (Batch batch : clone.getBatches().values()) {
+            Hibernate.initialize(batch.getElements());
+        }
         getSession().evict(clone);
         clone.setId(null);
         for (Attribute att : clone.getAttributes().values()) {
