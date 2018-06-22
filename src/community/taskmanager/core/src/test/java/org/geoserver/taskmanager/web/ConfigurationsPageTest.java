@@ -21,13 +21,13 @@ import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.geoserver.taskmanager.data.TaskManagerFactory;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
+import org.geoserver.taskmanager.web.model.ConfigurationsModel;
 import org.geoserver.taskmanager.web.panel.DropDownPanel;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.GeoServerTablePanel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.geoserver.taskmanager.web.model.ConfigurationsModel;
 
 public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
 
@@ -98,7 +98,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
         assertTrue(containsConfig(getConfigurationsFromTable(table), dummy1));
 
         Configuration dummy2 = dao.save(dummyConfiguration2());
-        
+
         ((ConfigurationsModel) table.getDataProvider()).reset();
 
         assertEquals(configurations.size() + 1, table.getDataProvider().size());
@@ -184,7 +184,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
 
         assertTrue(containsConfig(dao.getConfigurations(false), dummy1));
         assertTrue(containsConfig(dao.getConfigurations(false), dummy2));
-        
+
         ((ConfigurationsModel) table.getDataProvider()).reset();
 
         // sort descending on name
@@ -212,7 +212,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
 
         assertFalse(containsConfig(dao.getConfigurations(false), dummy1));
         assertTrue(containsConfig(dao.getConfigurations(false), dummy2));
-        
+
         ((ConfigurationsModel) table.getDataProvider()).reset();
 
         assertFalse(containsConfig(getConfigurationsFromTable(table), dummy1));

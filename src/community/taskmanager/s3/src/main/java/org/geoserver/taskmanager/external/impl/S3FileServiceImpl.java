@@ -58,7 +58,7 @@ public class S3FileServiceImpl implements FileService {
     private String password;
 
     private String rootFolder;
-    
+
     private String prepareScript;
 
     private static String S3_NAME_PREFIX = "s3-";
@@ -170,9 +170,11 @@ public class S3FileServiceImpl implements FileService {
             }
 
             FileUtils.copyInputStreamToFile(content, scratchFile);
-            
+
             if (doPrepare && prepareScript != null) {
-                Process p = Runtime.getRuntime().exec(prepareScript + " " + scratchFile.getAbsolutePath());
+                Process p =
+                        Runtime.getRuntime()
+                                .exec(prepareScript + " " + scratchFile.getAbsolutePath());
                 LOGGER.info(new String(IOUtils.toByteArray(p.getInputStream())));
                 LOGGER.warning(new String(IOUtils.toByteArray(p.getErrorStream())));
                 try {
@@ -180,7 +182,8 @@ public class S3FileServiceImpl implements FileService {
                     if (e != 0) {
                         throw new IOException("Preparation script ended with exit code " + e);
                     }
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                }
             }
 
             ObjectMetadata metadata = new ObjectMetadata();

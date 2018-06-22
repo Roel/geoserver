@@ -46,7 +46,7 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
         assertTrue(extTypes.dbName.parse("myjndidb", null) instanceof DbSource);
         assertNull(extTypes.dbName.parse("doesntexist", null));
     }
-    
+
     @Test
     public void testDbNameWithLogin() {
         login("someone", "pw", "ROLE_SOMEONE");
@@ -65,8 +65,8 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
         assertEquals("mypostgresdb", domain.get(1));
         assertEquals("testsourcedb", domain.get(2));
         assertFalse(extTypes.dbName.validate("testtargetdb", null));
-        assertNull(extTypes.dbName.parse("testtargetdb", null));      
-        
+        assertNull(extTypes.dbName.parse("testtargetdb", null));
+
         logout();
     }
 

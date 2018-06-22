@@ -58,7 +58,6 @@ public interface FileService extends Serializable, Named {
         create(filePath, content, false);
     }
 
-    
     /**
      * Check if this file exists.
      *

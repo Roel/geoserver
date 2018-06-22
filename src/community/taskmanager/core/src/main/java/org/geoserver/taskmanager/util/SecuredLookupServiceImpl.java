@@ -8,16 +8,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-public class SecuredLookupServiceImpl<T extends Secured>
-    extends LookupServiceImpl<T> implements LookupService<T> {
-    
+public class SecuredLookupServiceImpl<T extends Secured> extends LookupServiceImpl<T>
+        implements LookupService<T> {
+
     @Override
-    public T get(String name) { 
+    public T get(String name) {
         T s = super.get(name);
         return canAccess(s) ? s : null;
     }
@@ -27,7 +26,7 @@ public class SecuredLookupServiceImpl<T extends Secured>
         S s = super.get(name, clazz);
         return canAccess(s) ? s : null;
     }
-    
+
     @Override
     public SortedSet<String> names() {
         SortedSet<String> names = new TreeSet<String>(super.names());
@@ -41,7 +40,7 @@ public class SecuredLookupServiceImpl<T extends Secured>
         all.removeIf(s -> !canAccess(s));
         return all;
     }
-    
+
     private boolean canAccess(Secured sec) {
         if (sec == null) {
             return true;
@@ -49,7 +48,7 @@ public class SecuredLookupServiceImpl<T extends Secured>
         if (sec.getRoles() == null) {
             return true;
         }
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();        
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null) {
             return true;
         }
@@ -63,5 +62,4 @@ public class SecuredLookupServiceImpl<T extends Secured>
         }
         return false;
     }
-
 }

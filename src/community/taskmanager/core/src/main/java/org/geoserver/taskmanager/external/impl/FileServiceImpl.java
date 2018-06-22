@@ -49,9 +49,9 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
     private Path rootFolder;
 
     private String description;
-    
+
     private String prepareScript;
-    
+
     @Override
     public String getDescription() {
         return "Local File System: " + (description == null ? description : getName());
@@ -60,7 +60,7 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
     public String getPrepareScript() {
         return prepareScript;
     }
@@ -98,9 +98,10 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
 
         File targetFile = new File(getAbsolutePath(filePath).toUri());
         FileUtils.copyInputStreamToFile(content, targetFile);
-        
+
         if (doPrepare && prepareScript != null) {
-            Process p = Runtime.getRuntime().exec(prepareScript + " " + targetFile.getAbsolutePath());
+            Process p =
+                    Runtime.getRuntime().exec(prepareScript + " " + targetFile.getAbsolutePath());
             LOGGER.info(new String(IOUtils.toByteArray(p.getInputStream())));
             LOGGER.warning(new String(IOUtils.toByteArray(p.getErrorStream())));
             try {
@@ -108,7 +109,8 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
                 if (e != 0) {
                     throw new IOException("Preparation script ended with exit code " + e);
                 }
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
         }
     }
 

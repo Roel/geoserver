@@ -40,7 +40,7 @@ public class FileUploadPanel extends Panel {
     private static final long serialVersionUID = -1821529746678003578L;
 
     private IModel<String> fileNameModel;
-    
+
     private IModel<Boolean> prepareModel = new Model<Boolean>(true);
 
     private final GeoServerDialog dialog;
@@ -146,7 +146,7 @@ public class FileUploadPanel extends Panel {
                                 return hasBeenSubmitted();
                             }
                         });
-        
+
         add(new CheckBox("prepare", prepareModel));
 
         if (fileService != null) {

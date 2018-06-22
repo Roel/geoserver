@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class FileServiceDataTest extends AbstractTaskManagerTest {
 
     @Autowired LookupService<FileService> fileServiceRegistry;
-    
+
     @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
@@ -68,21 +68,19 @@ public class FileServiceDataTest extends AbstractTaskManagerTest {
         service.delete(filename);
         Assert.assertFalse(Files.exists(Paths.get(path)));
     }
-    
+
     @Test
     public void testFileServicePrepare() throws IOException, InterruptedException {
-        //this test only works in linux because it uses a linux script
+        // this test only works in linux because it uses a linux script
         Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
-        
+
         FileServiceImpl service = new FileServiceImpl();
         service.setRootFolder(FileUtils.getTempDirectoryPath());
-        
-        //create the script and make executable
+
+        // create the script and make executable
         File scriptFile = new File(tempFolder.getRoot(), "prepare.sh");
         try (OutputStream out = new FileOutputStream(scriptFile)) {
-            IOUtils.copy(
-                    FileServiceDataTest.class.getResourceAsStream("prepare.sh"), 
-                    out);
+            IOUtils.copy(FileServiceDataTest.class.getResourceAsStream("prepare.sh"), out);
         }
         Process p = Runtime.getRuntime().exec("chmod u+x " + scriptFile.getAbsolutePath());
         p.waitFor();
@@ -100,7 +98,7 @@ public class FileServiceDataTest extends AbstractTaskManagerTest {
         Assert.assertTrue(fileExists);
 
         String actualContent = IOUtils.toString(service.read(filename));
-        //verify extra text!
+        // verify extra text!
         Assert.assertEquals(content + "extra text\n", actualContent);
 
         service.delete(filename);

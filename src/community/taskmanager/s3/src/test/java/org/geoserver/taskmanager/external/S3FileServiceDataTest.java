@@ -8,7 +8,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.S3ClientOptions;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
@@ -41,7 +39,7 @@ public class S3FileServiceDataTest extends AbstractTaskManagerTest {
     private static final Logger LOGGER = Logging.getLogger(S3FileServiceDataTest.class);
 
     @Autowired LookupService<FileService> fileServiceRegistry;
-    
+
     @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
@@ -103,20 +101,18 @@ public class S3FileServiceDataTest extends AbstractTaskManagerTest {
         service.delete(filenamePath);
         Assert.assertFalse(service.checkFileExists(filenamePath));
     }
-    
+
     @Test
     public void testFileServicePrepare() throws IOException, InterruptedException {
-        //this test only works in linux because it uses a linux script
+        // this test only works in linux because it uses a linux script
         Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
-        
+
         S3FileServiceImpl service = getS3FileService();
-        
-        //create the script and make executable
+
+        // create the script and make executable
         File scriptFile = new File(tempFolder.getRoot(), "prepare.sh");
         try (OutputStream out = new FileOutputStream(scriptFile)) {
-            IOUtils.copy(
-                    FileServiceDataTest.class.getResourceAsStream("prepare.sh"), 
-                    out);
+            IOUtils.copy(FileServiceDataTest.class.getResourceAsStream("prepare.sh"), out);
         }
         Process p = Runtime.getRuntime().exec("chmod u+x " + scriptFile.getAbsolutePath());
         p.waitFor();
@@ -130,7 +126,7 @@ public class S3FileServiceDataTest extends AbstractTaskManagerTest {
         Assert.assertTrue(fileExists);
 
         String actualContent = IOUtils.toString(service.read(filename));
-        //verify extra text!
+        // verify extra text!
         Assert.assertEquals(content + "extra text\n", actualContent);
 
         service.delete(filename);

@@ -86,7 +86,7 @@ public abstract class AbstractTaskManagerTest {
         SecurityContextHolder.getContext()
                 .setAuthentication(new UsernamePasswordAuthenticationToken(username, password, l));
     }
-    
+
     protected void logout() {
         SecurityContextHolder.getContext().setAuthentication(null);
     }

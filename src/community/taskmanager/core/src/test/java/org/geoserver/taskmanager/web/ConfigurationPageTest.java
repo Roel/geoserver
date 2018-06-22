@@ -390,23 +390,29 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         tester.startPage(page);
         tester.assertRenderedPage(ConfigurationPage.class);
 
-        tester.assertComponent("configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component",
+        tester.assertComponent(
+                "configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component",
                 PanelListPanel.class);
-        tester.assertComponent("configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel",
+        tester.assertComponent(
+                "configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel",
                 ButtonPanel.class);
 
-        tester.assertModelValue("configurationForm:attributesPanel:listContainer:items:9:itemProperties:0:component",
+        tester.assertModelValue(
+                "configurationForm:attributesPanel:listContainer:items:9:itemProperties:0:component",
                 "fileService");
-        tester.assertModelValue("configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button",
+        tester.assertModelValue(
+                "configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button",
                 "Upload..");
 
         FormTester formTester = tester.newFormTester("configurationForm");
-        formTester.submit("attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button");
+        formTester.submit(
+                "attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button");
         assertFeedback("topFeedback", "You cannot execute this action with this value.");
 
-        formTester.select("attributesPanel:listContainer:items:9:itemProperties:1:component:dropdown",
-                1);
-        formTester.submit("attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button");
+        formTester.select(
+                "attributesPanel:listContainer:items:9:itemProperties:1:component:dropdown", 1);
+        formTester.submit(
+                "attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button");
         tester.assertNoErrorMessage();
 
         tester.assertComponent("dialog:dialog:content:form:userPanel", FileUploadPanel.class);
@@ -416,10 +422,12 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         tester.assertErrorMessages("Field 'File folder' is required.", "Field 'File' is required.");
 
         dialogFormTester.select("userPanel:folderSelection", 0);
-        tester.assertComponent("dialog:dialog:content:form:userPanel:fileInput", FileUploadField.class);
+        tester.assertComponent(
+                "dialog:dialog:content:form:userPanel:fileInput", FileUploadField.class);
         tester.assertComponent("dialog:dialog:content:form:userPanel:prepare", CheckBox.class);
         tester.assertModelValue("dialog:dialog:content:form:userPanel:prepare", true);
-        dialogFormTester.setFile("userPanel:fileInput",new File("src/test/resources/fileupload-test.txt"), "");
+        dialogFormTester.setFile(
+                "userPanel:fileInput", new File("src/test/resources/fileupload-test.txt"), "");
 
         dialogFormTester.submit("submit");
 

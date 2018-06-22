@@ -92,7 +92,7 @@ public class BatchRunTest extends AbstractWicketTaskManagerTest {
         Thread.sleep(500);
 
         tester.clickLink("batchesPanel:refresh");
-                
+
         tester.assertModelValue(
                 "batchesPanel:form:batchesPanel:listContainer:items:2:itemProperties:7:component",
                 Status.RUNNING);
