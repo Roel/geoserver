@@ -9,11 +9,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import org.apache.wicket.feedback.FeedbackMessage;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.util.file.File;
 import org.apache.wicket.util.tester.FormTester;
 import org.geoserver.taskmanager.data.Attribute;
 import org.geoserver.taskmanager.data.Batch;
@@ -23,11 +27,13 @@ import org.geoserver.taskmanager.data.impl.ConfigurationImpl;
 import org.geoserver.taskmanager.tasks.CopyTableTaskTypeImpl;
 import org.geoserver.taskmanager.tasks.CreateViewTaskTypeImpl;
 import org.geoserver.taskmanager.tasks.DbRemotePublicationTaskTypeImpl;
+import org.geoserver.taskmanager.tasks.FileLocalPublicationTaskTypeImpl;
 import org.geoserver.taskmanager.tasks.FileRemotePublicationTaskTypeImpl;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
 import org.geoserver.taskmanager.util.TaskManagerDataUtil;
 import org.geoserver.taskmanager.util.TaskManagerTaskUtil;
 import org.geoserver.taskmanager.web.panel.ButtonPanel;
+import org.geoserver.taskmanager.web.panel.FileUploadPanel;
 import org.geoserver.taskmanager.web.panel.NamePanel;
 import org.geoserver.taskmanager.web.panel.NewTaskPanel;
 import org.geoserver.taskmanager.web.panel.PanelListPanel;
@@ -369,6 +375,55 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         tester.assertRenderedPage(ResourceConfigurationPage.class);
 
         tester.clickLink("publishedinfo:cancel");
+
+        tester.assertRenderedPage(ConfigurationPage.class);
+    }
+
+    @Test
+    public void testActionFileUpload() throws IOException {
+
+        Task task4 = tutil.initTask(FileLocalPublicationTaskTypeImpl.NAME, "task4");
+        util.addTaskToConfiguration(config, task4);
+        config = dao.save(config);
+
+        ConfigurationPage page = new ConfigurationPage(config);
+        tester.startPage(page);
+        tester.assertRenderedPage(ConfigurationPage.class);
+
+        tester.assertComponent("configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component",
+                PanelListPanel.class);
+        tester.assertComponent("configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel",
+                ButtonPanel.class);
+
+        tester.assertModelValue("configurationForm:attributesPanel:listContainer:items:9:itemProperties:0:component",
+                "fileService");
+        tester.assertModelValue("configurationForm:attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button",
+                "Upload..");
+
+        FormTester formTester = tester.newFormTester("configurationForm");
+        formTester.submit("attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button");
+        assertFeedback("topFeedback", "You cannot execute this action with this value.");
+
+        formTester.select("attributesPanel:listContainer:items:9:itemProperties:1:component:dropdown",
+                1);
+        formTester.submit("attributesPanel:listContainer:items:10:itemProperties:2:component:listview:0:panel:button");
+        tester.assertNoErrorMessage();
+
+        tester.assertComponent("dialog:dialog:content:form:userPanel", FileUploadPanel.class);
+
+        FormTester dialogFormTester = tester.newFormTester("dialog:dialog:content:form");
+        dialogFormTester.submit("submit");
+        tester.assertErrorMessages("Field 'File folder' is required.", "Field 'File' is required.");
+
+        dialogFormTester.select("userPanel:folderSelection", 0);
+        tester.assertComponent("dialog:dialog:content:form:userPanel:fileInput", FileUploadField.class);
+        tester.assertComponent("dialog:dialog:content:form:userPanel:prepare", CheckBox.class);
+        tester.assertModelValue("dialog:dialog:content:form:userPanel:prepare", true);
+        dialogFormTester.setFile("userPanel:fileInput",new File("src/test/resources/fileupload-test.txt"), "");
+
+        dialogFormTester.submit("submit");
+
+        tester.assertNoErrorMessage();
 
         tester.assertRenderedPage(ConfigurationPage.class);
     }

@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.geoserver.taskmanager.external.FileReference;
 import org.geoserver.taskmanager.external.FileService;
 import org.geotools.util.logging.Logging;
@@ -57,6 +58,8 @@ public class S3FileServiceImpl implements FileService {
     private String password;
 
     private String rootFolder;
+    
+    private String prepareScript;
 
     private static String S3_NAME_PREFIX = "s3-";
 
@@ -81,6 +84,14 @@ public class S3FileServiceImpl implements FileService {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public String getPrepareScript() {
+        return prepareScript;
+    }
+
+    public void setPrepareScript(String prepareScript) {
+        this.prepareScript = prepareScript;
     }
 
     public String getUser() {
@@ -139,7 +150,7 @@ public class S3FileServiceImpl implements FileService {
     }
 
     @Override
-    public void create(String filePath, InputStream content) throws IOException {
+    public void create(String filePath, InputStream content, boolean doPrepare) throws IOException {
         // Check parameters
         if (content == null) {
             throw new IllegalArgumentException("Content of a file can not be null.");
@@ -159,6 +170,18 @@ public class S3FileServiceImpl implements FileService {
             }
 
             FileUtils.copyInputStreamToFile(content, scratchFile);
+            
+            if (doPrepare && prepareScript != null) {
+                Process p = Runtime.getRuntime().exec(prepareScript + " " + scratchFile.getAbsolutePath());
+                LOGGER.info(new String(IOUtils.toByteArray(p.getInputStream())));
+                LOGGER.warning(new String(IOUtils.toByteArray(p.getErrorStream())));
+                try {
+                    int e = p.waitFor();
+                    if (e != 0) {
+                        throw new IOException("Preparation script ended with exit code " + e);
+                    }
+                } catch (InterruptedException e) { }
+            }
 
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentEncoding(ENCODING);

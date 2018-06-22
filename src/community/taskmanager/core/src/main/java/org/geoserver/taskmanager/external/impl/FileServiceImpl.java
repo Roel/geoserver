@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.geoserver.platform.GeoServerResourceLoader;
@@ -49,6 +50,8 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
 
     private String description;
     
+    private String prepareScript;
+    
     @Override
     public String getDescription() {
         return "Local File System: " + (description == null ? description : getName());
@@ -56,6 +59,14 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public String getPrepareScript() {
+        return prepareScript;
+    }
+
+    public void setPrepareScript(String prepareScript) {
+        this.prepareScript = prepareScript;
     }
 
     public void setRootFolder(String rootFolder) {
@@ -73,7 +84,7 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
     }
 
     @Override
-    public void create(String filePath, InputStream content) throws IOException {
+    public void create(String filePath, InputStream content, boolean doPrepare) throws IOException {
         // Check parameters
         if (content == null) {
             throw new IllegalArgumentException("Content of a file can not be null.");
@@ -87,6 +98,18 @@ public class FileServiceImpl extends SecuredImpl implements FileService, Servlet
 
         File targetFile = new File(getAbsolutePath(filePath).toUri());
         FileUtils.copyInputStreamToFile(content, targetFile);
+        
+        if (doPrepare && prepareScript != null) {
+            Process p = Runtime.getRuntime().exec(prepareScript + " " + targetFile.getAbsolutePath());
+            LOGGER.info(new String(IOUtils.toByteArray(p.getInputStream())));
+            LOGGER.warning(new String(IOUtils.toByteArray(p.getErrorStream())));
+            try {
+                int e = p.waitFor();
+                if (e != 0) {
+                    throw new IOException("Preparation script ended with exit code " + e);
+                }
+            } catch (InterruptedException e) { }
+        }
     }
 
     @Override

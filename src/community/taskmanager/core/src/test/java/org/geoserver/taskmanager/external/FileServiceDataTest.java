@@ -4,18 +4,25 @@
  */
 package org.geoserver.taskmanager.external;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.SystemUtils;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
 import org.geoserver.taskmanager.external.impl.FileServiceImpl;
 import org.geoserver.taskmanager.util.LookupService;
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class FileServiceDataTest extends AbstractTaskManagerTest {
 
     @Autowired LookupService<FileService> fileServiceRegistry;
+    
+    @Rule public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Test
     public void testFileRegistry() {
@@ -55,6 +64,44 @@ public class FileServiceDataTest extends AbstractTaskManagerTest {
 
         String actualContent = IOUtils.toString(service.read(filename));
         Assert.assertEquals(content, actualContent);
+
+        service.delete(filename);
+        Assert.assertFalse(Files.exists(Paths.get(path)));
+    }
+    
+    @Test
+    public void testFileServicePrepare() throws IOException, InterruptedException {
+        //this test only works in linux because it uses a linux script
+        Assume.assumeTrue(SystemUtils.IS_OS_LINUX);
+        
+        FileServiceImpl service = new FileServiceImpl();
+        service.setRootFolder(FileUtils.getTempDirectoryPath());
+        
+        //create the script and make executable
+        File scriptFile = new File(tempFolder.getRoot(), "prepare.sh");
+        try (OutputStream out = new FileOutputStream(scriptFile)) {
+            IOUtils.copy(
+                    FileServiceDataTest.class.getResourceAsStream("prepare.sh"), 
+                    out);
+        }
+        Process p = Runtime.getRuntime().exec("chmod u+x " + scriptFile.getAbsolutePath());
+        p.waitFor();
+        service.setPrepareScript(scriptFile.getAbsolutePath());
+
+        String filename = System.currentTimeMillis() + "-test.txt";
+        String path = FileUtils.getTempDirectoryPath() + "/" + filename;
+
+        Assert.assertFalse(Files.exists(Paths.get(path)));
+        String content = "test the file service";
+        service.create(filename, IOUtils.toInputStream(content, "UTF-8"), true);
+        Assert.assertTrue(Files.exists(Paths.get(path)));
+
+        boolean fileExists = service.checkFileExists(filename);
+        Assert.assertTrue(fileExists);
+
+        String actualContent = IOUtils.toString(service.read(filename));
+        //verify extra text!
+        Assert.assertEquals(content + "extra text\n", actualContent);
 
         service.delete(filename);
         Assert.assertFalse(Files.exists(Paths.get(path)));
