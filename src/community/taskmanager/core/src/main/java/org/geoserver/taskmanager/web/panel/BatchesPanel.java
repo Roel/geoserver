@@ -265,9 +265,9 @@ public class BatchesPanel extends Panel {
                                             }
 
                                             @Override
-                                            public void onRender() {
+                                            public void onBeforeRender() {
                                                 batchesModel.reset();
-                                                super.onRender();
+                                                super.onBeforeRender();
                                             }
 
                                             @SuppressWarnings("unchecked")

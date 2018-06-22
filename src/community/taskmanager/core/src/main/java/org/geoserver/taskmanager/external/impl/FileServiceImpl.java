@@ -27,6 +27,7 @@ import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.geoserver.platform.GeoServerResourceLoader;
 import org.geoserver.taskmanager.external.FileReference;
 import org.geoserver.taskmanager.external.FileService;
+import org.geoserver.taskmanager.util.SecuredImpl;
 import org.geotools.util.logging.Logging;
 import org.springframework.web.context.ServletContextAware;
 
@@ -36,7 +37,7 @@ import org.springframework.web.context.ServletContextAware;
  *
  * @author Timothy De Bock - timothy.debock.github@gmail.com
  */
-public class FileServiceImpl implements FileService, ServletContextAware {
+public class FileServiceImpl extends SecuredImpl implements FileService, ServletContextAware {
 
     private static final long serialVersionUID = -1948411877746516243L;
 
@@ -46,22 +47,11 @@ public class FileServiceImpl implements FileService, ServletContextAware {
 
     private Path rootFolder;
 
-    private String name;
-
     private String description;
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
+    
     @Override
     public String getDescription() {
-        return "Local File System: " + (description == null ? description : name);
+        return "Local File System: " + (description == null ? description : getName());
     }
 
     public void setDescription(String description) {

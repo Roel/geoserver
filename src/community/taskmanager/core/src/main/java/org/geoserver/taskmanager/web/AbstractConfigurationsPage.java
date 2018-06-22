@@ -362,9 +362,9 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                             }
 
                             @Override
-                            public void onRender() {
+                            public void onBeforeRender() {
                                 ((ConfigurationsModel) getDataProvider()).reset();
-                                super.onRender();
+                                super.onBeforeRender();
                             }
 
                             @SuppressWarnings("unchecked")
