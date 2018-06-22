@@ -22,6 +22,7 @@ import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.geoserver.taskmanager.data.TaskManagerFactory;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
+import org.geoserver.taskmanager.web.model.BatchesModel;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.GeoServerTablePanel;
 import org.junit.Before;
@@ -185,6 +186,8 @@ public abstract class AbstractBatchesPanelTest<T extends Page>
 
         assertFalse(containsBatch(getBatches(), dummy1));
         assertTrue(containsBatch(getBatches(), dummy2));
+        
+        ((BatchesModel) table.getDataProvider()).reset();
 
         assertFalse(containsBatch(getBatchesFromTable(table), dummy1));
         assertTrue(containsBatch(getBatchesFromTable(table), dummy2));

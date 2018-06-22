@@ -69,7 +69,7 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
 
         Task task = config.getTasks().get("task");
         BatchElement el = util.addBatchElement(batch, task);
-        batch = dao.save(batch);
+        batch = util.init(dao.save(batch));
         assertEquals(1, batch.getElements().size());
         assertEquals(Collections.emptyList(), dao.getTasksAvailableForBatch(batch));
 
@@ -77,7 +77,7 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
 
         // soft delete
         dao.remove(el);
-        batch = dao.reload(batch);
+        batch = util.init(batch);
         assertTrue(batch.getElements().isEmpty());
         assertEquals(
                 Collections.singletonList(config.getTasks().get("task")),
@@ -85,13 +85,13 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
 
         BatchElement el2 = util.addBatchElement(batch, task);
         assertEquals(el.getId(), el2.getId());
-        batch = dao.save(batch);
+        batch = util.init(dao.save(batch));
         assertEquals(1, batch.getElements().size());
         assertEquals(Collections.emptyList(), dao.getTasksAvailableForBatch(batch));
 
         // hard delete
         dao.delete(batch.getElements().get(0));
-        batch = dao.reload(batch);
+        batch = util.init(batch);
         assertTrue(batch.getElements().isEmpty());
         el2 = util.addBatchElement(batch, task);
         assertFalse(el.getId().equals(el2.getId()));
@@ -102,7 +102,7 @@ public class TaskManagerDataTest extends AbstractTaskManagerTest {
         Task task = util.init(config.getTasks().get("task"));
         assertEquals(0, task.getBatchElements().size());
         BatchElement el = util.addBatchElement(batch, task);
-        batch = dao.save(batch);
+        batch = util.init(dao.save(batch));
         el = batch.getElements().get(0);
         task = util.init(task);
         assertEquals(1, task.getBatchElements().size());

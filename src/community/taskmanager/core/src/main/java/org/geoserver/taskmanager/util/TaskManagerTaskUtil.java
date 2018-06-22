@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geoserver.taskmanager.data.Attribute;
+import org.geoserver.taskmanager.data.Batch;
 import org.geoserver.taskmanager.data.BatchElement;
 import org.geoserver.taskmanager.data.BatchRun;
 import org.geoserver.taskmanager.data.Configuration;
@@ -238,9 +239,10 @@ public class TaskManagerTaskUtil {
             task = dataUtil.init(task);
             for (BatchElement el : task.getBatchElements()) {
                 if (el.getIndex() > 0) {
+                    Batch batch = dataUtil.init(el.getBatch());
                     int indexTaskBefore =
                             orderedTasks.indexOf(
-                                    el.getBatch().getElements().get(el.getIndex() - 1).getTask());
+                                    batch.getElements().get(el.getIndex() - 1).getTask());
                     if (indexTaskBefore >= 0 && indexTaskBefore < position) {
                         position = indexTaskBefore;
                     }
