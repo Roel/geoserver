@@ -762,8 +762,12 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                         (IModel<String>) property.getModel(itemModel),
                                         new PropertyModel<List<String>>(
                                                 domains, itemModel.getObject().getName()),
-                                        configurationModel.getObject().isTemplate());
-
+                                        configurationModel.getObject().isTemplate()
+                                                || !TaskManagerBeans.get()
+                                                        .getTaskUtil()
+                                                        .isAttributeRequired(
+                                                                itemModel.getObject(),
+                                                                configurationModel.getObject()));
                         ddp.getDropDownChoice()
                                 .add(
                                         new AjaxFormSubmitBehavior("change") {
