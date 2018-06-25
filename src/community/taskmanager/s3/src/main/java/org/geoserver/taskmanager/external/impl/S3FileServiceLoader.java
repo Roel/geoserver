@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import org.apache.wicket.util.string.Strings;
 import org.geoserver.taskmanager.external.FileService;
 import org.geotools.util.logging.Logging;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,10 @@ public class S3FileServiceLoader {
                         properties.getProperty(prefix + ".s3.password"),
                         prefix,
                         rootfolder);
+        String prepareScript = properties.getProperty(prefix + ".s3.prepareScript").trim();
+        if (!Strings.isEmpty(prepareScript)) {
+            fileService.setPrepareScript(prepareScript);
+        }
         fileServices.add(fileService);
 
         lookupFileService.setFileServices(fileServices);
