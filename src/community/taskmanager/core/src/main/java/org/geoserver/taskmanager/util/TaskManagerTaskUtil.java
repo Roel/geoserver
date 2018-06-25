@@ -539,9 +539,9 @@ public class TaskManagerTaskUtil {
     /**
      * Get attribute domain based on associated parameters.
      *
-     * @param type the type
-     * @param string
-     * @return the task
+     * @param attribute the attribute
+     * @param config the configuration
+     * @return the actions
      */
     public List<String> getActionsForAttribute(Attribute attribute, Configuration config) {
         List<Parameter> params = dataUtil.getAssociatedParameters(attribute, config);
@@ -588,5 +588,24 @@ public class TaskManagerTaskUtil {
             }
         }
         return values;
+    }
+
+    /**
+     * Determine if attribute is required.
+     *
+     * @param attribute the attribute
+     * @param config the configuration
+     * @return whether the attribute is required
+     */
+    public boolean isAttributeRequired(Attribute attribute, Configuration config) {
+        List<Parameter> params = dataUtil.getAssociatedParameters(attribute, config);
+        for (Parameter param : params) {
+            TaskType taskType = taskTypes.get(param.getTask().getType());
+            ParameterInfo info = taskType.getParameterInfo().get(param.getName());
+            if (info.isRequired()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
