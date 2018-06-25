@@ -171,7 +171,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
             // create resource (and layer)
 
             final GSResourceEncoder re = CatalogUtil.syncMetadata(resource, tempName);
-
+            re.setAdvertised(false);
             postProcess(
                     re,
                     ctx,
@@ -326,6 +326,7 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                                 ? new GSCoverageEncoder(false)
                                 : new GSFeatureTypeEncoder(false);
                 re.setName(resource.getName());
+                re.setAdvertised(true);
                 if (!restManager
                         .getPublisher()
                         .configureResource(ws, storeType, storeName, tempName, re)) {
@@ -336,16 +337,6 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                                     + tempName
                                     + " to "
                                     + resource.getName());
-                }
-
-                // advertise the layer
-                final GSLayerEncoder layerEncoder = new GSLayerEncoder(false);
-                layerEncoder.setAdvertised(true);
-                if (!restManager
-                        .getPublisher()
-                        .configureLayer(ws, resource.getName(), layerEncoder)) {
-                    throw new TaskException(
-                            "Failed to advertise layer " + ws + ":" + layer.getName());
                 }
             }
 
