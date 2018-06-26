@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.geoserver.taskmanager.external.FileReference;
 import org.geoserver.taskmanager.external.FileService;
@@ -162,8 +163,7 @@ public class S3FileServiceImpl implements FileService {
         if (checkFileExists(filePath)) {
             throw new IllegalArgumentException("The file already exists");
         }
-        File scratchFile =
-                File.createTempFile("prefix", String.valueOf(System.currentTimeMillis()));
+        File scratchFile = File.createTempFile("s3fs", "." + FilenameUtils.getExtension(filePath));
         try {
             if (!getS3Client().doesBucketExist(rootFolder)) {
                 getS3Client().createBucket(rootFolder);
