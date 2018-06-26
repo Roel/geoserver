@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.wicket.util.string.Strings;
 import org.geoserver.taskmanager.util.Named;
 
 /**
@@ -107,4 +109,16 @@ public interface FileService extends Serializable, Named {
      * @return the URI
      */
     URI getURI(String filePath);
+
+    static String versioned(String filePath) {
+        if (filePath.contains(PLACEHOLDER_VERSION)) {
+            return filePath;
+        }
+        String ext = FilenameUtils.getExtension(filePath);
+        if (Strings.isEmpty(ext)) {
+            return filePath + "." + PLACEHOLDER_VERSION;
+        } else {
+            return FilenameUtils.removeExtension(filePath) + "." + PLACEHOLDER_VERSION + "." + ext;
+        }
+    }
 }

@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.collect.Lists;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -170,5 +171,14 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
                 extTypes.file(false, false)
                                 .parse("doesntexist", Collections.singletonList("data-directory"))
                         instanceof FileReference);
+
+        assertEquals(
+                "temp.1",
+                ((FileReference)
+                                extTypes.file(false, false)
+                                        .parse(
+                                                "temp",
+                                                Lists.newArrayList("data-directory", "true")))
+                        .getNextVersion());
     }
 }

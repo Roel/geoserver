@@ -54,9 +54,9 @@ public class S3FileServiceLoader {
                         properties.getProperty(prefix + ".s3.password"),
                         prefix,
                         rootfolder);
-        String prepareScript = properties.getProperty(prefix + ".s3.prepareScript").trim();
+        String prepareScript = properties.getProperty(prefix + ".s3.prepareScript");
         if (!Strings.isEmpty(prepareScript)) {
-            fileService.setPrepareScript(prepareScript);
+            fileService.setPrepareScript(prepareScript.trim());
         }
         fileServices.add(fileService);
 

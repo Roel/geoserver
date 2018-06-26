@@ -4,6 +4,8 @@
  */
 package org.geoserver.taskmanager.external;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -150,5 +152,13 @@ public class FileServiceDataTest extends AbstractTaskManagerTest {
         Assert.assertTrue(folders.contains(Paths.get("foo", "bar", "foobar").toString()));
         Assert.assertTrue(folders.contains(Paths.get("foo", "bar", "foobar", "barfoo").toString()));
         Assert.assertTrue(folders.contains("hello"));
+    }
+
+    @Test
+    public void testVersionedPath() {
+        assertEquals("myfile.###", FileService.versioned("myfile"));
+        assertEquals("myfile.###.ext", FileService.versioned("myfile.ext"));
+        assertEquals("/path/to/myfile.###.ext", FileService.versioned("/path/to/myfile.ext"));
+        assertEquals("my###file.ext", FileService.versioned("my###file.ext"));
     }
 }
