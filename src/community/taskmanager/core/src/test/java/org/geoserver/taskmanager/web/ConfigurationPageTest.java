@@ -43,12 +43,16 @@ import org.geoserver.web.data.resource.ResourceConfigurationPage;
 import org.geoserver.web.wicket.GeoServerTablePanel;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 public class ConfigurationPageTest extends AbstractBatchesPanelTest<ConfigurationPage> {
+    
+    @Rule public TemporaryFolder tempDir = new TemporaryFolder();
 
     private TaskManagerDataUtil util;
     private TaskManagerTaskUtil tutil;
@@ -109,6 +113,7 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
     public void after() {
         // clean-up
         dao.delete(config);
+        logout();
     }
 
     @SuppressWarnings("unchecked")
@@ -426,8 +431,9 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
                 "dialog:dialog:content:form:userPanel:fileInput", FileUploadField.class);
         tester.assertComponent("dialog:dialog:content:form:userPanel:prepare", CheckBox.class);
         tester.assertModelValue("dialog:dialog:content:form:userPanel:prepare", true);
+                
         dialogFormTester.setFile(
-                "userPanel:fileInput", new File("src/test/resources/fileupload-test.txt"), "");
+                "userPanel:fileInput", new File(tempDir.newFile().getAbsolutePath()), "");
 
         dialogFormTester.submit("submit");
 

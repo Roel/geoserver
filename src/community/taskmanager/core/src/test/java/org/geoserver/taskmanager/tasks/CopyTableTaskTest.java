@@ -121,7 +121,7 @@ public class CopyTableTaskTest extends AbstractTaskManagerTest {
     @After
     public void clearDataFromDatabase() {
         dao.delete(batch);
-        dao.delete(config);
+        dao.delete(config);        
     }
 
     @Test

@@ -43,6 +43,11 @@
         <property name="db" value="testtargetdb"/>
         <property name="username" value="postgres" />
         <property name="password" value="postgres" />
+        <property name="roles">
+        	<list>
+        		<value>ROLE_SOMEONE</value>
+        	</list>
+        </property>
     </bean> --> 
     
     <!-- for local db pub tests, jndi -->
@@ -59,7 +64,7 @@
         	<list>
         		<value>ROLE_SOMEONE_ELSE</value>
         	</list>
-        </property>
+        </property> 
     </bean> 
     <!-- for remote db pub tests, postgres -->
     <bean class="org.geoserver.taskmanager.external.impl.PostgisDbSourceImpl">
@@ -68,12 +73,12 @@
         <property name="db" value="testtargetdb" />
         <property name="username" value="postgres" />
         <property name="password" value="postgres" />
-        <property name="roles">
+         <property name="roles">
         	<list>
         		<value>ROLE_SOMEONE</value>
         		<value>ROLE_SOMEONE_ELSE</value>
         	</list>
-        </property>        
+        </property>      
     </bean>    
 
     <!-- external geoserver for testing -->

@@ -75,6 +75,7 @@ public class InitConfigPageTest extends AbstractWicketTaskManagerTest {
     @After
     public void after() {
         dao.delete(config);
+        logout();
     }
 
     @SuppressWarnings("unchecked")
