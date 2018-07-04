@@ -45,7 +45,7 @@ public class InitConfigUtil {
         }
     }
 
-    public static Configuration wrap(Configuration config) {
+    public Configuration wrap(Configuration config) {
         if (!(config instanceof ConfigurationWrapper)) {
             return new ConfigurationWrapper(config);
         } else {
@@ -65,7 +65,7 @@ public class InitConfigUtil {
         return config.getBatches().get(INIT_BATCH);
     }
 
-    private static class ConfigurationWrapper implements Configuration {
+    private class ConfigurationWrapper implements Configuration {
 
         private static final long serialVersionUID = 8073599284694547987L;
 
@@ -152,10 +152,13 @@ public class InitConfigUtil {
         @Override
         public Map<String, Task> getTasks() {
             Map<String, Task> tasks = new HashMap<String, Task>();
-            Batch batch = delegate.getBatches().get(INIT_BATCH);
+            Batch batch = getInitBatch(delegate);
             if (batch != null) {
-                for (BatchElement element : batch.getElements()) {
-                    tasks.put(element.getTask().getName(), element.getTask());
+                if (batch.getId() != null) {
+                    batch = dataUtil.init(batch);
+                    for (BatchElement element : batch.getElements()) {
+                        tasks.put(element.getTask().getName(), element.getTask());
+                    }
                 }
             }
             return Collections.unmodifiableMap(tasks);

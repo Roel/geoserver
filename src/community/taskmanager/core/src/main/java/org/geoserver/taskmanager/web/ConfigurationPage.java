@@ -119,7 +119,9 @@ public class ConfigurationPage extends GeoServerSecuredPage {
         this.configurationModel =
                 new Model<Configuration>(
                         initMode
-                                ? InitConfigUtil.wrap(configurationModel.getObject())
+                                ? TaskManagerBeans.get()
+                                        .getInitConfigUtil()
+                                        .wrap(configurationModel.getObject())
                                 : configurationModel.getObject());
         oldTasks = new HashMap<>(configurationModel.getObject().getTasks());
         oldBatches = new HashMap<>(configurationModel.getObject().getBatches());
@@ -884,7 +886,9 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                             batchesPanel.getRemovedBatches()));
                     configurationModel.setObject(
                             initMode
-                                    ? InitConfigUtil.wrap(originalConfigurationModel.getObject())
+                                    ? TaskManagerBeans.get()
+                                            .getInitConfigUtil()
+                                            .wrap(originalConfigurationModel.getObject())
                                     : originalConfigurationModel.getObject());
                     removedTasks.clear();
                     batchesPanel.getRemovedBatches().clear();
