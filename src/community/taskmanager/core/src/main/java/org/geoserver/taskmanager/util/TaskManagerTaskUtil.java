@@ -218,21 +218,31 @@ public class TaskManagerTaskUtil {
         return parseParameters(taskTypes.get(task.getType()), getRawParameterValues(task));
     }
 
-    /**
-     * Clean-up a configuration.
-     *
-     * @param config the configuration.
-     * @return true if the cleanup was entirely successful, false if one or more task clean-ups
-     *     failed, in which case the logs should be checked.
-     */
-    public boolean cleanup(Configuration config) {
-        boolean success = true;
-
+    protected List<Task> orderTasksForCleanup(Configuration config) {
         // let's try to figure out the ideal order to clean-up tasks,
         // merging the orders of the different batches and turning them around
         // this algorithm will work perfectly if there are no contradictions in there
         // (for example B1 = T1,T2    and B2 = T2,T1)
         // in that case, the chosen order will depend on coincidence
+
+        // one other thing: tasks in the @initialize batch should have preference to
+        // be at the end, so we will make sure they are handled first in this pre-order
+        List<Task> preOrderedTasks = new ArrayList<Task>();
+        for (Task task : config.getTasks().values()) {
+            boolean isInitTask = false;
+            task = dataUtil.init(task);
+            for (BatchElement el : task.getBatchElements()) {
+                Batch batch = dataUtil.init(el.getBatch());
+                isInitTask = isInitTask || InitConfigUtil.isInitBatch(batch);
+            }
+            if (isInitTask) {
+                preOrderedTasks.add(0, task);
+            } else {
+                preOrderedTasks.add(task);
+            }
+        }
+
+        // now the ordering algorithm as specified above
         List<Task> orderedTasks = new ArrayList<Task>();
         for (Task task : config.getTasks().values()) {
             int position = orderedTasks.size();
@@ -251,8 +261,21 @@ public class TaskManagerTaskUtil {
             orderedTasks.add(position, task);
         }
 
+        return orderedTasks;
+    }
+
+    /**
+     * Clean-up a configuration.
+     *
+     * @param config the configuration.
+     * @return true if the cleanup was entirely successful, false if one or more task clean-ups
+     *     failed, in which case the logs should be checked.
+     */
+    public boolean cleanup(Configuration config) {
+        boolean success = true;
+
         // now clean-up
-        for (Task task : orderedTasks) {
+        for (Task task : orderTasksForCleanup(config)) {
             if (canCleanup(task)) {
                 success = cleanup(task) && success;
             }

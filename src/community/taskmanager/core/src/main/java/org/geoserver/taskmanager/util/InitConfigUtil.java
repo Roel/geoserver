@@ -65,6 +65,10 @@ public class InitConfigUtil {
         return config.getBatches().get(INIT_BATCH);
     }
 
+    public static boolean isInitBatch(Batch batch) {
+        return batch.getConfiguration() != null && batch.getName().equals(INIT_BATCH);
+    }
+
     private class ConfigurationWrapper implements Configuration {
 
         private static final long serialVersionUID = 8073599284694547987L;
