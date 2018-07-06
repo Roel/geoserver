@@ -124,7 +124,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
         tester.assertRenderedPage(ConfigurationPage.class);
 
         tester.assertModelValue("configurationForm:description", null);
-        
+
         logout();
     }
 
@@ -147,7 +147,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
         tester.assertModelValue("configurationForm:description", dummy1.getDescription());
 
         dao.delete(dummy1);
-        
+
         logout();
     }
 
@@ -171,14 +171,14 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
         tester.assertRenderedPage(ConfigurationPage.class);
 
         tester.assertModelValue("configurationForm:description", "template description");
-        
+
         logout();
     }
 
     @Test
     public void testDelete() throws Exception {
         login();
-        
+
         ConfigurationsPage page = new ConfigurationsPage();
         tester.startPage(page);
 
@@ -234,7 +234,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
     @Test
     public void testCopy() throws Exception {
         login();
-        
+
         ConfigurationsPage page = new ConfigurationsPage();
 
         Configuration dummy1 = dao.save(dummyConfiguration1());
@@ -257,7 +257,7 @@ public class ConfigurationsPageTest extends AbstractWicketTaskManagerTest {
         tester.assertRenderedPage(ConfigurationPage.class);
 
         tester.assertModelValue("configurationForm:description", "z description");
-        
+
         logout();
     }
 

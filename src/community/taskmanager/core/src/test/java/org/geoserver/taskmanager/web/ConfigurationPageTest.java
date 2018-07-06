@@ -51,7 +51,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 
 public class ConfigurationPageTest extends AbstractBatchesPanelTest<ConfigurationPage> {
-    
+
     @Rule public TemporaryFolder tempDir = new TemporaryFolder();
 
     private TaskManagerDataUtil util;
@@ -431,7 +431,7 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
                 "dialog:dialog:content:form:userPanel:fileInput", FileUploadField.class);
         tester.assertComponent("dialog:dialog:content:form:userPanel:prepare", CheckBox.class);
         tester.assertModelValue("dialog:dialog:content:form:userPanel:prepare", true);
-                
+
         dialogFormTester.setFile(
                 "userPanel:fileInput", new File(tempDir.newFile().getAbsolutePath()), "");
 

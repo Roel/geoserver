@@ -78,11 +78,13 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
 
     @Override
     public Configuration save(final Configuration config) {
+        for (Batch batch : config.getBatches().values()) {
+            reorder(batch);
+        }
         return saveObject(config);
     }
 
-    @Override
-    public Batch save(final Batch batch) {
+    protected void reorder(Batch batch) {
         int i = 0;
         for (BatchElement element : batch.getElements()) {
             if (element.isActive()) {
@@ -91,6 +93,11 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                 element.setIndex(null);
             }
         }
+    }
+
+    @Override
+    public Batch save(final Batch batch) {
+        reorder(batch);
         return saveObject(batch);
     }
 
