@@ -235,8 +235,12 @@ public class BatchPage extends GeoServerSecuredPage {
                     batchModel.setObject(
                             TaskManagerBeans.get()
                                     .getDataUtil()
-                                    .saveScheduleAndRemove(
-                                            batchModel.getObject(), removedElements));
+                                    .init(
+                                            TaskManagerBeans.get()
+                                                    .getDataUtil()
+                                                    .saveScheduleAndRemove(
+                                                            batchModel.getObject(),
+                                                            removedElements)));
                     // update the old config (still used on configuration page)
                     if (config != null) {
                         batchModel.getObject().setConfiguration(config);

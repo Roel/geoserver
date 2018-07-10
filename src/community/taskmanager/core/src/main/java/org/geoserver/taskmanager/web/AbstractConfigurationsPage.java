@@ -112,7 +112,8 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                             new Model<ArrayList<String>>(list),
                                                             new ParamResourceModel(
                                                                     "addNewDialog.chooseTemplate",
-                                                                    getPage()));
+                                                                    getPage()),
+                                                            true);
                                             return panel;
                                         }
 
