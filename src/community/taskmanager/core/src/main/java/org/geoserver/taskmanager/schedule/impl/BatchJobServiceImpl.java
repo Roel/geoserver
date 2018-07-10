@@ -163,6 +163,7 @@ public class BatchJobServiceImpl
     }
 
     @Override
+    @Transactional("tmTransactionManager")
     public void reloadFromData() {
         LOGGER.info("Reloading scheduler from data.");
 
@@ -174,7 +175,6 @@ public class BatchJobServiceImpl
         }
 
         for (Batch batch : dao.getAllBatches()) {
-            batch = dataUtil.init(batch);
             try {
                 schedule(batch);
             } catch (SchedulerException | IllegalArgumentException e) {
@@ -204,6 +204,7 @@ public class BatchJobServiceImpl
         this.init = init;
     }
 
+    @Transactional("tmTransactionManager")
     public void onApplicationEvent(ContextRefreshedEvent event) {
         if (init) {
             reloadFromData();

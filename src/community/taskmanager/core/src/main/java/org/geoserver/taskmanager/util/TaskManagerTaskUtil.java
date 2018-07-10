@@ -232,8 +232,7 @@ public class TaskManagerTaskUtil {
             boolean isInitTask = false;
             task = dataUtil.init(task);
             for (BatchElement el : task.getBatchElements()) {
-                Batch batch = dataUtil.init(el.getBatch());
-                isInitTask = isInitTask || InitConfigUtil.isInitBatch(batch);
+                isInitTask = isInitTask || InitConfigUtil.isInitBatch(el.getBatch());
             }
             if (isInitTask) {
                 preOrderedTasks.add(0, task);

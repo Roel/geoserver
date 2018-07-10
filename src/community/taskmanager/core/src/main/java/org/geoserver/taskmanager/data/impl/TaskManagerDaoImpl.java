@@ -85,12 +85,14 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
     }
 
     protected void reorder(Batch batch) {
-        int i = 0;
-        for (BatchElement element : batch.getElements()) {
-            if (element.isActive()) {
-                element.setIndex(i++);
-            } else {
-                element.setIndex(null);
+        if (Hibernate.isInitialized(batch.getElements())) {
+            int i = 0;
+            for (BatchElement element : batch.getElements()) {
+                if (element.isActive()) {
+                    element.setIndex(i++);
+                } else {
+                    element.setIndex(null);
+                }
             }
         }
     }
