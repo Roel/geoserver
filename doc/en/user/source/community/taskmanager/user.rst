@@ -6,6 +6,7 @@ User's Guide
 -  `Security <#security>`__
 -  `Graphical User Interface <#graphical-user-interface>`__
 -  `Task Types <#task-types>`__
+-  `Import Tool <#import-tool>`__
 -  `Examples <#examples>`__
 
 Installation
@@ -353,8 +354,10 @@ values. Contrary to the rest of the configuration, this function is only
 exposed via a REST service and not via the GUI. The import tool will
 generate a new configuration for each line in the CSV file, except for
 the first. The first line must specify the attribute names which should
-all match attributes that exist in the template. The CSV file must
-specify a valid attribute value for each required attribute.
+all match attributes that exist in the template, plus ``name`` (required), 
+``description``` (optional) and ``workspace`` (optional) for the configuration
+metadata. The CSV file mustspecify a valid attribute value for each
+required attribute.
 
 To invoke the import tool, ``POST`` your CSV file to
 ``http://{geoserver-host}/geoserver/taskmanager-import/{template}``
