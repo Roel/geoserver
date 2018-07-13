@@ -24,23 +24,13 @@ public class HzResourceNotificationDispatcher extends SimpleResourceNotification
 
     private HzCluster cluster;
 
-    public HzResourceNotificationDispatcher() {
-        // lazy loaded cluster
-    }
-
     public HzResourceNotificationDispatcher(HzCluster cluster) {
         this.cluster = cluster;
         topic().addMessageListener(this);
     }
 
     private ITopic<ResourceNotification> topic() {
-        if (cluster == null) {
-            cluster = HzCluster.getInstanceIfAvailable().orNull();
-            if (cluster != null) {
-                topic().addMessageListener(this);
-            }
-        }
-        return cluster == null ? null : cluster.getHz().getTopic(TOPIC_NAME);
+        return cluster.getHz().getTopic(TOPIC_NAME);
     }
 
     @Override
