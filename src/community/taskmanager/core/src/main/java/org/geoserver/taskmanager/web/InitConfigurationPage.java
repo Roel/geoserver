@@ -49,8 +49,12 @@ public class InitConfigurationPage extends GeoServerSecuredPage {
                                 // reload page
                                 setResponsePage(
                                         new ConfigurationPage(
-                                                InitConfigUtil.unwrap(
-                                                        configurationModel.getObject())));
+                                                TaskManagerBeans.get()
+                                                        .getDao()
+                                                        .reload(
+                                                                InitConfigUtil.unwrap(
+                                                                        configurationModel
+                                                                                .getObject()))));
                             }
                         }
                     });

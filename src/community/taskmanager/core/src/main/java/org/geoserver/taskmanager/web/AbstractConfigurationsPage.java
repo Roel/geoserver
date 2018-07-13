@@ -13,6 +13,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -375,16 +376,26 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                     IModel<Configuration> itemModel,
                                     Property<Configuration> property) {
                                 if (property.equals(ConfigurationsModel.NAME)) {
-                                    return new SimpleAjaxLink<String>(
-                                            id, (IModel<String>) property.getModel(itemModel)) {
-                                        private static final long serialVersionUID =
-                                                -9184383036056499856L;
+                                    SimpleAjaxLink<String> link =
+                                            new SimpleAjaxLink<String>(
+                                                    id,
+                                                    (IModel<String>) property.getModel(itemModel)) {
+                                                private static final long serialVersionUID =
+                                                        -9184383036056499856L;
 
-                                        @Override
-                                        protected void onClick(AjaxRequestTarget target) {
-                                            setResponsePage(new ConfigurationPage(itemModel));
-                                        }
-                                    };
+                                                @Override
+                                                protected void onClick(AjaxRequestTarget target) {
+                                                    setResponsePage(
+                                                            new ConfigurationPage(itemModel));
+                                                }
+                                            };
+                                    if (!itemModel.getObject().isTemplate()
+                                            && !itemModel.getObject().isValidated()) {
+                                        link.add(
+                                                new AttributeAppender(
+                                                        "class", "notvalidated", " "));
+                                    }
+                                    return link;
                                 }
                                 return null;
                             }

@@ -144,6 +144,13 @@ public class ConfigurationPage extends GeoServerSecuredPage {
 
         add(new WebMarkupContainer("init").setVisible(initMode));
 
+        add(
+                new WebMarkupContainer("notvalidated")
+                        .setVisible(
+                                !initMode
+                                        && !configurationModel.getObject().isTemplate()
+                                        && !configurationModel.getObject().isValidated()));
+
         Form<Configuration> form = new Form<Configuration>("configurationForm", configurationModel);
         add(form);
 

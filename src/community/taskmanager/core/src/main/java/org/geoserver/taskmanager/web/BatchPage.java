@@ -94,6 +94,7 @@ public class BatchPage extends GeoServerSecuredPage {
                 new WebMarkupContainer("notvalidated")
                         .setVisible(
                                 batchModel.getObject().getConfiguration() != null
+                                        && !batchModel.getObject().getConfiguration().isTemplate()
                                         && !batchModel
                                                 .getObject()
                                                 .getConfiguration()
