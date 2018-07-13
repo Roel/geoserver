@@ -32,6 +32,7 @@ import org.apache.wicket.request.resource.PackageResourceReference;
 import org.geoserver.taskmanager.data.Batch;
 import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.util.FrequencyUtil;
+import org.geoserver.taskmanager.util.InitConfigUtil;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
 import org.geoserver.taskmanager.web.BatchPage;
 import org.geoserver.taskmanager.web.BatchRunsPage;
@@ -364,6 +365,12 @@ public class BatchesPanel extends Panel {
                                                                     && configurationModel
                                                                             .getObject()
                                                                             .isTemplate())
+                                                            || (configurationModel != null
+                                                                    && !configurationModel
+                                                                            .getObject()
+                                                                            .isValidated()
+                                                                    && !InitConfigUtil.isInitBatch(
+                                                                            itemModel.getObject()))
                                                             || !TaskManagerBeans.get()
                                                                     .getSecUtil()
                                                                     .isWritable(

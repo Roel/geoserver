@@ -14,17 +14,22 @@ import org.geoserver.taskmanager.data.BatchRun;
 import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.data.Run.Status;
 import org.geoserver.taskmanager.data.Task;
+import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /** @author Niels Charlier */
 @Service
 public class InitConfigUtil {
 
-    @Autowired TaskManagerDataUtil dataUtil;
-
     private static final String INIT_BATCH = "@Initialize";
 
+    @Autowired private TaskManagerDao dao;
+
+    @Autowired private TaskManagerDataUtil dataUtil;
+
+    @Transactional("tmTransactionManager")
     public boolean isInitConfig(Configuration config) {
         if (config.isTemplate()) {
             return false;
@@ -32,7 +37,7 @@ public class InitConfigUtil {
         Batch batch = config.getBatches().get(INIT_BATCH);
         if (batch != null) {
             if (batch.getId() != null) {
-                batch = dataUtil.init(batch);
+                batch = dao.reload(batch);
                 for (BatchRun batchRun : batch.getBatchRuns()) {
                     if (batchRun.getStatus() == Status.COMMITTED) {
                         return false;
@@ -47,7 +52,7 @@ public class InitConfigUtil {
 
     public Configuration wrap(Configuration config) {
         if (!(config instanceof ConfigurationWrapper)) {
-            return new ConfigurationWrapper(config);
+            return new ConfigurationWrapper(config, dataUtil.init(getInitBatch(config)));
         } else {
             return config;
         }
@@ -69,14 +74,17 @@ public class InitConfigUtil {
         return batch.getConfiguration() != null && batch.getName().equals(INIT_BATCH);
     }
 
-    private class ConfigurationWrapper implements Configuration {
+    private static class ConfigurationWrapper implements Configuration {
 
         private static final long serialVersionUID = 8073599284694547987L;
 
         private Configuration delegate;
 
-        public ConfigurationWrapper(Configuration delegate) {
+        private Batch initBatch;
+
+        public ConfigurationWrapper(Configuration delegate, Batch initBatch) {
             this.delegate = delegate;
+            this.initBatch = initBatch;
         }
 
         public Configuration getDelegate() {
@@ -156,11 +164,9 @@ public class InitConfigUtil {
         @Override
         public Map<String, Task> getTasks() {
             Map<String, Task> tasks = new HashMap<String, Task>();
-            Batch batch = getInitBatch(delegate);
-            if (batch != null) {
-                if (batch.getId() != null) {
-                    batch = dataUtil.init(batch);
-                    for (BatchElement element : batch.getElements()) {
+            if (initBatch != null) {
+                if (initBatch.getId() != null) {
+                    for (BatchElement element : initBatch.getElements()) {
                         tasks.put(element.getTask().getName(), element.getTask());
                     }
                 }
@@ -170,9 +176,8 @@ public class InitConfigUtil {
 
         @Override
         public Map<String, Batch> getBatches() {
-            Batch batch = getInitBatch(delegate);
-            if (batch != null) {
-                return Collections.singletonMap(batch.getName(), batch);
+            if (initBatch != null) {
+                return Collections.singletonMap(initBatch.getName(), initBatch);
             }
             return Collections.emptyMap();
         }

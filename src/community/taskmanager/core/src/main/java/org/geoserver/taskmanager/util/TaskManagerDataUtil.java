@@ -349,10 +349,8 @@ public class TaskManagerDataUtil {
      */
     @Transactional("tmTransactionManager")
     public Task init(Task task) {
-        if (!Hibernate.isInitialized(task.getBatchElements())) {
-            task = dao.reload(task);
-            Hibernate.initialize(task.getBatchElements());
-        }
+        task = dao.reload(task);
+        Hibernate.initialize(task.getBatchElements());
         return task;
     }
 
@@ -364,10 +362,8 @@ public class TaskManagerDataUtil {
      */
     @Transactional("tmTransactionManager")
     public BatchElement init(BatchElement be) {
-        if (!Hibernate.isInitialized(be.getRuns())) {
-            be = dao.reload(be);
-            Hibernate.initialize(be.getRuns());
-        }
+        be = dao.reload(be);
+        Hibernate.initialize(be.getRuns());
         return be;
     }
 
@@ -379,12 +375,9 @@ public class TaskManagerDataUtil {
      */
     @Transactional("tmTransactionManager")
     public Batch init(Batch b) {
-        if (!Hibernate.isInitialized(b.getElements())
-                || !Hibernate.isInitialized(b.getBatchRuns())) {
-            b = dao.reload(b);
-            Hibernate.initialize(b.getElements());
-            Hibernate.initialize(b.getBatchRuns());
-        }
+        b = dao.reload(b);
+        Hibernate.initialize(b.getElements());
+        Hibernate.initialize(b.getBatchRuns());
         return b;
     }
 }
