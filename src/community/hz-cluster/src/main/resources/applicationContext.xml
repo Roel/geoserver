@@ -31,7 +31,9 @@
    
    <!-- override the default one -->
    <bean id="hzResourceNotificationDispatcher" primary="true" 
-   		class="org.geoserver.cluster.hazelcast.HzResourceNotificationDispatcher" />
+   		class="org.geoserver.cluster.hazelcast.HzResourceNotificationDispatcher" >
+   		<constructor-arg ref="hzCluster"/>
+   </bean>
    <alias name="hzResourceNotificationDispatcher" alias="resourceNotificationDispatcher" />
    
    <!-- turn of default webui redirect -->
