@@ -148,6 +148,7 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                 new WebMarkupContainer("notvalidated")
                         .setVisible(
                                 !initMode
+                                        && configurationModel.getObject().getId() != null
                                         && !configurationModel.getObject().isTemplate()
                                         && !configurationModel.getObject().isValidated()));
 
