@@ -52,10 +52,15 @@ public class InitConfigUtil {
 
     public Configuration wrap(Configuration config) {
         if (!(config instanceof ConfigurationWrapper)) {
-            return new ConfigurationWrapper(config, dataUtil.init(getInitBatch(config)));
-        } else {
-            return config;
+            Batch batch = getInitBatch(config);
+            if (batch != null) {
+                if (batch.getId() != null) {
+                    batch = dataUtil.init(batch);
+                    return new ConfigurationWrapper(config, batch);
+                }
+            }
         }
+        return config;
     }
 
     public static Configuration unwrap(Configuration config) {
