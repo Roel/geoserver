@@ -10,6 +10,7 @@ import it.geosolutions.geoserver.rest.GeoServerRESTPublisher.UploadMethod;
 import it.geosolutions.geoserver.rest.encoder.GSGenericStoreEncoder;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder;
 import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
+import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -149,6 +150,7 @@ public class FileRemotePublicationTaskTypeImpl extends AbstractRemotePublication
     protected void postProcess(
             GSResourceEncoder re, TaskContext ctx, TaskRunnable<GSResourceEncoder> update)
             throws TaskException {
+        final boolean coverage = re instanceof GSCoverageEncoder;
         FileReference fileRef =
                 (FileReference)
                         ctx.getBatchContext()
@@ -167,16 +169,26 @@ public class FileRemotePublicationTaskTypeImpl extends AbstractRemotePublication
                                                 String nativeName =
                                                         FilenameUtils.getBaseName(
                                                                 fileRef.getLatestVersion());
-                                                GSCoverageEncoder re = new GSCoverageEncoder(false);
+                                                final GSResourceEncoder re;
+                                                if (coverage) {
+                                                    re = new GSCoverageEncoder(false);
+                                                } else {
+                                                    re = new GSFeatureTypeEncoder(false);
+                                                }
                                                 re.setNativeName(nativeName);
-                                                re.setNativeCoverageName(nativeName);
+                                                if (coverage) {
+                                                    ((GSCoverageEncoder) re)
+                                                            .setNativeCoverageName(nativeName);
+                                                }
                                                 update.run(re);
                                             }
                                         });
         if (fileRef != null) {
             String nativeName = FilenameUtils.getBaseName(fileRef.getLatestVersion());
-            ((GSCoverageEncoder) re).setNativeName(nativeName);
-            ((GSCoverageEncoder) re).setNativeCoverageName(nativeName);
+            re.setNativeName(nativeName);
+            if (coverage) {
+                ((GSCoverageEncoder) re).setNativeCoverageName(nativeName);
+            }
         }
     }
 
