@@ -186,7 +186,7 @@ public abstract class AbstractBatchesPanelTest<T extends Page>
 
         assertFalse(containsBatch(getBatches(), dummy1));
         assertTrue(containsBatch(getBatches(), dummy2));
-        
+
         ((BatchesModel) table.getDataProvider()).reset();
 
         assertFalse(containsBatch(getBatchesFromTable(table), dummy1));
