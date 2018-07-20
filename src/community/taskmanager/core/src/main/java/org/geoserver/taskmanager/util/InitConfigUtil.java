@@ -56,8 +56,8 @@ public class InitConfigUtil {
             if (batch != null) {
                 if (batch.getId() != null) {
                     batch = dataUtil.init(batch);
-                    return new ConfigurationWrapper(config, batch);
                 }
+                return new ConfigurationWrapper(config, batch);
             }
         }
         return config;
@@ -170,10 +170,8 @@ public class InitConfigUtil {
         public Map<String, Task> getTasks() {
             Map<String, Task> tasks = new HashMap<String, Task>();
             if (initBatch != null) {
-                if (initBatch.getId() != null) {
-                    for (BatchElement element : initBatch.getElements()) {
-                        tasks.put(element.getTask().getName(), element.getTask());
-                    }
+                for (BatchElement element : initBatch.getElements()) {
+                    tasks.put(element.getTask().getName(), element.getTask());
                 }
             }
             return Collections.unmodifiableMap(tasks);
