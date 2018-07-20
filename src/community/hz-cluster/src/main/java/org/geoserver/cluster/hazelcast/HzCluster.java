@@ -161,10 +161,6 @@ public class HzCluster implements GeoServerPluginConfigurator, DisposableBean, I
         this.rnd = rnd;
     }
 
-    /*public HzResourceNotificationDispatcher getResourceNotificationDispatcher() {
-        return rnd;
-    }*/
-
     /** For Spring initialisation, don't call otherwise. */
     public void setRawCatalog(Catalog rawCatalog) throws IOException {
         this.rawCatalog = rawCatalog;
