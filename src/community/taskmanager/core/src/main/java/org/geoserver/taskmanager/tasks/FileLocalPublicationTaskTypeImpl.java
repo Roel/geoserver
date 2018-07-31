@@ -229,6 +229,10 @@ public class FileLocalPublicationTaskTypeImpl implements TaskType {
                             catalog.getResource(resource.getId(), ResourceInfo.class);
                     editResource.setAdvertised(true);
                     catalog.save(editResource);
+
+                    LayerInfo editLayer = catalog.getLayer(layer.getId());
+                    editLayer.setAdvertised(true);
+                    catalog.save(editLayer);
                 }
             }
 
