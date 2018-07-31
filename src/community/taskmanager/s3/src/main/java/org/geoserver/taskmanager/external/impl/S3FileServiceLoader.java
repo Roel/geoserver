@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -58,8 +59,15 @@ public class S3FileServiceLoader {
         if (!Strings.isEmpty(prepareScript)) {
             fileService.setPrepareScript(prepareScript.trim());
         }
+        String roles = properties.getProperty(prefix + "." + rootfolder + ".s3.roles");
+        if (!Strings.isEmpty(roles)) {
+            List<String> rolesList = new ArrayList<String>();
+            for (String role : roles.split(",")) {
+                rolesList.add(role.trim());
+            }
+            fileService.setRoles(rolesList);
+        }
         fileServices.add(fileService);
-
         lookupFileService.setFileServices(fileServices);
     }
 

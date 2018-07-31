@@ -11,7 +11,7 @@ import java.net.URI;
 import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.wicket.util.string.Strings;
-import org.geoserver.taskmanager.util.Named;
+import org.geoserver.taskmanager.util.Secured;
 
 /**
  * Persist and read files. All actions on this service are relative to the configured rootFolder.
@@ -19,7 +19,7 @@ import org.geoserver.taskmanager.util.Named;
  * @author Timothy De Bock - timothy.debock.github@gmail.com
  * @author Niels Charlier
  */
-public interface FileService extends Serializable, Named {
+public interface FileService extends Serializable, Secured {
 
     String PLACEHOLDER_VERSION = "###";
 

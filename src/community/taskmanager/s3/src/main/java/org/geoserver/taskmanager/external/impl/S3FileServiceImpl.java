@@ -62,6 +62,8 @@ public class S3FileServiceImpl implements FileService {
 
     private String prepareScript;
 
+    private List<String> roles;
+
     private static String S3_NAME_PREFIX = "s3-";
 
     public static String name(String prefix, String bucket) {
@@ -341,5 +343,13 @@ public class S3FileServiceImpl implements FileService {
         s3.setEndpoint(endpoint);
 
         return s3;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

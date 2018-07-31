@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
@@ -51,12 +52,14 @@ public class S3FileServiceDataTest extends AbstractTaskManagerTest {
         Assert.assertTrue(fs instanceof S3FileServiceImpl);
         Assert.assertEquals("http://127.0.0.1:9000", ((S3FileServiceImpl) fs).getEndpoint());
         Assert.assertEquals("source", ((S3FileServiceImpl) fs).getRootFolder());
+        Assert.assertEquals(Arrays.asList("a", "b", "c"), ((S3FileServiceImpl) fs).getRoles());
 
         fs = fileServiceRegistry.get("s3-test-target");
         Assert.assertNotNull(fs);
         Assert.assertTrue(fs instanceof S3FileServiceImpl);
         Assert.assertEquals("http://127.0.0.1:9000", ((S3FileServiceImpl) fs).getEndpoint());
         Assert.assertEquals("target", ((S3FileServiceImpl) fs).getRootFolder());
+        Assert.assertEquals(Arrays.asList("d", "e", "f"), ((S3FileServiceImpl) fs).getRoles());
 
         fs = fileServiceRegistry.get("temp-directory");
         Assert.assertNotNull(fs);
