@@ -206,15 +206,18 @@ public class BatchJobServiceImpl
 
     @Transactional("tmTransactionManager")
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (init) {
-            reloadFromData();
-        } else {
-            LOGGER.info("Skipping initialization as specified in configuration.");
-        }
-        try {
-            scheduler.start();
-        } catch (SchedulerException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        // call only once at start-up, so not for child contexts.
+        if (event.getApplicationContext().getParent() == null) {
+            if (init) {
+                reloadFromData();
+            } else {
+                LOGGER.info("Skipping initialization as specified in configuration.");
+            }
+            try {
+                scheduler.start();
+            } catch (SchedulerException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
         }
     }
 
