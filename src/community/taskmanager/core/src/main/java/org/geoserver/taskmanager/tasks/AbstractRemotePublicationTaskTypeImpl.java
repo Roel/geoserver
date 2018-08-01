@@ -338,15 +338,6 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                                     + " to "
                                     + resource.getName());
                 }
-
-                final GSLayerEncoder layerEncoder = new GSLayerEncoder(false);
-                layerEncoder.setAdvertised(true);
-                if (!restManager
-                        .getPublisher()
-                        .configureLayer(ws, resource.getName(), layerEncoder)) {
-                    throw new TaskException(
-                            "Failed to advertise layer " + ws + ":" + resource.getName());
-                }
             }
 
             @Override
