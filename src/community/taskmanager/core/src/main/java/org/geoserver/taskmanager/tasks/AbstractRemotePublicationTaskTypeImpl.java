@@ -42,9 +42,7 @@ import org.geoserver.taskmanager.schedule.TaskType;
 import org.geoserver.taskmanager.util.CatalogUtil;
 import org.geotools.util.logging.Logging;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType {
 
     private static final Logger LOGGER = Logging.getLogger(DbRemotePublicationTaskTypeImpl.class);
@@ -124,6 +122,8 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                                 ? restManager.getReader().existsDatastore(ws, storeName)
                                 : restManager.getReader().existsCoveragestore(ws, storeName));
         final String tempName = "_temp_" + UUID.randomUUID().toString().replace('-', '_');
+        ctx.getBatchContext()
+                .put(layer.prefixedName(), resource.getNamespace().getPrefix() + ":" + tempName);
         final String actualStoreName = neverReuseStore() && createStore ? tempName : storeName;
 
         try {
@@ -338,6 +338,8 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                                     + " to "
                                     + resource.getName());
                 }
+
+                ctx.getBatchContext().delete(layer.prefixedName());
             }
 
             @Override
