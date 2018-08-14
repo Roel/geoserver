@@ -392,7 +392,12 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                 @Override
                                                 protected void onClick(AjaxRequestTarget target) {
                                                     setResponsePage(
-                                                            new ConfigurationPage(itemModel));
+                                                            new ConfigurationPage(
+                                                                    TaskManagerBeans.get()
+                                                                            .getDao()
+                                                                            .init(
+                                                                                    itemModel
+                                                                                            .getObject())));
                                                 }
                                             };
                                     if (!itemModel.getObject().isTemplate()

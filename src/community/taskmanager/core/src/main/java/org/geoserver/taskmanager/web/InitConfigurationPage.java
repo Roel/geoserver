@@ -51,7 +51,7 @@ public class InitConfigurationPage extends GeoServerSecuredPage {
                                         new ConfigurationPage(
                                                 TaskManagerBeans.get()
                                                         .getDao()
-                                                        .reload(
+                                                        .init(
                                                                 InitConfigUtil.unwrap(
                                                                         configurationModel
                                                                                 .getObject()))));

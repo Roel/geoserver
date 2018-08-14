@@ -34,7 +34,6 @@ public class BatchRunsPage extends GeoServerSecuredPage {
     private GeoServerTablePanel<BatchRun> runsPanel;
 
     public BatchRunsPage(IModel<Batch> batchModel, Page parentPage) {
-        batchModel.setObject(TaskManagerBeans.get().getDao().initHistory(batchModel.getObject()));
         this.batchModel = batchModel;
         setReturnPage(parentPage);
     }

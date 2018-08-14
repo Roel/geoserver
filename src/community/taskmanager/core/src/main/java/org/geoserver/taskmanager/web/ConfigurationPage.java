@@ -111,10 +111,6 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                 getSession().getAuthentication(), configurationModel.getObject())) {
             throw new RestartResponseException(UnauthorizedPage.class);
         }
-        if (configurationModel.getObject().getId() != null) {
-            configurationModel.setObject(
-                    TaskManagerBeans.get().getDao().init(configurationModel.getObject()));
-        }
         initMode =
                 TaskManagerBeans.get()
                         .getInitConfigUtil()

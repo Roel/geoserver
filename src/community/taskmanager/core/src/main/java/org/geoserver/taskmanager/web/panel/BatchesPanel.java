@@ -101,7 +101,7 @@ public class BatchesPanel extends Panel {
                         if (configurationModel != null) {
                             batch.setConfiguration(configurationModel.getObject());
                         }
-                        setResponsePage(new BatchPage(new Model<Batch>(batch), getPage()));
+                        setResponsePage(new BatchPage(batch, getPage()));
                     }
 
                     @Override
@@ -296,7 +296,12 @@ public class BatchesPanel extends Panel {
                                                                     AjaxRequestTarget target) {
                                                                 setResponsePage(
                                                                         new BatchPage(
-                                                                                itemModel,
+                                                                                TaskManagerBeans
+                                                                                        .get()
+                                                                                        .getDao()
+                                                                                        .init(
+                                                                                                itemModel
+                                                                                                        .getObject()),
                                                                                 getPage()));
                                                             }
                                                         };
@@ -316,7 +321,12 @@ public class BatchesPanel extends Panel {
                                                                     Form<?> form) {
                                                                 setResponsePage(
                                                                         new BatchPage(
-                                                                                itemModel,
+                                                                                TaskManagerBeans
+                                                                                        .get()
+                                                                                        .getDao()
+                                                                                        .init(
+                                                                                                itemModel
+                                                                                                        .getObject()),
                                                                                 getPage()));
                                                             }
                                                         };
@@ -356,7 +366,14 @@ public class BatchesPanel extends Panel {
                                                                 AjaxRequestTarget target) {
                                                             setResponsePage(
                                                                     new BatchRunsPage(
-                                                                            itemModel, getPage()));
+                                                                            new Model<Batch>(
+                                                                                    TaskManagerBeans
+                                                                                            .get()
+                                                                                            .getDao()
+                                                                                            .initHistory(
+                                                                                                    itemModel
+                                                                                                            .getObject())),
+                                                                            getPage()));
                                                         }
                                                     };
                                                 } else if (property == BatchesModel.RUN) {
