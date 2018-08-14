@@ -17,7 +17,6 @@ import org.geoserver.taskmanager.data.Task;
 import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /** @author Niels Charlier */
 @Service
@@ -27,17 +26,14 @@ public class InitConfigUtil {
 
     @Autowired private TaskManagerDao dao;
 
-    @Autowired private TaskManagerDataUtil dataUtil;
-
-    @Transactional("tmTransactionManager")
     public boolean isInitConfig(Configuration config) {
         if (config.isTemplate()) {
             return false;
         }
-        Batch batch = config.getBatches().get(INIT_BATCH);
+        Batch batch = getInitBatch(config);
         if (batch != null) {
             if (batch.getId() != null) {
-                batch = dao.reload(batch);
+                batch = dao.initHistory(batch);
                 for (BatchRun batchRun : batch.getBatchRuns()) {
                     if (batchRun.getStatus() == Status.COMMITTED) {
                         return false;
@@ -54,9 +50,6 @@ public class InitConfigUtil {
         if (!(config instanceof ConfigurationWrapper)) {
             Batch batch = getInitBatch(config);
             if (batch != null) {
-                if (batch.getId() != null) {
-                    batch = dataUtil.init(batch);
-                }
                 return new ConfigurationWrapper(config, batch);
             }
         }
@@ -85,11 +78,22 @@ public class InitConfigUtil {
 
         private Configuration delegate;
 
-        private Batch initBatch;
+        private Map<String, Task> tasks = new HashMap<String, Task>();;
+
+        private Map<String, Batch> batches;
 
         public ConfigurationWrapper(Configuration delegate, Batch initBatch) {
             this.delegate = delegate;
-            this.initBatch = initBatch;
+
+            if (initBatch != null) {
+                for (BatchElement element : initBatch.getElements()) {
+                    tasks.put(element.getTask().getName(), element.getTask());
+                }
+
+                batches = Collections.singletonMap(initBatch.getName(), initBatch);
+            } else {
+                batches = Collections.emptyMap();
+            }
         }
 
         public Configuration getDelegate() {
@@ -168,21 +172,12 @@ public class InitConfigUtil {
 
         @Override
         public Map<String, Task> getTasks() {
-            Map<String, Task> tasks = new HashMap<String, Task>();
-            if (initBatch != null) {
-                for (BatchElement element : initBatch.getElements()) {
-                    tasks.put(element.getTask().getName(), element.getTask());
-                }
-            }
-            return Collections.unmodifiableMap(tasks);
+            return tasks;
         }
 
         @Override
         public Map<String, Batch> getBatches() {
-            if (initBatch != null) {
-                return Collections.singletonMap(initBatch.getName(), initBatch);
-            }
-            return Collections.emptyMap();
+            return batches;
         }
     }
 }

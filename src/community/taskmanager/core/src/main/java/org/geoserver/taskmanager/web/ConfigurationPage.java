@@ -111,6 +111,10 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                 getSession().getAuthentication(), configurationModel.getObject())) {
             throw new RestartResponseException(UnauthorizedPage.class);
         }
+        if (configurationModel.getObject().getId() != null) {
+            configurationModel.setObject(
+                    TaskManagerBeans.get().getDao().init(configurationModel.getObject()));
+        }
         initMode =
                 TaskManagerBeans.get()
                         .getInitConfigUtil()
@@ -436,7 +440,11 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                     AjaxRequestTarget target, Component contents) {
                                 Set<String> attNames = new HashSet<String>();
                                 for (Task task : tasksPanel.getSelection()) {
-                                    BatchElement element = taskInUse(task);
+                                    BatchElement element =
+                                            TaskManagerBeans.get()
+                                                    .getDataUtil()
+                                                    .taskInUse(
+                                                            task, configurationModel.getObject());
                                     if (element == null) {
                                         if (shouldCleanupModel.getObject()) {
                                             // clean-up
@@ -513,26 +521,6 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                         });
             }
         };
-    }
-
-    private BatchElement taskInUse(Task task) {
-        if (task.getId() != null) {
-            task = TaskManagerBeans.get().getDataUtil().init(task);
-            for (BatchElement element : task.getBatchElements()) {
-                if (element.getBatch().isActive()) {
-                    return element;
-                }
-            }
-        } else {
-            for (Batch batch : configurationModel.getObject().getBatches().values()) {
-                for (BatchElement element : batch.getElements()) {
-                    if (element.getTask().equals(task)) {
-                        return element;
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     protected GeoServerTablePanel<Task> tasksPanel() {

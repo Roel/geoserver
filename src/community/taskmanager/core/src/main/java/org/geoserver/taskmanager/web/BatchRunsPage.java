@@ -34,7 +34,7 @@ public class BatchRunsPage extends GeoServerSecuredPage {
     private GeoServerTablePanel<BatchRun> runsPanel;
 
     public BatchRunsPage(IModel<Batch> batchModel, Page parentPage) {
-        batchModel.setObject(TaskManagerBeans.get().getDataUtil().init(batchModel.getObject()));
+        batchModel.setObject(TaskManagerBeans.get().getDao().initHistory(batchModel.getObject()));
         this.batchModel = batchModel;
         setReturnPage(parentPage);
     }
@@ -62,7 +62,9 @@ public class BatchRunsPage extends GeoServerSecuredPage {
                     @Override
                     public void onClick(AjaxRequestTarget target) {
                         batchModel.setObject(
-                                TaskManagerBeans.get().getDataUtil().init(batchModel.getObject()));
+                                TaskManagerBeans.get()
+                                        .getDao()
+                                        .initHistory(batchModel.getObject()));
                         ((MarkupContainer) runsPanel.get("listContainer").get("items")).removeAll();
                         target.add(runsPanel);
                     }

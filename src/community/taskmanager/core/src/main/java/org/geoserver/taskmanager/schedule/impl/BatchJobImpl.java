@@ -59,7 +59,7 @@ public class BatchJobImpl implements Job {
         } catch (NumberFormatException e) {
             throw new JobExecutionException(e);
         }
-        Batch batch = beans.getDataUtil().init(beans.getDao().getBatch(batchId));
+        Batch batch = beans.getDao().init(beans.getDao().getBatch(batchId));
 
         LOGGER.log(Level.INFO, "Starting batch " + batch.getFullName());
 
@@ -84,7 +84,7 @@ public class BatchJobImpl implements Job {
             for (int i = 0; i < elements.size(); i++) {
                 rollback = false;
 
-                BatchElement element = beans.getDataUtil().init(elements.get(i));
+                BatchElement element = elements.get(i);
 
                 // if this task is currently running, wait
                 Run run = null;
@@ -96,10 +96,9 @@ public class BatchJobImpl implements Job {
                 }
 
                 // OK, let's go
-                Task task = element.getTask();
-                TaskContext ctx = beans.getTaskUtil().createContext(task, bContext);
+                TaskContext ctx = beans.getTaskUtil().createContext(element.getTask(), bContext);
 
-                TaskType type = beans.getTaskTypes().get(task.getType());
+                TaskType type = beans.getTaskTypes().get(element.getTask().getType());
 
                 try {
                     resultStack.push(type.run(ctx));
@@ -112,7 +111,7 @@ public class BatchJobImpl implements Job {
                     LOGGER.log(
                             Level.SEVERE,
                             "Task "
-                                    + task.getFullName()
+                                    + element.getTask().getFullName()
                                     + " failed in batch "
                                     + batch.getFullName()
                                     + ", rolling back.",
@@ -135,7 +134,7 @@ public class BatchJobImpl implements Job {
 
                 if (rollback) {
                     while (!resultStack.isEmpty()) {
-                        Run runPop = beans.getDao().reload(runStack.pop());
+                        Run runPop = runStack.pop();
                         runPop.setStatus(Run.Status.ROLLING_BACK);
                         runPop = beans.getDao().save(runPop);
                         try {
@@ -165,7 +164,7 @@ public class BatchJobImpl implements Job {
             }
 
             while (!runStack.isEmpty()) {
-                Run runPop = beans.getDao().reload(runStack.pop());
+                Run runPop = runStack.pop();
                 Run runTemp;
                 // to avoid concurrent commit, if this task is currently still waiting for a commit,
                 // wait

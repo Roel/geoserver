@@ -78,7 +78,7 @@ public class BatchPage extends GeoServerSecuredPage {
         }
         if (batchModel.getObject().getId() != null) {
             Configuration config = batchModel.getObject().getConfiguration();
-            batchModel.setObject(TaskManagerBeans.get().getDataUtil().init(batchModel.getObject()));
+            batchModel.setObject(TaskManagerBeans.get().getDao().init(batchModel.getObject()));
             batchModel.getObject().setConfiguration(config);
         }
         this.batchModel = batchModel;
@@ -238,12 +238,8 @@ public class BatchPage extends GeoServerSecuredPage {
                     batchModel.setObject(
                             TaskManagerBeans.get()
                                     .getDataUtil()
-                                    .init(
-                                            TaskManagerBeans.get()
-                                                    .getDataUtil()
-                                                    .saveScheduleAndRemove(
-                                                            batchModel.getObject(),
-                                                            removedElements)));
+                                    .saveScheduleAndRemove(
+                                            batchModel.getObject(), removedElements));
                     // update the old config (still used on configuration page)
                     if (config != null) {
                         batchModel.getObject().setConfiguration(config);

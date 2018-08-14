@@ -22,7 +22,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-// @Ignore
 public class InitConfigPageTest extends AbstractWicketTaskManagerTest {
 
     private TaskManagerDao dao;

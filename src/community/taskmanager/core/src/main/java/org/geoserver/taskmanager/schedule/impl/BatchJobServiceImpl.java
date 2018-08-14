@@ -151,6 +151,7 @@ public class BatchJobServiceImpl
     @Override
     @Transactional("tmTransactionManager")
     public Configuration remove(Configuration config) {
+        config = dao.reload(config);
         for (Batch batch : config.getBatches().values()) {
             try {
                 scheduler.deleteJob(JobKey.jobKey(batch.getId().toString()));
@@ -242,7 +243,7 @@ public class BatchJobServiceImpl
     }
 
     @Override
-    @Transactional(transactionManager = "tmTransactionManager")
+    @Transactional("tmTransactionManager")
     public void interrupt(BatchRun batchRun) {
         batchRun = dao.reload(batchRun);
         if (!batchRun.getStatus().isClosed()) {
