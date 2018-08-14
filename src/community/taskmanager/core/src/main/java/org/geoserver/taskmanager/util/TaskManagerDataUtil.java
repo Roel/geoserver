@@ -305,12 +305,6 @@ public class TaskManagerDataUtil {
      */
     @Transactional("tmTransactionManager")
     public Run startCommitIfPossible(Run run) {
-        if (run == null) {
-            System.out.println("run is null");
-        }
-        if (run.getBatchElement() == null) {
-            System.out.println("batchelement " + run.getId() + " is null");
-        }
         if (dao.getCommittingRun(run.getBatchElement().getTask()) == null) {
             run.setStatus(Run.Status.COMMITTING);
             return dao.save(run);
