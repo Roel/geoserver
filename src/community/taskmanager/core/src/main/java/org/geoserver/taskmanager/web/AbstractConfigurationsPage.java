@@ -20,7 +20,6 @@ import org.apache.wicket.model.Model;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.taskmanager.data.BatchElement;
 import org.geoserver.taskmanager.data.Configuration;
-import org.geoserver.taskmanager.data.Task;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
 import org.geoserver.taskmanager.web.model.ConfigurationsModel;
 import org.geoserver.taskmanager.web.panel.DropDownPanel;
@@ -156,7 +155,10 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                             public void onClick(AjaxRequestTarget target) {
                                 boolean someCant = false;
                                 for (Configuration config : configurationsPanel.getSelection()) {
-                                    BatchElement be = taskInUseByExternalBatch(config);
+                                    BatchElement be =
+                                            TaskManagerBeans.get()
+                                                    .getDataUtil()
+                                                    .taskInUseByExternalBatch(config);
                                     if (be != null) {
                                         error(
                                                 new ParamResourceModel(
@@ -242,6 +244,10 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                                 configurationsPanel
                                                                         .getSelection()) {
                                                             if (shouldCleanupModel.getObject()) {
+                                                                config =
+                                                                        TaskManagerBeans.get()
+                                                                                .getDao()
+                                                                                .init(config);
                                                                 if (TaskManagerBeans.get()
                                                                         .getTaskUtil()
                                                                         .canCleanup(config)) {
@@ -401,18 +407,5 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                             }
                         });
         configurationsPanel.setOutputMarkupId(true);
-    }
-
-    private BatchElement taskInUseByExternalBatch(Configuration config) {
-        for (Task task : config.getTasks().values()) {
-            task = TaskManagerBeans.get().getDataUtil().init(task);
-            for (BatchElement element : task.getBatchElements()) {
-                if (element.getBatch().getConfiguration() == null
-                        && element.getBatch().isActive()) {
-                    return element;
-                }
-            }
-        }
-        return null;
     }
 }

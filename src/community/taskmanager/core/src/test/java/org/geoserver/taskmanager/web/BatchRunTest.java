@@ -123,7 +123,7 @@ public class BatchRunTest extends AbstractWicketTaskManagerTest {
 
         tester.clickLink("form:runsPanel:listContainer:items:1:itemProperties:3:component:link");
 
-        BatchRun br = util.init(batch).getBatchRuns().get(0);
+        BatchRun br = dao.initHistory(batch).getBatchRuns().get(0);
         while (!(br = dao.reload(br)).getStatus().isClosed()) {
             Thread.sleep(100);
         }

@@ -223,32 +223,30 @@ public class TaskManagerTaskUtil {
         // merging the orders of the different batches and turning them around
         // this algorithm will work perfectly if there are no contradictions in there
         // (for example B1 = T1,T2    and B2 = T2,T1)
-        // in that case, the chosen order will depend on coincidence
+        // otherwise, the chosen order will depend on coincidence
 
         // one other thing: tasks in the @initialize batch should have preference to
-        // be at the end, so we will make sure they are handled first in this pre-order
+        // be at the end, so we will make sure they are handled last using a pre-order
         List<Task> preOrderedTasks = new ArrayList<Task>();
         for (Task task : config.getTasks().values()) {
             boolean isInitTask = false;
-            task = dataUtil.init(task);
             for (BatchElement el : task.getBatchElements()) {
                 isInitTask = isInitTask || InitConfigUtil.isInitBatch(el.getBatch());
             }
             if (isInitTask) {
-                preOrderedTasks.add(0, task);
-            } else {
                 preOrderedTasks.add(task);
+            } else {
+                preOrderedTasks.add(0, task);
             }
         }
 
         // now the ordering algorithm as specified above
         List<Task> orderedTasks = new ArrayList<Task>();
-        for (Task task : config.getTasks().values()) {
+        for (Task task : preOrderedTasks) {
             int position = orderedTasks.size();
-            task = dataUtil.init(task);
             for (BatchElement el : task.getBatchElements()) {
                 if (el.getIndex() > 0) {
-                    Batch batch = dataUtil.init(el.getBatch());
+                    Batch batch = el.getBatch();
                     int indexTaskBefore =
                             orderedTasks.indexOf(
                                     batch.getElements().get(el.getIndex() - 1).getTask());

@@ -236,32 +236,34 @@ public class TaskManagerTaskUtilTest extends AbstractTaskManagerTest {
         util.addTaskToConfiguration(config, task4);
         Batch init = fac.createBatch();
         init.setName("@Initialize");
-        util.addBatchElement(init, task4);
         util.addBatchToConfiguration(config, init);
+        util.addBatchElement(init, task3);
 
         config = dao.save(config);
+        task1 = config.getTasks().get("task1");
+        task2 = config.getTasks().get("task2");
         task3 = config.getTasks().get("task3");
         task4 = config.getTasks().get("task4");
 
         Batch batch1 = fac.createBatch();
         batch1.setName("batch1");
-        util.addBatchElement(batch1, task1);
-        util.addBatchElement(batch1, task3);
         util.addBatchToConfiguration(config, batch1);
+        util.addBatchElement(batch1, task1);
+        util.addBatchElement(batch1, task4);
         Batch batch2 = fac.createBatch();
         batch2.setName("batch2");
+        util.addBatchToConfiguration(config, batch2);
         util.addBatchElement(batch2, task2);
         util.addBatchElement(batch2, task1);
-        util.addBatchToConfiguration(config, batch2);
 
         config = dao.save(config);
 
         List<Task> orderedTasks = taskUtil.orderTasksForCleanup(config);
         assertEquals(4, orderedTasks.size());
-        assertEquals("task3", orderedTasks.get(0).getName());
+        assertEquals("task4", orderedTasks.get(0).getName());
         assertEquals("task1", orderedTasks.get(1).getName());
         assertEquals("task2", orderedTasks.get(2).getName());
-        assertEquals("task4", orderedTasks.get(3).getName());
+        assertEquals("task3", orderedTasks.get(3).getName());
     }
 
     @Test
