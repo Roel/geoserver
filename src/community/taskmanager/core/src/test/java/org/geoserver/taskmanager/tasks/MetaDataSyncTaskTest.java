@@ -136,6 +136,10 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
 
         batchCreate = bjService.saveAndSchedule(batchCreate);
         batchSync = bjService.saveAndSchedule(batchSync);
+        
+        config = dao.init(config);
+        task1 = config.getTasks().get("task1");
+        task2 = config.getTasks().get("task2");
     }
 
     @After
