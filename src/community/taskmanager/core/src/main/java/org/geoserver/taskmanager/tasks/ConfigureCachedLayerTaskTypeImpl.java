@@ -105,12 +105,18 @@ public class ConfigureCachedLayerTaskTypeImpl implements TaskType {
             }
 
             if (restManager.getGeoWebCacheRest().getLayer(layerName) == null) {
-                restManager.getGeoWebCacheRest().configureLayer(cachedLayerEncoder);
+                if (!restManager.getGeoWebCacheRest().configureLayer(cachedLayerEncoder)) {
+                    throw new TaskException("Failed to configure cached layer " + layerName);
+                }
             } else {
-                restManager.getGeoWebCacheRest().updateLayer(cachedLayerEncoder);
+                if (!restManager.getGeoWebCacheRest().updateLayer(cachedLayerEncoder)) {
+                    throw new TaskException("Failed to update cached layer " + layerName);
+                }
             }
         } else if (tileLayer == null) {
-            restManager.getGeoWebCacheRest().deleteLayer(layerName);
+            if (!restManager.getGeoWebCacheRest().deleteLayer(layerName)) {
+                throw new TaskException("Failed to delete cached layer " + layerName);
+            }
         }
 
         return new TaskResult() {
