@@ -39,6 +39,8 @@ public class BatchJobImpl implements Job {
 
     private static final Logger LOGGER = Logging.getLogger(BatchJobImpl.class);
 
+    private static final int CONCURRENCY_DELAY = 1000;
+
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         // get all the context beans
@@ -90,7 +92,7 @@ public class BatchJobImpl implements Job {
                 Run run = null;
                 while ((run = beans.getDataUtil().runIfPossible(element, batchRun)) == null) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(CONCURRENCY_DELAY);
                     } catch (InterruptedException e) {
                     }
                 }
@@ -170,7 +172,7 @@ public class BatchJobImpl implements Job {
                 // wait
                 while ((runTemp = beans.getDataUtil().startCommitIfPossible(runPop)) == null) {
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(CONCURRENCY_DELAY);
                     } catch (InterruptedException e) {
                     }
                 }
