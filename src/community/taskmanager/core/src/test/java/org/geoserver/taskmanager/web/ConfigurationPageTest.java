@@ -222,7 +222,8 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         assertEquals(3, tasksPanel.getDataProvider().size());
         assertEquals(3, configModel.getObject().getTasks().size());
         assertEquals(
-                CopyTableTaskTypeImpl.NAME, configModel.getObject().getTasks().get("task3").getType());
+                CopyTableTaskTypeImpl.NAME,
+                configModel.getObject().getTasks().get("task3").getType());
     }
 
     @SuppressWarnings("unchecked")

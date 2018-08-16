@@ -117,7 +117,7 @@ public class ConfigureCachedLayerTaskTest extends AbstractTaskManagerTest {
         dataUtil.addBatchElement(batchUpdate, task2);
 
         batchUpdate = bjService.saveAndSchedule(batchUpdate);
-        
+
         config = dao.init(config);
         task1 = config.getTasks().get("task1");
         task2 = config.getTasks().get("task2");
