@@ -27,7 +27,6 @@ import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.geoserver.taskmanager.data.Batch;
 import org.geoserver.taskmanager.data.Configuration;
@@ -366,13 +365,11 @@ public class BatchesPanel extends Panel {
                                                                 AjaxRequestTarget target) {
                                                             setResponsePage(
                                                                     new BatchRunsPage(
-                                                                            new Model<Batch>(
-                                                                                    TaskManagerBeans
-                                                                                            .get()
-                                                                                            .getDao()
-                                                                                            .initHistory(
-                                                                                                    itemModel
-                                                                                                            .getObject())),
+                                                                            TaskManagerBeans.get()
+                                                                                    .getDao()
+                                                                                    .initHistory(
+                                                                                            itemModel
+                                                                                                    .getObject()),
                                                                             getPage()));
                                                         }
                                                     };

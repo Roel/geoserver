@@ -154,7 +154,8 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
         criteria.add(
                 Subqueries.propertyEq(
                         "outerBr.id",
-                        DetachedCriteria.forClass(BatchRunImpl.class, "innerBr")
+                        DetachedCriteria.forClass(RunImpl.class)
+                                .createAlias("batchRun", "innerBr")
                                 .createAlias("innerBr.batch", "innerBatch")
                                 .add(Restrictions.eqProperty("innerBatch.id", "outerBatch.id"))
                                 .setProjection(Projections.max("innerBr.id"))));
@@ -197,7 +198,8 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
         criteria.add(
                 Subqueries.propertyEq(
                         "outerBr.id",
-                        DetachedCriteria.forClass(BatchRunImpl.class, "innerBr")
+                        DetachedCriteria.forClass(RunImpl.class)
+                                .createAlias("batchRun", "innerBr")
                                 .createAlias("innerBr.batch", "innerBatch")
                                 .add(Restrictions.eqProperty("innerBatch.id", "outerBatch.id"))
                                 .setProjection(Projections.max("innerBr.id"))));

@@ -46,6 +46,8 @@ public class BatchRunsModel extends GeoServerDataProvider<BatchRun> {
 
     @Override
     protected List<BatchRun> getItems() {
-        return new ArrayList<BatchRun>(batchModel.getObject().getBatchRuns());
+        List<BatchRun> list = new ArrayList<BatchRun>(batchModel.getObject().getBatchRuns());
+        list.removeIf(br -> br.getRuns().isEmpty());
+        return list;
     }
 }
