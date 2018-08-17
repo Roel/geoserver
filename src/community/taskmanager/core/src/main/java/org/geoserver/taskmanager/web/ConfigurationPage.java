@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -173,7 +175,7 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                     }
                 });
 
-        List<String> workspaces = new ArrayList<String>();
+        SortedSet<String> workspaces = new TreeSet<String>();
         for (WorkspaceInfo wi : GeoServerApplication.get().getCatalog().getWorkspaces()) {
             if (wi.getName().equals(configurationModel.getObject().getWorkspace())
                     || TaskManagerBeans.get()
@@ -195,7 +197,7 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                 new DropDownChoice<String>(
                         "workspace",
                         new PropertyModel<String>(configurationModel, "workspace"),
-                        workspaces) {
+                        new ArrayList<String>(workspaces)) {
                     private static final long serialVersionUID = -6665795544099616226L;
 
                     @Override

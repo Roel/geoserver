@@ -149,7 +149,7 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         formTester.setValue("userPanel:name", "task3");
         formTester.submit("submit");
         assertFeedback("dialog:dialog:content:form:userPanel:feedback", "required");
-        formTester.select("userPanel:type", 8);
+        formTester.select("userPanel:type", 9);
         formTester.submit("submit");
         assertEquals(3, tasksPanel.getDataProvider().size());
         assertEquals(3, configModel.getObject().getTasks().size());
@@ -297,7 +297,7 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         tester.assertRenderedPage(ConfigurationPage.class);
 
         assertEquals("the_greatest_configuration", configModel.getObject().getName());
-        // assertEquals(0, util.init(config.getObject()).getTasks().size());
+        assertEquals(0, dao.init(configModel.getObject()).getTasks().size());
 
         // new batch has been scheduled
         assertNotNull(scheduler.getJobDetail(JobKey.jobKey(dummyBatch.getId().toString())));
@@ -305,8 +305,8 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         // save
         formTester.setValue("name", "foo_bar_configuration");
         tester.clickLink("configurationForm:save");
-        // tester.assertRenderedPage(ConfigurationsPage.class);
-        // assertEquals("foo_bar_configuration", dao.reload(config.getObject()).getName());
+        tester.assertRenderedPage(ConfigurationsPage.class);
+        assertEquals("foo_bar_configuration", dao.reload(configModel.getObject()).getName());
 
         dao.delete(dummyBatch);
     }
