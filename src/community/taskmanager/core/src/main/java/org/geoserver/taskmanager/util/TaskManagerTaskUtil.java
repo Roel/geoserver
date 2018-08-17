@@ -318,6 +318,25 @@ public class TaskManagerTaskUtil {
     }
 
     /**
+     * Makes sure that task contains all of its type's attributes and adds missing ones if
+     * necessary.
+     *
+     * @param task the task
+     */
+    public void fixTask(Task task) {
+        TaskType taskType = taskTypes.get(task.getType());
+        for (ParameterInfo info : taskType.getParameterInfo().values()) {
+            if (!task.getParameters().containsKey(info.getName())) {
+                Parameter param = fac.createParameter();
+                param.setName(info.getName());
+                param.setValue("${" + info.getName() + "}");
+                param.setTask(task);
+                task.getParameters().put(info.getName(), param);
+            }
+        }
+    }
+
+    /**
      * Duplicates a task to a new task
      *
      * @param original the original task the type

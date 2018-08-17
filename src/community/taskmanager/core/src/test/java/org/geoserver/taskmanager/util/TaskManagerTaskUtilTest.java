@@ -185,6 +185,18 @@ public class TaskManagerTaskUtilTest extends AbstractTaskManagerTest {
     }
 
     @Test
+    public void testFixTask() {
+        Task t = taskUtil.initTask("Dummy", "newDummyTask");
+        t.getParameters().remove(DummyTaskTypeImpl.PARAM2);
+        assertEquals(1, t.getParameters().size());
+        assertEquals("${param1}", t.getParameters().get(DummyTaskTypeImpl.PARAM1).getValue());
+        taskUtil.fixTask(t);
+        assertEquals(2, t.getParameters().size());
+        assertEquals("${param1}", t.getParameters().get(DummyTaskTypeImpl.PARAM1).getValue());
+        assertEquals("${param2}", t.getParameters().get(DummyTaskTypeImpl.PARAM2).getValue());
+    }
+
+    @Test
     public void testCopyTask() {
         Task t = taskUtil.copyTask(task1, "copiedTask");
         assertEquals("copiedTask", t.getName());
