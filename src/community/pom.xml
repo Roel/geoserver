@@ -247,6 +247,7 @@
         <module>mbstyle</module>
         <module>s3-geotiff</module>
         <module>status-monitoring</module>
+        <module>metadata</module>
       </modules>
     </profile>
     <profile>
@@ -547,6 +548,12 @@
       <modules>
         <module>status-monitoring</module>
       </modules>
+    </profile>
+    <profile>
+     <id>metadata</id>
+     <modules>
+       <module>metadata</module>
+     </modules>
     </profile>
   </profiles>  
 </project>
