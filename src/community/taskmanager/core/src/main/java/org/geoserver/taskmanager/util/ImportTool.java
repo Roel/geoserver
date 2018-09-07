@@ -77,6 +77,8 @@ public class ImportTool {
                     if (config == null) {
                         config = dao.copyConfiguration(template);
                         config.setName(configName);
+                    } else {
+                        config = dao.init(config);
                     }
                     config.setTemplate(false);
                     if (record.containsKey("description")) {
