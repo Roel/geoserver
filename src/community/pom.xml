@@ -250,6 +250,7 @@
         <module>taskmanager</module>
         <module>s3-geotiff</module>
         <module>status-monitoring</module>
+        <module>metadata</module>
       </modules>
     </profile>
     <profile>
@@ -561,6 +562,7 @@
         <module>s3-geotiff</module> 
         <module>web-resource</module>
         <module>gwc-s3</module>
+        <module>metadata</module>
       </modules>
     </profile>
     <profile>
@@ -573,6 +575,12 @@
       <id>taskmanager-s3</id>
       <modules>
         <module>taskmanager</module>
+     </modules>
+    </profile>
+    <profile>
+      <id>metadata</id>
+      <modules>
+        <module>metadata</module>
      </modules>
     </profile>
 
