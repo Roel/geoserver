@@ -10,6 +10,7 @@ import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.wicket.Component;
@@ -28,6 +29,7 @@ import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.model.MetadataTemplate;
 import org.geoserver.metadata.data.model.impl.GlobalModel;
+import org.geoserver.metadata.data.model.impl.MetadataTemplateImpl;
 import org.geoserver.metadata.data.service.MetadataTemplateService;
 import org.geoserver.metadata.web.panel.ProgressPanel;
 import org.geoserver.metadata.web.panel.TemplatesPositionPanel;
@@ -155,6 +157,25 @@ public class MetadataTemplatesPage extends GeoServerSecuredPage {
         remove.setEnabled(false);
         add(remove);
 
+        // the copy button
+        AjaxLink<Object> copy =
+                new AjaxLink<Object>("copySelected") {
+                    private static final long serialVersionUID = 3581476968062788921L;
+
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        MetadataTemplate clone = templatesPanel.getSelection().get(0).clone();
+                        ((MetadataTemplateImpl) clone).setId(UUID.randomUUID().toString());
+                        clone.setName(null);
+                        setResponsePage(
+                                new MetadataTemplatePage(templates, new Model<>(clone))
+                                        .setReturnPage(MetadataTemplatesPage.this));
+                    }
+                };
+        copy.setOutputMarkupId(true);
+        copy.setEnabled(false);
+        add(copy);
+
         // the panel
         templatesPanel =
                 new GeoServerTablePanel<MetadataTemplate>(
@@ -165,7 +186,9 @@ public class MetadataTemplatesPage extends GeoServerSecuredPage {
                     @Override
                     protected void onSelectionUpdate(AjaxRequestTarget target) {
                         remove.setEnabled(templatesPanel.getSelection().size() > 0);
+                        copy.setEnabled(templatesPanel.getSelection().size() == 1);
                         target.add(remove);
+                        target.add(copy);
                     }
 
                     @SuppressWarnings("unchecked")

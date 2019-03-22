@@ -307,4 +307,24 @@ public class TemplatesPageTest extends AbstractWicketMetadataTest {
                 "templatesPanel:listContainer:items:18:itemProperties:1:component:link:label",
                 "template-nested-object");
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testCopy() throws Exception {
+
+        // select first template
+        ((IModel<Boolean>)
+                        tester.getComponentFromLastRenderedPage(
+                                        "templatesPanel:listContainer:items:2:selectItemContainer:selectItem")
+                                .getDefaultModel())
+                .setObject(true);
+        // copy
+        tester.getComponentFromLastRenderedPage("copySelected").setEnabled(true);
+        tester.clickLink("copySelected");
+
+        tester.assertRenderedPage(MetadataTemplatePage.class);
+
+        tester.assertModelValue("form:name", null);
+        tester.assertModelValue("form:description", "List of basic fields");
+    }
 }
