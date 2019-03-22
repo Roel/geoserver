@@ -551,6 +551,7 @@
         <module>status-monitoring</module>
       </modules>
     </profile>
+     <!-- dov profile -->
     <profile>
       <id>nsg-wfs-profile</id>
       <modules>

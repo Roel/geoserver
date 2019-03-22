@@ -448,5 +448,14 @@
         <module>geofence-server</module>
       </modules>
     </profile>
+
+    <!-- dov profile -->
+    <profile>
+      <id>dov</id>
+      <modules>
+        <module>csw</module>
+        <module>inspire</module>
+      </modules>
+    </profile>
   </profiles>
 </project>
