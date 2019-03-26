@@ -31,10 +31,6 @@ public class MetadataMapModel<T> implements IModel<T> {
 
     protected Serializable value;
 
-    public MetadataMapModel(MetadataMap map, String expression, Class<?> target) {
-        this(new MetadataMapWrappingModel(map), expression, target);
-    }
-
     public MetadataMapModel(IModel<MetadataMap> model, String expression, Class<?> target) {
         this.model = model;
         this.expression = expression;
@@ -60,22 +56,5 @@ public class MetadataMapModel<T> implements IModel<T> {
 
     public String getExpression() {
         return expression;
-    }
-
-    private static class MetadataMapWrappingModel implements IModel<MetadataMap> {
-
-        private MetadataMap map;
-
-        public MetadataMapWrappingModel(MetadataMap m) {
-            map = m;
-        }
-
-        public MetadataMap getObject() {
-            return map;
-        }
-
-        public void setObject(MetadataMap arg0) {}
-
-        public void detach() {}
     }
 }
