@@ -28,7 +28,7 @@ public class AutoCompletePanel extends Panel {
                     protected Iterator<String> getChoices(String input) {
                         List<String> result = new ArrayList<String>();
                         for (String value : values) {
-                            if (value.toLowerCase().startsWith(input.toLowerCase())) {
+                            if (value.toLowerCase().contains(input.toLowerCase())) {
                                 result.add(value);
                             }
                         }
