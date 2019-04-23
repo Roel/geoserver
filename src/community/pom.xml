@@ -262,6 +262,7 @@
         <module>wfs3</module>
         <!-- <module>monitor-hibernate</module> -->
         <module>qos</module>
+        <module>metadata</module>
       </modules>
     </profile>
     <profile>
@@ -580,6 +581,12 @@
       <id>taskmanager-s3</id>
       <modules>
         <module>taskmanager</module>
+     </modules>
+    </profile>
+    <profile>
+      <id>metadata</id>
+      <modules>
+        <module>metadata</module>
      </modules>
     </profile>
     <profile>
