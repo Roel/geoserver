@@ -4,8 +4,8 @@
  */
 package org.geoserver.metadata.data.service.impl;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.sql.Date;
+import org.locationtech.jts.geom.Geometry;
 
 public final class MetadataConstants {
 
