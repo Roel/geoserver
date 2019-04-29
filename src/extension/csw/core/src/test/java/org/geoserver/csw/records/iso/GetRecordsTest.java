@@ -155,6 +155,18 @@ public class GetRecordsTest extends MDTestSupport {
                 "http://localhost:8080/geoserver/wms",
                 "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[2]/gmd:linkage/gmd:URL",
                 d);
+        assertXpathEvaluatesTo(
+                "OGC:WCS",
+                "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[3]/gmd:protocol/gco:CharacterString",
+                d);
+        assertXpathEvaluatesTo(
+                "Forests",
+                "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[3]/gmd:name/gco:CharacterString",
+                d);
+        assertXpathEvaluatesTo(
+                "http://localhost:8080/geoserver/wcs",
+                "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[3]/gmd:linkage/gmd:URL",
+                d);
     }
 
     @Test
@@ -331,9 +343,10 @@ public class GetRecordsTest extends MDTestSupport {
                 "csw?service=CSW&version=2.0.2&request=GetRecords&typeNames=gmd:MD_Metadata"
                         + "&resultType=results&elementSetName=full&outputSchema=http://www.isotc211.org/2005/gmd";
         Document doc = getAsDOM(request);
+        print(doc);
 
         assertXpathEvaluatesTo(
-                "2",
+                "3",
                 "count(/csw:GetRecordsResponse/csw:SearchResults/gmd:MD_Metadata/"
                         + "gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/"
                         + "gmd:onLine/gmd:CI_OnlineResource/gmd:name/gco:CharacterString[.='Lines'])",
