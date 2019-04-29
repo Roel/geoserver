@@ -41,6 +41,10 @@ public class GetRecordByIdTest extends MDTestSupport {
                 "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:purpose/gmx:Anchor",
                 d);
         assertXpathEvaluatesTo(
+                "anchor-ref",
+                "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:purpose/gmx:Anchor/@xlink:href",
+                d);
+        assertXpathEvaluatesTo(
                 "true",
                 "//gmd:MD_Metadata[gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString='Forests']/gmd:dateStamp/gco:Date/@xsi:nil",
                 d);
