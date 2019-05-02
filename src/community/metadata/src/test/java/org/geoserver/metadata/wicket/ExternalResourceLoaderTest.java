@@ -24,6 +24,8 @@ public class ExternalResourceLoaderTest extends AbstractWicketMetadataTest {
 
     @Before
     public void before() throws IOException {
+        login();
+
         // Load the page
         MetadataTemplatesPage page = new MetadataTemplatesPage();
         tester.startPage(page);
@@ -46,6 +48,8 @@ public class ExternalResourceLoaderTest extends AbstractWicketMetadataTest {
                 loader.loadStringResource(
                         tester.getLastRenderedPage(), "metadata.generated.form.identifier-single");
         Assert.assertEquals("identifier single field", actual);
+
+        logout();
     }
 
     @Test
