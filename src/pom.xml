@@ -1950,7 +1950,7 @@
  </modules>
 
  <properties>
-  <gs.version>2.15.0</gs.version>
+  <gs.version>2.15.0-dov-4.0-SNAPSHOT</gs.version>
   <gt.version>21.0-dov-0.1-SNAPSHOT</gt.version>
   <gwc.version>1.15.0</gwc.version>
   <jts.version>1.16.0</jts.version>
