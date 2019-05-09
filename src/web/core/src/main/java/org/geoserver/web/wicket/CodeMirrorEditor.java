@@ -21,7 +21,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxCallListener;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.attributes.IAjaxCallListener;
-import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.head.CssHeaderItem;
@@ -29,6 +28,7 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -121,9 +121,9 @@ public class CodeMirrorEditor extends FormComponentPanel<String> {
 
     public void addCustomButton(String title, String cssClass, CustomButtonAction action) {
         customButtons.add(
-                new AjaxLink<Object>(customButtons.newChildId()) {
+                new GeoServerAjaxFormLink(customButtons.newChildId()) {
                     @Override
-                    public void onClick(AjaxRequestTarget target) {
+                    protected void onClick(AjaxRequestTarget target, Form<?> form) {
                         action.onClick(target);
                     }
 
