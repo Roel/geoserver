@@ -186,14 +186,14 @@ public class BatchJobServiceImpl
                 batch.setEnabled(false);
                 dao.save(batch);
             }
+        }
 
-            for (BatchRun br : dao.getCurrentBatchRuns(batch)) {
-                LOGGER.log(
-                        Level.WARNING,
-                        "Automatically closing inactive batch run at start-up: "
-                                + batch.getFullName());
-                dataUtil.closeBatchRun(br, "closed at start-up");
-            }
+        for (BatchRun br : dao.getCurrentBatchRuns()) {
+            LOGGER.log(
+                    Level.WARNING,
+                    "Automatically closing inactive batch run at start-up: "
+                            + br.getBatch().getFullName());
+            dataUtil.closeBatchRun(br, "closed at start-up");
         }
     }
 

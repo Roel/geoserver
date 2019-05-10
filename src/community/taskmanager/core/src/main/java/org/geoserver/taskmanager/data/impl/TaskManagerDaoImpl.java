@@ -18,6 +18,7 @@ import org.geoserver.taskmanager.data.SoftRemove;
 import org.geoserver.taskmanager.data.Task;
 import org.geoserver.taskmanager.data.TaskManagerDao;
 import org.hibernate.Criteria;
+import org.hibernate.FetchMode;
 import org.hibernate.Hibernate;
 import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
@@ -129,6 +130,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                         .createCriteria(BatchImpl.class)
                         .createAlias(
                                 "configuration", "configuration", CriteriaSpecification.LEFT_JOIN)
+                        .setFetchMode("elements", FetchMode.JOIN)
                         .add(Restrictions.eq("removeStamp", 0L))
                         .add(
                                 Restrictions.or(
@@ -352,6 +354,26 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                         .createAlias("batchRun", "batchRun")
                         .createAlias("batchRun.batch", "batch")
                         .add(Restrictions.eq("batch.id", batch.getId()))
+                        .add(
+                                Restrictions.in(
+                                        "status",
+                                        new Run.Status[] {
+                                            Run.Status.RUNNING,
+                                            Run.Status.READY_TO_COMMIT,
+                                            Run.Status.COMMITTING
+                                        }))
+                        .setProjection(Projections.groupProperty("batchRun"))
+                        .list());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<BatchRun> getCurrentBatchRuns() {
+        return (List<BatchRun>)
+                (getSession()
+                        .createCriteria(RunImpl.class)
+                        .createAlias("batchRun", "batchRun")
+                        .createAlias("batchRun.batch", "batch")
                         .add(
                                 Restrictions.in(
                                         "status",

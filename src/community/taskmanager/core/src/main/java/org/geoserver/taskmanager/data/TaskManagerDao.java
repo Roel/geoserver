@@ -227,4 +227,6 @@ public interface TaskManagerDao {
     Configuration init(Configuration c);
 
     Batch initHistory(Batch b);
+
+    List<BatchRun> getCurrentBatchRuns();
 }
