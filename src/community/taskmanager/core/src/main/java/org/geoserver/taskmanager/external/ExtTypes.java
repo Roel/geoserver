@@ -76,7 +76,9 @@ public class ExtTypes {
                                                     null,
                                                     ds.getSchema(),
                                                     "%",
-                                                    new String[] {"TABLE", "VIEW"})) {
+                                                    new String[] {
+                                                        "TABLE", "VIEW", "MATERIALIZED VIEW"
+                                                    })) {
                                         while (rs.next()) {
                                             if (ds.getSchema() != null || rs.getString(2) == null) {
                                                 tables.add(rs.getString(3));
