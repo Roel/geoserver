@@ -10,6 +10,7 @@ import java.util.List;
 import org.geoserver.metadata.data.dto.AttributeMappingConfiguration;
 import org.geoserver.metadata.data.dto.AttributeTypeMappingConfiguration;
 import org.geoserver.metadata.data.dto.GeonetworkMappingConfiguration;
+import org.geoserver.metadata.data.dto.NamespaceConfiguration;
 
 /**
  * Toplevel Object that matches yaml structure.
@@ -28,6 +29,8 @@ public class GeonetworkMappingConfigurationImpl implements GeonetworkMappingConf
 
     List<AttributeTypeMappingConfiguration> objectmapping = new ArrayList<>();
 
+    List<NamespaceConfiguration> namespaces = new ArrayList<>();
+
     @Override
     public List<AttributeMappingConfiguration> getGeonetworkmapping() {
         return geonetworkmapping;
@@ -36,6 +39,11 @@ public class GeonetworkMappingConfigurationImpl implements GeonetworkMappingConf
     @Override
     public List<AttributeTypeMappingConfiguration> getObjectmapping() {
         return objectmapping;
+    }
+
+    @Override
+    public List<NamespaceConfiguration> getNamespaces() {
+        return namespaces;
     }
 
     @Override

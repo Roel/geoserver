@@ -7,10 +7,8 @@ package org.geoserver.metadata.data.service.impl;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
+import javax.annotation.PostConstruct;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -25,6 +23,7 @@ import org.geoserver.metadata.data.dto.AttributeTypeConfiguration;
 import org.geoserver.metadata.data.dto.AttributeTypeMappingConfiguration;
 import org.geoserver.metadata.data.dto.FieldTypeEnum;
 import org.geoserver.metadata.data.dto.MappingTypeEnum;
+import org.geoserver.metadata.data.dto.NamespaceConfiguration;
 import org.geoserver.metadata.data.dto.OccurrenceEnum;
 import org.geoserver.metadata.data.model.ComplexMetadataAttribute;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
@@ -44,6 +43,16 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
     private static final long serialVersionUID = -4931070325217885824L;
 
     @Autowired private ConfigurationService configService;
+
+    private NamespaceContextImpl namespaceContext = new NamespaceContextImpl();;
+
+    @PostConstruct
+    public void setupNamespaces() {
+        for (NamespaceConfiguration nsConfig :
+                configService.getGeonetworkMappingConfiguration().getNamespaces()) {
+            namespaceContext.register(nsConfig.getPrefix(), nsConfig.getURI());
+        }
+    }
 
     @Override
     public void parseMetadata(Document doc, ResourceInfo rInfo, ComplexMetadataMap metadataMap)
@@ -191,7 +200,7 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
         try {
             XPathFactory factory = XPathFactory.newInstance();
             XPath xpath = factory.newXPath();
-            xpath.setNamespaceContext(new NamespaceResolver(doc));
+            xpath.setNamespaceContext(namespaceContext);
             XPathExpression expr = xpath.compile(geonetwork);
             Object result;
             if (node != null) {
@@ -203,33 +212,6 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
             return nodes;
         } catch (XPathExpressionException e) {
             throw new IOException(e);
-        }
-    }
-
-    public class NamespaceResolver implements NamespaceContext {
-        // Store the source document to search the namespaces
-        private Document sourceDocument;
-
-        public NamespaceResolver(Document document) {
-            sourceDocument = document;
-        }
-
-        // The lookup for the namespace uris is delegated to the stored document.
-        public String getNamespaceURI(String prefix) {
-            if (prefix.equals(XMLConstants.DEFAULT_NS_PREFIX)) {
-                return sourceDocument.lookupNamespaceURI(null);
-            } else {
-                return sourceDocument.lookupNamespaceURI(prefix);
-            }
-        }
-
-        public String getPrefix(String namespaceURI) {
-            return sourceDocument.lookupPrefix(namespaceURI);
-        }
-
-        @SuppressWarnings("rawtypes")
-        public Iterator getPrefixes(String namespaceURI) {
-            return null;
         }
     }
 }

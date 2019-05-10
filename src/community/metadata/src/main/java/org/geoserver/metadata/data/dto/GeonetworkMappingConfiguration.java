@@ -27,5 +27,7 @@ public interface GeonetworkMappingConfiguration {
 
     public List<AttributeTypeMappingConfiguration> getObjectmapping();
 
+    public List<NamespaceConfiguration> getNamespaces();
+
     public AttributeTypeMappingConfiguration findType(String typename);
 }

@@ -26,6 +26,7 @@ import org.geoserver.metadata.data.dto.CustomNativeMappingsConfiguration;
 import org.geoserver.metadata.data.dto.GeonetworkConfiguration;
 import org.geoserver.metadata.data.dto.GeonetworkMappingConfiguration;
 import org.geoserver.metadata.data.dto.MetadataConfiguration;
+import org.geoserver.metadata.data.dto.NamespaceConfiguration;
 import org.geoserver.metadata.data.dto.impl.CustomNativeMappingsConfigurationImpl;
 import org.geoserver.metadata.data.dto.impl.GeonetworkMappingConfigurationImpl;
 import org.geoserver.metadata.data.dto.impl.MetadataConfigurationImpl;
@@ -207,6 +208,14 @@ public class ConfigurationServiceImpl implements ConfigurationService {
             if (!objectKay.contains(mapping.getTypename())) {
                 geonetworkMappingConfig.getObjectmapping().add(mapping);
                 objectKay.add(mapping.getTypename());
+            }
+        }
+
+        Set<String> nsPrefixes = new HashSet<>();
+        for (NamespaceConfiguration ns : config.getNamespaces()) {
+            if (!nsPrefixes.contains(ns.getPrefix())) {
+                geonetworkMappingConfig.getNamespaces().add(ns);
+                nsPrefixes.add(ns.getPrefix());
             }
         }
     }
