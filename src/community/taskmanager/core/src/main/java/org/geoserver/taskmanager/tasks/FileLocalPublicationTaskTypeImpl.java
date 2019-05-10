@@ -277,4 +277,9 @@ public class FileLocalPublicationTaskTypeImpl implements TaskType {
         // FILE and HTTP
         return "S3GeoTiff";
     }
+
+    @Override
+    public boolean templateOnly() {
+        return true;
+    }
 }
