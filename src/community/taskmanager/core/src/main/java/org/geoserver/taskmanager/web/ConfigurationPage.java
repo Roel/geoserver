@@ -906,16 +906,17 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                             setResponsePage(new InitConfigurationPage(configurationModel));
                         }
                     }
-                } catch (ConstraintViolationException e) {
-                    form.error(new ParamResourceModel("duplicate", getPage()).getString());
-                    addFeedbackPanels(target);
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, e.getMessage(), e);
-                    Throwable rootCause = ExceptionUtils.getRootCause(e);
-                    form.error(
-                            rootCause == null
-                                    ? e.getLocalizedMessage()
-                                    : rootCause.getLocalizedMessage());
+                    if (e.getCause() instanceof ConstraintViolationException) {
+                        form.error(new ParamResourceModel("duplicate", getPage()).getString());
+                    } else {
+                        LOGGER.log(Level.WARNING, e.getMessage(), e);
+                        Throwable rootCause = ExceptionUtils.getRootCause(e);
+                        form.error(
+                                rootCause == null
+                                        ? e.getLocalizedMessage()
+                                        : rootCause.getLocalizedMessage());
+                    }
                     addFeedbackPanels(target);
                 }
             }

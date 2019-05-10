@@ -360,8 +360,8 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
         formTester.setValue("name", "my_configuration");
         tester.clickLink("configurationForm:save");
 
-        assertFeedback("topFeedback", "Unique");
-        assertFeedback("bottomFeedback", "Unique");
+        assertFeedback("topFeedback", "unique");
+        assertFeedback("bottomFeedback", "unique");
     }
 
     @Test

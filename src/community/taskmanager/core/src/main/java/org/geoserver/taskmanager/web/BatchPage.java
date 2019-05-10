@@ -251,15 +251,17 @@ public class BatchPage extends GeoServerSecuredPage {
                     } else {
                         form.success(new ParamResourceModel("success", getPage()).getString());
                     }
-                } catch (ConstraintViolationException e) {
-                    form.error(new ParamResourceModel("duplicate", getPage()).getString());
                 } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, e.getMessage(), e);
-                    Throwable rootCause = ExceptionUtils.getRootCause(e);
-                    form.error(
-                            rootCause == null
-                                    ? e.getLocalizedMessage()
-                                    : rootCause.getLocalizedMessage());
+                    if (e.getCause() instanceof ConstraintViolationException) {
+                        form.error(new ParamResourceModel("duplicate", getPage()).getString());
+                    } else {
+                        LOGGER.log(Level.WARNING, e.getMessage(), e);
+                        Throwable rootCause = ExceptionUtils.getRootCause(e);
+                        form.error(
+                                rootCause == null
+                                        ? e.getLocalizedMessage()
+                                        : rootCause.getLocalizedMessage());
+                    }
                 }
                 addFeedbackPanels(target);
             }
