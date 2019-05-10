@@ -18,7 +18,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.namespace.QName;
 import org.geoserver.catalog.LayerInfo;
+import org.geoserver.data.test.MockData;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
 import org.geotools.feature.NameImpl;
 import org.junit.Assume;
@@ -31,6 +33,12 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
 
     protected boolean setupDataDirectory() throws Exception {
         DATA_DIRECTORY.addWcs11Coverages();
+        // add coverage with default namespace
+        DATA_DIRECTORY.addCoverage(
+                new QName(MockData.DEFAULT_URI, "Tazbyte", MockData.DEFAULT_PREFIX),
+                MockData.class.getResource("tazbyte.tiff"),
+                "tiff",
+                "raster");
         return true;
     }
 
@@ -114,13 +122,19 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
     @Test
     public void testInternalLayer() {
         List<String> domain = extTypes.internalLayer.getDomain(null);
-        assertEquals(4, domain.size());
-        assertEquals("wcs:BlueMarble", domain.get(0));
-        assertEquals("wcs:DEM", domain.get(1));
-        assertEquals("wcs:RotatedCad", domain.get(2));
-        assertEquals("wcs:World", domain.get(3));
+        assertEquals(6, domain.size());
+        assertEquals("Tazbyte", domain.get(0));
+        assertEquals("gs:Tazbyte", domain.get(1));
+        assertEquals("wcs:BlueMarble", domain.get(2));
+        assertEquals("wcs:DEM", domain.get(3));
+        assertEquals("wcs:RotatedCad", domain.get(4));
+        assertEquals("wcs:World", domain.get(5));
+        assertTrue(extTypes.internalLayer.validate("Tazbyte", null));
+        assertTrue(extTypes.internalLayer.validate("gs:Tazbyte", null));
         assertTrue(extTypes.internalLayer.validate("wcs:BlueMarble", null));
         assertFalse(extTypes.internalLayer.validate("doesntexist", null));
+        assertTrue(extTypes.internalLayer.parse("Tazbyte", null) instanceof LayerInfo);
+        assertTrue(extTypes.internalLayer.parse("gs:Tazbyte", null) instanceof LayerInfo);
         assertTrue(extTypes.internalLayer.parse("wcs:BlueMarble", null) instanceof LayerInfo);
         assertNull(extTypes.internalLayer.parse("doesntexist", null));
     }

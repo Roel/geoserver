@@ -147,6 +147,11 @@ public class ExtTypes {
                     SortedSet<String> layers = new TreeSet<>();
                     for (LayerInfo layer : geoServer.getCatalog().getLayers()) {
                         layers.add(layer.prefixedName());
+                        if (layer.getResource()
+                                .getNamespace()
+                                .equals(geoServer.getCatalog().getDefaultNamespace())) {
+                            layers.add(layer.getName());
+                        }
                     }
                     return new ArrayList<String>(layers);
                 }
