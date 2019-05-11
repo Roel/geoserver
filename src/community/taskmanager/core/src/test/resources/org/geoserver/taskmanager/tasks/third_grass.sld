@@ -19,7 +19,7 @@
               <GraphicFill>
                 <Graphic>
                   <ExternalGraphic>
-                    <OnlineResource xlink:type="simple" xlink:href="grass_fill.png" />
+                    <OnlineResource xlink:type="simple" xlink:href="img/grass_fill.png" />
                     <Format>image/png</Format>
                   </ExternalGraphic>
                   <Opacity>
