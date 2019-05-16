@@ -165,6 +165,7 @@ public class MetadataTemplatesPage extends GeoServerSecuredPage {
                     @Override
                     public void onClick(AjaxRequestTarget target) {
                         MetadataTemplate clone = templatesPanel.getSelection().get(0).clone();
+                        clone.getLinkedLayers().clear();
                         ((MetadataTemplateImpl) clone).setId(UUID.randomUUID().toString());
                         clone.setName(null);
                         setResponsePage(
