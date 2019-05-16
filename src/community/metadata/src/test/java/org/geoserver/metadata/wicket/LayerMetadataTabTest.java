@@ -5,12 +5,14 @@
 package org.geoserver.metadata.wicket;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import org.apache.wicket.Component;
 import org.apache.wicket.Session;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
@@ -20,6 +22,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.util.tester.FormTester;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.metadata.AbstractWicketMetadataTest;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
@@ -51,7 +54,7 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
     public void before() throws IOException {
         Session.get().setLocale(new Locale("nl"));
 
-        layer = geoServer.getCatalog().getLayers().get(0);
+        layer = geoServer.getCatalog().getLayerByName("mylayer");
         login();
         ResourceConfigurationPage page = new ResourceConfigurationPage(layer, false);
         tester.startPage(page);
@@ -83,6 +86,19 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
                                 "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel");
         // derived field hidden
         assertEquals(14, panel.getDataProvider().size());
+
+        FormTester ft = tester.newFormTester("publishedinfo");
+        ft.submit("save");
+
+        // has at least metadata map with timestamp
+        layer = geoServer.getCatalog().getLayerByName("mylayer");
+        assertNotNull(layer.getResource().getMetadata().get(MetadataConstants.CUSTOM_METADATA_KEY));
+        assertNotNull(
+                ((Map<?, ?>)
+                                layer.getResource()
+                                        .getMetadata()
+                                        .get(MetadataConstants.CUSTOM_METADATA_KEY))
+                        .get(MetadataConstants.TIMESTAMP_KEY));
     }
 
     @Test

@@ -7,6 +7,7 @@ package org.geoserver.metadata.web.layer;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,6 +202,12 @@ public class MetadataTabPanel extends PublishedEditTabPanel<LayerInfo> {
                         .getApplicationContext()
                         .getBean(CustomNativeMappingService.class);
         cnmService.mapCustomToNative((LayerInfo) MetadataTabPanel.this.getDefaultModelObject());
+
+        // save timestamp
+        metadataModel
+                .getObject()
+                .get(Date.class, MetadataConstants.TIMESTAMP_KEY)
+                .setValue(new Date());
     }
 
     @Override

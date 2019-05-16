@@ -430,3 +430,10 @@ e.g.
 .. code::
 
   metadata.generated.form.metadata-identifier=Metadata identificator
+
+Hidden Fields
+-------------
+
+Hidden fields are not visible in the GUI and do not need to be configured. They are updated automatically.
+
+ - ``_timestamp``: date and time of the last metadata update.

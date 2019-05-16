@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -283,6 +284,9 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
                                     .computeIfAbsent(
                                             MetadataConstants.DERIVED_KEY, key -> new HashMap<>());
             metadataService.merge(model, sources, derivedAtts);
+            // update timestamp
+            model.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
+
             resource.getMetadata().put(MetadataConstants.DERIVED_KEY, derivedAtts);
             geoServer.getCatalog().save(resource);
         }
