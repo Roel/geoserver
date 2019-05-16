@@ -95,6 +95,7 @@ public class MetadataTemplateImpl implements Serializable, MetadataTemplate {
         clone.setId(getId());
         clone.setName(getName());
         clone.setDescription(getDescription());
+        clone.linkedLayers = new HashSet<>(getLinkedLayers());
         clone.metadata = new HashMap<>();
         for (Entry<String, Serializable> entry : getMetadata().entrySet()) {
             clone.metadata.put(entry.getKey(), ComplexMetadataMapImpl.dimCopy(entry.getValue()));
