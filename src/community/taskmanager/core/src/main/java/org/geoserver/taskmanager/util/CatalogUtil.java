@@ -203,7 +203,10 @@ public class CatalogUtil {
             // subdirectories for pictures
             Set<String> dirs = new HashSet<>();
             for (String picturePath : pictures) {
-                dirs.add(Paths.get(picturePath).getParent().toString());
+                Path parent = Paths.get(picturePath).getParent();
+                if (parent != null) {
+                    dirs.add(parent.toString());
+                }
             }
 
             File zipFile = File.createTempFile("style", ".zip");
