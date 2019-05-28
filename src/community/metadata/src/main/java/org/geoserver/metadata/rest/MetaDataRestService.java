@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,16 +79,18 @@ public class MetaDataRestService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @GetMapping("fix")
     public String fixAll() {
         for (ResourceInfo info : catalog.getResources(ResourceInfo.class)) {
             Serializable custom = info.getMetadata().get(MetadataConstants.CUSTOM_METADATA_KEY);
             if (custom instanceof HashMap<?, ?>) {
+                @SuppressWarnings("unchecked")
                 ComplexMetadataMapImpl complex =
                         new ComplexMetadataMapImpl((Map<String, Serializable>) custom);
                 metadataService.init(complex);
                 metadataService.derive(complex);
+                // save timestamp
+                complex.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
             }
             catalog.save(info);
         }
@@ -110,6 +113,15 @@ public class MetaDataRestService {
                 info.setResource(
                         catalog.getResource(info.getResource().getId(), ResourceInfo.class));
                 nativeToCustomService.mapNativeToCustom(info, indexList);
+                Serializable custom =
+                        info.getResource().getMetadata().get(MetadataConstants.CUSTOM_METADATA_KEY);
+                if (custom instanceof HashMap<?, ?>) {
+                    @SuppressWarnings("unchecked")
+                    ComplexMetadataMapImpl complex =
+                            new ComplexMetadataMapImpl((Map<String, Serializable>) custom);
+                    // save timestamp
+                    complex.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
+                }
                 catalog.save(info.getResource());
             } else {
                 LOGGER.warning("Couldn't find layer " + resourceName);
@@ -129,6 +141,15 @@ public class MetaDataRestService {
         for (LayerInfo info : catalog.getLayers()) {
             info.setResource(catalog.getResource(info.getResource().getId(), ResourceInfo.class));
             nativeToCustomService.mapNativeToCustom(info, indexList);
+            Serializable custom =
+                    info.getResource().getMetadata().get(MetadataConstants.CUSTOM_METADATA_KEY);
+            if (custom instanceof HashMap<?, ?>) {
+                @SuppressWarnings("unchecked")
+                ComplexMetadataMapImpl complex =
+                        new ComplexMetadataMapImpl((Map<String, Serializable>) custom);
+                // save timestamp
+                complex.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
+            }
             catalog.save(info.getResource());
         }
         return "Success.";
@@ -180,6 +201,8 @@ public class MetaDataRestService {
                                         .toArray(i -> new String[i])));
                 nativeToCustomService.mapCustomToNative(lInfo);
                 metadataService.derive(complex);
+                // save timestamp
+                complex.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
                 catalog.save(rInfo);
                 catalog.save(lInfo);
             } else {
