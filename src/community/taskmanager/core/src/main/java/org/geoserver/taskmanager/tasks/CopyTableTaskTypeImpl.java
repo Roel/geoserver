@@ -107,17 +107,89 @@ public class CopyTableTaskTypeImpl implements TaskType {
 
         try (Connection sourceConn = sourcedb.getDataSource().getConnection()) {
             sourceConn.setAutoCommit(false);
-            try (Connection destConn = targetdb.getDataSource().getConnection()) {
-                try (Statement stmt = sourceConn.createStatement()) {
-                    stmt.setFetchSize(BATCH_SIZE);
-                    try (ResultSet rs =
-                            stmt.executeQuery(
-                                    "SELECT * FROM "
-                                            + sourcedb.getDialect().quote(table.getTableName()))) {
+            try (Statement stmt = sourceConn.createStatement()) {
+                stmt.setFetchSize(BATCH_SIZE);
+                try (ResultSet rs =
+                        stmt.executeQuery(
+                                "SELECT * FROM "
+                                        + sourcedb.getDialect().quote(table.getTableName()))) {
 
-                        ResultSetMetaData rsmd = rs.getMetaData();
+                    ResultSetMetaData rsmd = rs.getMetaData();
 
-                        String tempSchema = SqlUtil.schema(tempTableName);
+                    String tempSchema = SqlUtil.schema(tempTableName);
+
+                    // create the temp table structure
+                    StringBuilder sb =
+                            new StringBuilder("CREATE TABLE ")
+                                    .append(targetdb.getDialect().quote(tempTableName))
+                                    .append(" ( ");
+                    int columnCount = rsmd.getColumnCount();
+
+                    for (int i = 1; i <= columnCount; i++) {
+                        String columnName = targetdb.getDialect().quote(rsmd.getColumnLabel(i));
+                        String typeName = rsmd.getColumnTypeName(i);
+                        sb.append(columnName).append(" ").append(typeName);
+                        if (("char".equals(typeName) || "varchar".equals(typeName))
+                                && rsmd.getColumnDisplaySize(i) > 0
+                                && rsmd.getColumnDisplaySize(i) < Integer.MAX_VALUE) {
+                            sb.append(" (").append(rsmd.getColumnDisplaySize(i)).append(" ) ");
+                        }
+                        switch (sourcedb.getDialect().isNullable(rsmd.isNullable(i))) {
+                            case ResultSetMetaData.columnNoNulls:
+                                sb.append(" NOT NULL");
+                                break;
+                            case ResultSetMetaData.columnNullable:
+                                sb.append(" NULL");
+                                break;
+                        }
+                        sb.append(", ");
+                    }
+                    String primaryKey = getPrimaryKey(sourceConn, table.getTableName());
+                    boolean hasPrimaryKeyColumn = !primaryKey.isEmpty();
+                    if (!hasPrimaryKeyColumn) {
+                        // create a Primary key column if none exist.
+                        sb.append(GENERATE_ID_COLUMN_NAME + " int PRIMARY KEY, ");
+                        columnCount++;
+                    }
+
+                    sb.setLength(sb.length() - 2);
+                    sb.append(" ); ");
+
+                    // creating indexes
+                    Map<String, Set<String>> indexAndColumnMap =
+                            getIndexesColumns(sourceConn, table.getTableName());
+                    Set<String> uniqueIndexes = getUniqueIndexes(sourceConn, table.getTableName());
+                    Set<String> spatialColumns =
+                            sourcedb.getDialect()
+                                    .getSpatialColumns(
+                                            sourceConn, table.getTableName(), sourcedb.getSchema());
+
+                    for (String indexName : indexAndColumnMap.keySet()) {
+                        Set<String> columnNames = indexAndColumnMap.get(indexName);
+                        boolean isSpatialIndex =
+                                columnNames.size() == 1
+                                        && spatialColumns.contains(columnNames.iterator().next());
+
+                        sb.append(
+                                targetdb.getDialect()
+                                        .createIndex(
+                                                tempTableName,
+                                                columnNames,
+                                                isSpatialIndex,
+                                                uniqueIndexes.contains(indexName)));
+                    }
+                    // we are copying a view and need to create the spatial index.
+                    if (indexAndColumnMap.isEmpty() && !spatialColumns.isEmpty()) {
+                        sb.append(
+                                targetdb.getDialect()
+                                        .createIndex(tempTableName, spatialColumns, true, false));
+                    }
+
+                    String dump = sb.toString();
+                    LOGGER.log(Level.FINE, "creating temporary table: " + dump);
+
+                    try (Connection destConn = targetdb.getDataSource().getConnection()) {
+
                         String sqlCreateSchemaIfNotExists =
                                 tempSchema == null
                                         ? ""
@@ -126,83 +198,8 @@ public class CopyTableTaskTypeImpl implements TaskType {
                                                         destConn,
                                                         targetdb.getDialect().quote(tempSchema));
 
-                        // create the temp table structure
-                        StringBuilder sb = new StringBuilder(sqlCreateSchemaIfNotExists);
-                        sb.append("CREATE TABLE ")
-                                .append(targetdb.getDialect().quote(tempTableName))
-                                .append(" ( ");
-                        int columnCount = rsmd.getColumnCount();
-
-                        for (int i = 1; i <= columnCount; i++) {
-                            String columnName = targetdb.getDialect().quote(rsmd.getColumnLabel(i));
-                            String typeName = rsmd.getColumnTypeName(i);
-                            sb.append(columnName).append(" ").append(typeName);
-                            if (("char".equals(typeName) || "varchar".equals(typeName))
-                                    && rsmd.getColumnDisplaySize(i) > 0
-                                    && rsmd.getColumnDisplaySize(i) < Integer.MAX_VALUE) {
-                                sb.append(" (").append(rsmd.getColumnDisplaySize(i)).append(" ) ");
-                            }
-                            switch (sourcedb.getDialect().isNullable(rsmd.isNullable(i))) {
-                                case ResultSetMetaData.columnNoNulls:
-                                    sb.append(" NOT NULL");
-                                    break;
-                                case ResultSetMetaData.columnNullable:
-                                    sb.append(" NULL");
-                                    break;
-                            }
-                            sb.append(", ");
-                        }
-                        String primaryKey = getPrimaryKey(sourceConn, table.getTableName());
-                        boolean hasPrimaryKeyColumn = !primaryKey.isEmpty();
-                        if (!hasPrimaryKeyColumn) {
-                            // create a Primary key column if none exist.
-                            sb.append(GENERATE_ID_COLUMN_NAME + " int PRIMARY KEY, ");
-                            columnCount++;
-                        }
-
-                        sb.setLength(sb.length() - 2);
-                        sb.append(" ); ");
-
-                        // creating indexes
-                        Map<String, Set<String>> indexAndColumnMap =
-                                getIndexesColumns(sourceConn, table.getTableName());
-                        Set<String> uniqueIndexes =
-                                getUniqueIndexes(sourceConn, table.getTableName());
-                        Set<String> spatialColumns =
-                                sourcedb.getDialect()
-                                        .getSpatialColumns(
-                                                sourceConn,
-                                                table.getTableName(),
-                                                sourcedb.getSchema());
-
-                        for (String indexName : indexAndColumnMap.keySet()) {
-                            Set<String> columnNames = indexAndColumnMap.get(indexName);
-                            boolean isSpatialIndex =
-                                    columnNames.size() == 1
-                                            && spatialColumns.contains(
-                                                    columnNames.iterator().next());
-
-                            sb.append(
-                                    targetdb.getDialect()
-                                            .createIndex(
-                                                    tempTableName,
-                                                    columnNames,
-                                                    isSpatialIndex,
-                                                    uniqueIndexes.contains(indexName)));
-                        }
-                        // we are copying a view and need to create the spatial index.
-                        if (indexAndColumnMap.isEmpty() && !spatialColumns.isEmpty()) {
-                            sb.append(
-                                    targetdb.getDialect()
-                                            .createIndex(
-                                                    tempTableName, spatialColumns, true, false));
-                        }
-
-                        String dump = sb.toString();
-                        LOGGER.log(Level.FINE, "creating temporary table: " + dump);
-
                         try (Statement stmt2 = destConn.createStatement()) {
-                            stmt2.executeUpdate(dump);
+                            stmt2.executeUpdate(sqlCreateSchemaIfNotExists + dump);
                         }
 
                         // copy the data
