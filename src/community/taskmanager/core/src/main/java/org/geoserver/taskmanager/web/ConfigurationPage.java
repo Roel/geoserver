@@ -140,6 +140,10 @@ public class ConfigurationPage extends GeoServerSecuredPage {
         this(new Model<Configuration>(configuration));
     }
 
+    public IModel<Configuration> getConfigurationModel() {
+        return configurationModel;
+    }
+
     @Override
     public void onInitialize() {
         super.onInitialize();

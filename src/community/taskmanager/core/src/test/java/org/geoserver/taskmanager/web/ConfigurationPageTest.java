@@ -492,4 +492,39 @@ public class ConfigurationPageTest extends AbstractBatchesPanelTest<Configuratio
             fail("Missing expected feedback message: " + partOfMessage);
         }
     }
+
+    @Test
+    public void testBatchUpdatedInConfiguration() {
+
+        Batch dummy1 = dao.save(dummyBatch1());
+
+        ConfigurationPage page = newPage();
+        tester.startPage(page);
+
+        tester.clickLink(
+                prefix()
+                        + "batchesPanel:form:batchesPanel:listContainer:items:1:itemProperties:1:component:link");
+
+        tester.assertRenderedPage(BatchPage.class);
+
+        tester.assertModelValue("batchForm:name", dummy1.getName());
+
+        FormTester formTester = tester.newFormTester("batchForm");
+
+        formTester.setValue("description", "my-description");
+
+        formTester.submit("save");
+
+        tester.assertRenderedPage(ConfigurationPage.class);
+
+        assertEquals(
+                "my-description",
+                page.getConfigurationModel()
+                        .getObject()
+                        .getBatches()
+                        .get(dummy1.getName())
+                        .getDescription());
+
+        dao.delete(dummy1);
+    }
 }

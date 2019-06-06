@@ -319,15 +319,20 @@ public class BatchesPanel extends Panel {
                                                             protected void onSubmit(
                                                                     AjaxRequestTarget target,
                                                                     Form<?> form) {
+                                                                Batch batch =
+                                                                        TaskManagerBeans.get()
+                                                                                .getDao()
+                                                                                .init(
+                                                                                        itemModel
+                                                                                                .getObject());
+                                                                if (configurationModel != null) {
+                                                                    batch.setConfiguration(
+                                                                            configurationModel
+                                                                                    .getObject());
+                                                                }
                                                                 setResponsePage(
                                                                         new BatchPage(
-                                                                                TaskManagerBeans
-                                                                                        .get()
-                                                                                        .getDao()
-                                                                                        .init(
-                                                                                                itemModel
-                                                                                                        .getObject()),
-                                                                                getPage()));
+                                                                                batch, getPage()));
                                                             }
                                                         };
                                                     }
