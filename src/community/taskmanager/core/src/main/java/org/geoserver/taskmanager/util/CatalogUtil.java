@@ -89,7 +89,6 @@ public class CatalogUtil {
             if (resource.getNativeCRS() != null) {
                 re.setNativeCRS(CRS.toSRS(resource.getNativeCRS()));
             }
-            re.setNativeName(resource.getNativeName());
         }
         re.setName(name);
         re.setTitle(resource.getTitle());
