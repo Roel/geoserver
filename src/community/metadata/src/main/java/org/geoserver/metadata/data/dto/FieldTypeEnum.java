@@ -22,5 +22,6 @@ public enum FieldTypeEnum {
     UUID,
     DROPDOWN,
     SUGGESTBOX,
+    REQUIREBOX,
     DERIVED
 }

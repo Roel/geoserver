@@ -77,7 +77,19 @@ public class EditorFactory {
             case UUID:
                 return new UUIDFieldPanel(id, (IModel<String>) model);
             case SUGGESTBOX:
-                return new AutoCompletePanel(id, (IModel<String>) model, configuration.getValues());
+                return new AutoCompletePanel(
+                        id,
+                        (IModel<String>) model,
+                        configuration.getValues(),
+                        false,
+                        configuration.getLabel());
+            case REQUIREBOX:
+                return new AutoCompletePanel(
+                        id,
+                        (IModel<String>) model,
+                        configuration.getValues(),
+                        true,
+                        configuration.getLabel());
             case COMPLEX:
                 return new AttributesTablePanel(
                         id,

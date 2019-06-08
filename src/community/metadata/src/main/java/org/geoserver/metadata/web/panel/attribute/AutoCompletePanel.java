@@ -10,18 +10,26 @@ import java.util.List;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.IValidator;
+import org.apache.wicket.validation.ValidationError;
 
 public class AutoCompletePanel extends Panel {
 
     private static final long serialVersionUID = -1829729746678003578L;
 
-    public AutoCompletePanel(String id, IModel<String> model, List<String> values) {
+    public AutoCompletePanel(
+            String id,
+            IModel<String> model,
+            List<String> values,
+            boolean forceValues,
+            String fieldLabel) {
 
         super(id, model);
 
-        add(
+        AutoCompleteTextField<String> field =
                 new AutoCompleteTextField<String>("autoComplete", model) {
-
                     private static final long serialVersionUID = 7742400754591550452L;
 
                     @Override
@@ -38,6 +46,28 @@ public class AutoCompletePanel extends Panel {
                             return result.iterator();
                         }
                     }
-                });
+                };
+
+        if (forceValues) {
+            field.add(
+                    new IValidator<String>() {
+
+                        private static final long serialVersionUID = -7843517457763685578L;
+
+                        @Override
+                        public void validate(IValidatable<String> validatable) {
+                            if (!values.contains(validatable.getValue())) {
+                                validatable.error(
+                                        new ValidationError(
+                                                new StringResourceModel(
+                                                                "invalid", AutoCompletePanel.this)
+                                                        .setParameters(fieldLabel)
+                                                        .getString()));
+                            }
+                        }
+                    });
+        }
+
+        add(field);
     }
 }
