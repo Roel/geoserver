@@ -4,13 +4,17 @@
  */
 package org.geoserver.metadata.web.panel.attribute;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteTextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
@@ -24,7 +28,8 @@ public class AutoCompletePanel extends Panel {
             IModel<String> model,
             List<String> values,
             boolean forceValues,
-            String fieldLabel) {
+            String fieldLabel,
+            IModel<List<String>> selectedValues) {
 
         super(id, model);
 
@@ -34,19 +39,37 @@ public class AutoCompletePanel extends Panel {
 
                     @Override
                     protected Iterator<String> getChoices(String input) {
-                        List<String> result = new ArrayList<String>();
+                        Set<String> result = new TreeSet<String>();
                         for (String value : values) {
                             if (value.toLowerCase().contains(input.toLowerCase())) {
                                 result.add(value);
                             }
                         }
                         if (result.isEmpty()) {
-                            return values.iterator();
-                        } else {
-                            return result.iterator();
+                            result.addAll(values);
                         }
+                        if (selectedValues != null) {
+                            result.removeIf(i -> selectedValues.getObject().contains(i));
+                            if (!Strings.isEmpty(model.getObject())) {
+                                result.add(model.getObject());
+                            }
+                        }
+                        return result.iterator();
                     }
                 };
+        if (selectedValues != null) {
+            field.add(
+                    new AjaxFormComponentUpdatingBehavior("change") {
+                        private static final long serialVersionUID = 1989673955080590525L;
+
+                        @Override
+                        protected void onUpdate(AjaxRequestTarget target) {
+                            target.add(
+                                    AutoCompletePanel.this.findParent(
+                                            RepeatableAttributesTablePanel.class));
+                        }
+                    });
+        }
 
         if (forceValues) {
             field.add(

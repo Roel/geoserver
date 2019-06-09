@@ -117,7 +117,8 @@ public class RepeatableAttributesTablePanel extends Panel {
                                             .create(
                                                     attributeConfiguration,
                                                     id,
-                                                    itemModel.getObject());
+                                                    itemModel.getObject(),
+                                                    dataProvider);
 
                             if (component != null) {
                                 component.setEnabled(enableInput);

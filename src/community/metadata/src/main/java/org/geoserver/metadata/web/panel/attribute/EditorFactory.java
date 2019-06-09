@@ -7,6 +7,7 @@ package org.geoserver.metadata.web.panel.attribute;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -37,19 +38,28 @@ public class EditorFactory {
         IModel<T> model =
                 new ComplexMetadataAttributeModel<T>(
                         metadataMap.get(getItemClass(configuration), configuration.getKey()));
-        return create(configuration, id, model, metadataMap.subMap(configuration.getKey()));
+        return create(configuration, id, model, metadataMap.subMap(configuration.getKey()), null);
     }
 
     public <T extends Serializable> Component create(
             AttributeConfiguration configuration,
             String id,
             ComplexMetadataAttribute<T> metadataAttribute) {
+        return create(configuration, id, metadataAttribute, null);
+    }
+
+    public <T extends Serializable> Component create(
+            AttributeConfiguration configuration,
+            String id,
+            ComplexMetadataAttribute<T> metadataAttribute,
+            IModel<List<String>> selection) {
         IModel<T> model = new ComplexMetadataAttributeModel<T>(metadataAttribute);
         return create(
                 configuration,
                 id,
                 model,
-                new ComplexMetadataMapImpl(new HashMap<String, Serializable>()));
+                new ComplexMetadataMapImpl(new HashMap<String, Serializable>()),
+                selection);
     }
 
     @SuppressWarnings("unchecked")
@@ -57,7 +67,8 @@ public class EditorFactory {
             AttributeConfiguration configuration,
             String id,
             IModel<?> model,
-            ComplexMetadataMap submap) {
+            ComplexMetadataMap submap,
+            IModel<List<String>> selection) {
 
         switch (configuration.getFieldType()) {
             case TEXT:
@@ -67,7 +78,8 @@ public class EditorFactory {
             case BOOLEAN:
                 return new CheckBoxPanel(id, (IModel<Boolean>) model);
             case DROPDOWN:
-                return new DropDownPanel(id, (IModel<String>) model, configuration.getValues());
+                return new DropDownPanel(
+                        id, (IModel<String>) model, configuration.getValues(), selection);
             case TEXT_AREA:
                 return new TextAreaPanel(id, (IModel<String>) model);
             case DATE:
@@ -82,14 +94,16 @@ public class EditorFactory {
                         (IModel<String>) model,
                         configuration.getValues(),
                         false,
-                        configuration.getLabel());
+                        configuration.getLabel(),
+                        selection);
             case REQUIREBOX:
                 return new AutoCompletePanel(
                         id,
                         (IModel<String>) model,
                         configuration.getValues(),
                         true,
-                        configuration.getLabel());
+                        configuration.getLabel(),
+                        selection);
             case COMPLEX:
                 return new AttributesTablePanel(
                         id,
