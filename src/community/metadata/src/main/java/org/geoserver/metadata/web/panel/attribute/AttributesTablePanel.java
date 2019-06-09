@@ -6,7 +6,6 @@ package org.geoserver.metadata.web.panel.attribute;
 
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -152,12 +151,8 @@ public class AttributesTablePanel extends Panel {
      * @return
      */
     private String resolveLabelValue(AttributeConfiguration attribute) {
-
-        try {
-            return getString(AttributeConfiguration.PREFIX + attribute.getKey());
-        } catch (MissingResourceException ignored) {
-        }
-        return attribute.getLabel();
+        return getString(
+                AttributeConfiguration.PREFIX + attribute.getKey(), null, attribute.getLabel());
     }
 
     @SuppressWarnings("unchecked")

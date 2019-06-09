@@ -11,9 +11,11 @@ import java.util.TreeSet;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.Strings;
+import org.geoserver.metadata.data.dto.AttributeConfiguration;
 
 public class DropDownPanel extends Panel {
 
@@ -21,6 +23,7 @@ public class DropDownPanel extends Panel {
 
     public DropDownPanel(
             String id,
+            String attributeKey,
             IModel<String> model,
             List<String> values,
             IModel<List<String>> selectedValues) {
@@ -28,20 +31,25 @@ public class DropDownPanel extends Panel {
         super(id, model);
 
         if (selectedValues == null) { // not part of repeatable
-            add(createDropDown(model, values));
+            add(createDropDown(attributeKey, model, values));
         } else { // part of repeatable
-            add(createDropDown(model, values, selectedValues));
+            add(createDropDown(attributeKey, model, values, selectedValues));
         }
     }
 
-    private DropDownChoice<String> createDropDown(IModel<String> model, List<String> values) {
-        DropDownChoice<String> choice = new DropDownChoice<String>("dropdown", model, values);
+    private DropDownChoice<String> createDropDown(
+            String attributeKey, IModel<String> model, List<String> values) {
+        DropDownChoice<String> choice =
+                new DropDownChoice<String>("dropdown", model, values, createRenderer(attributeKey));
         choice.setNullValid(true);
         return choice;
     }
 
     private DropDownChoice<String> createDropDown(
-            IModel<String> model, List<String> values, IModel<List<String>> selectedValues) {
+            String attributeKey,
+            IModel<String> model,
+            List<String> values,
+            IModel<List<String>> selectedValues) {
         DropDownChoice<String> choice =
                 new DropDownChoice<String>(
                         "dropdown",
@@ -57,7 +65,7 @@ public class DropDownPanel extends Panel {
                                 if (!Strings.isEmpty(model.getObject())) {
                                     currentList.add(model.getObject());
                                 }
-                                return new ArrayList<String>();
+                                return new ArrayList<String>(currentList);
                             }
 
                             @Override
@@ -67,7 +75,8 @@ public class DropDownPanel extends Panel {
 
                             @Override
                             public void detach() {}
-                        });
+                        },
+                        createRenderer(attributeKey));
         choice.add(
                 new AjaxFormComponentUpdatingBehavior("change") {
                     private static final long serialVersionUID = 1989673955080590525L;
@@ -81,5 +90,27 @@ public class DropDownPanel extends Panel {
                 });
         choice.setNullValid(true);
         return choice;
+    }
+
+    private IChoiceRenderer<String> createRenderer(String attributeKey) {
+        return new IChoiceRenderer<String>() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public Object getDisplayValue(String object) {
+                return getString(
+                        AttributeConfiguration.PREFIX + attributeKey + "." + object, null, object);
+            }
+
+            @Override
+            public String getIdValue(String object, int index) {
+                return object;
+            }
+
+            @Override
+            public String getObject(String id, IModel<? extends List<? extends String>> choices) {
+                return id;
+            }
+        };
     }
 }

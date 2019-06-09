@@ -79,7 +79,11 @@ public class EditorFactory {
                 return new CheckBoxPanel(id, (IModel<Boolean>) model);
             case DROPDOWN:
                 return new DropDownPanel(
-                        id, (IModel<String>) model, configuration.getValues(), selection);
+                        id,
+                        configuration.getKey(),
+                        (IModel<String>) model,
+                        configuration.getValues(),
+                        selection);
             case TEXT_AREA:
                 return new TextAreaPanel(id, (IModel<String>) model);
             case DATE:

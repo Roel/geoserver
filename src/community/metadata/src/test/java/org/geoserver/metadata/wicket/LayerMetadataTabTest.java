@@ -115,6 +115,14 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
         tester.assertLabel(
                 "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:6:itemProperties:1:component:attributesTablePanel:listContainer:items:1:itemProperties:0:component",
                 "Het code veld");
+
+        @SuppressWarnings("unchecked")
+        DropDownChoice<String> choice =
+                (DropDownChoice<String>)
+                        tester.getComponentFromLastRenderedPage(
+                                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:4:itemProperties:1:component:dropdown");
+        assertEquals(
+                "The Final Choice", choice.getChoiceRenderer().getDisplayValue("the-final-choice"));
     }
 
     /** The layer is linked to the 'simple field' template. */

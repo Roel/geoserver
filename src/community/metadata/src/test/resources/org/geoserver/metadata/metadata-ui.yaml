@@ -11,6 +11,7 @@ attributes:
         - Select me
         - Or select this row
         - Don't select this one
+        - the-final-choice
   - label: refsystem as list
     key: refsystem-as-list
     fieldType: TEXT
