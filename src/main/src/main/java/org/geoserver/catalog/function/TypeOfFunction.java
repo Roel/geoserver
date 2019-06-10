@@ -3,7 +3,7 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.csw.function;
+package org.geoserver.catalog.function;
 
 import static org.geotools.filter.capability.FunctionNameImpl.parameter;
 
@@ -30,7 +30,7 @@ import org.opengis.filter.capability.FunctionName;
  *
  * @author Niels Charlier
  */
-public class FilterFunction_typeOf extends FunctionExpressionImpl {
+public class TypeOfFunction extends FunctionExpressionImpl {
 
     public static FunctionName NAME =
             new FunctionNameImpl("typeOf", String.class, parameter("info", CatalogInfo.class));
@@ -62,7 +62,7 @@ public class FilterFunction_typeOf extends FunctionExpressionImpl {
         return null;
     }
 
-    public FilterFunction_typeOf() {
+    public TypeOfFunction() {
         super(NAME);
     }
 
