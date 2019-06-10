@@ -36,4 +36,6 @@ public interface AttributeConfiguration extends Serializable {
     public OccurrenceEnum getOccurrence();
 
     public String getDerivedFrom();
+    
+    public String getCondition();
 }

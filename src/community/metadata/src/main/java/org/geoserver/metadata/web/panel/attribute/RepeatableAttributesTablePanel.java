@@ -17,6 +17,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.ReuseIfModelsEqualStrategy;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
+import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.model.ComplexMetadataAttribute;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
@@ -35,13 +36,17 @@ public class RepeatableAttributesTablePanel extends Panel {
     private GeoServerTablePanel<ComplexMetadataAttribute<String>> tablePanel;
 
     private Label noData;
+    
+    private ResourceInfo rInfo;
 
     public RepeatableAttributesTablePanel(
             String id,
             RepeatableAttributeDataProvider<String> dataProvider,
             IModel<ComplexMetadataMap> metadataModel,
-            Map<String, List<Integer>> derivedAtts) {
+            Map<String, List<Integer>> derivedAtts,
+            ResourceInfo rInfo) {
         super(id, metadataModel);
+        this.rInfo = rInfo;
 
         setOutputMarkupId(true);
 
@@ -118,7 +123,8 @@ public class RepeatableAttributesTablePanel extends Panel {
                                                     attributeConfiguration,
                                                     id,
                                                     itemModel.getObject(),
-                                                    dataProvider);
+                                                    dataProvider,
+                                                    rInfo);
 
                             if (component != null) {
                                 component.setEnabled(enableInput);

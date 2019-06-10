@@ -7,16 +7,25 @@ package org.geoserver.metadata.web.panel.attribute;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.AttributeCollection;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.dto.FieldTypeEnum;
 import org.geoserver.metadata.data.service.ConfigurationService;
 import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.wicket.GeoServerDataProvider;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.util.logging.Logging;
 
 public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfiguration> {
 
     private static final long serialVersionUID = -4454769618643460913L;
+    
+    private static final Logger LOGGER = Logging.getLogger(AttributeDataProvider.class);
 
     public static Property<AttributeConfiguration> NAME =
             new BeanProperty<AttributeConfiguration>("name", "label");
@@ -32,8 +41,11 @@ public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfig
             };
 
     private List<AttributeConfiguration> items = new ArrayList<>();
+    
+    private ResourceInfo rInfo;
 
-    public AttributeDataProvider() {
+    public AttributeDataProvider(ResourceInfo rInfo) {
+        this.rInfo = rInfo;
         ConfigurationService metadataConfigurationService =
                 GeoServerApplication.get()
                         .getApplicationContext()
@@ -46,7 +58,8 @@ public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfig
      *
      * @param typename
      */
-    public AttributeDataProvider(String typename) {
+    public AttributeDataProvider(String typename, ResourceInfo rInfo) {
+        this.rInfo = rInfo;
         ConfigurationService metadataConfigurationService =
                 GeoServerApplication.get()
                         .getApplicationContext()
@@ -60,10 +73,29 @@ public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfig
 
     protected void load(AttributeCollection coll) {
         for (AttributeConfiguration config : coll.getAttributes()) {
-            if (config.getFieldType() != FieldTypeEnum.DERIVED) { // don't display derived fields!
+            if (shouldDisplay(config)) { 
                 items.add(config);
             }
         }
+    }
+
+    private boolean shouldDisplay(AttributeConfiguration config) {
+        if (config.getFieldType() == FieldTypeEnum.DERIVED) {
+            return false; // don't display derived fields!
+        }
+        if (config.getCondition() != null && rInfo != null) {
+            try {
+                Object result = CQL.toExpression(
+                        config.getCondition())
+                        .evaluate(rInfo);
+                if (!Boolean.TRUE.equals(result)) {
+                    return false;
+                }
+            } catch (CQLException e) {
+                LOGGER.log(Level.WARNING, "Failed to parse condition for " + config.getKey(), e);
+            }
+        }
+        return true;
     }
 
     @Override

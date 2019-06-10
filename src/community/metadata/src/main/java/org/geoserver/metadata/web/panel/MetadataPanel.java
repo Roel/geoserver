@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
 import org.geoserver.metadata.web.panel.attribute.AttributeDataProvider;
 import org.geoserver.metadata.web.panel.attribute.AttributesTablePanel;
@@ -22,13 +23,17 @@ public class MetadataPanel extends Panel {
     private static final long serialVersionUID = 1297739738862860160L;
 
     private final Map<String, List<Integer>> derivedAtts;
+    
+    private final ResourceInfo rInfo;
 
     public MetadataPanel(
-            String id,
+            String id,            
             IModel<ComplexMetadataMap> metadataModel,
-            Map<String, List<Integer>> derivedAtts) {
+            Map<String, List<Integer>> derivedAtts,
+            ResourceInfo rInfo) {
         super(id, metadataModel);
         this.derivedAtts = derivedAtts;
+        this.rInfo = rInfo;
     }
 
     @Override
@@ -38,9 +43,10 @@ public class MetadataPanel extends Panel {
         AttributesTablePanel attributesPanel =
                 new AttributesTablePanel(
                         "attributesPanel",
-                        new AttributeDataProvider(),
+                        new AttributeDataProvider(rInfo),
                         getMetadataModel(),
-                        derivedAtts);
+                        derivedAtts,
+                        rInfo);        
 
         attributesPanel.setOutputMarkupId(true);
         add(attributesPanel);

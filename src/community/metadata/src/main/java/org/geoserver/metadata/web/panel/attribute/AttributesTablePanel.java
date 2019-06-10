@@ -12,6 +12,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.ReuseIfModelsEqualStrategy;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.resource.loader.IStringResourceLoader;
+import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.dto.FieldTypeEnum;
@@ -33,14 +34,18 @@ import org.geoserver.web.wicket.GeoServerTablePanel;
  */
 public class AttributesTablePanel extends Panel {
     private static final long serialVersionUID = 1297739738862860160L;
+    
+    private ResourceInfo rInfo;
 
     public AttributesTablePanel(
             String id,
             GeoServerDataProvider<AttributeConfiguration> dataProvider,
             IModel<ComplexMetadataMap> metadataModel,
-            Map<String, List<Integer>> derivedAtts) {
+            Map<String, List<Integer>> derivedAtts,
+            ResourceInfo rInfo) {
         super(id, metadataModel);
-
+        this.rInfo = rInfo;
+        
         List<IStringResourceLoader> loaders =
                 getApplication().getResourceSettings().getStringResourceLoaders();
         boolean loaded = false;
@@ -104,7 +109,8 @@ public class AttributesTablePanel extends Panel {
                                         .create(
                                                 attributeConfiguration,
                                                 id,
-                                                getMetadataModel().getObject());
+                                                getMetadataModel().getObject(),
+                                                rInfo);
                         // disable components with values from the templates
                         if (component != null
                                 && derivedAtts != null
@@ -127,7 +133,8 @@ public class AttributesTablePanel extends Panel {
                                 GeoServerApplication.get()
                                         .getBeanOfType(GeneratorService.class)
                                         .findGeneratorByType(attributeConfiguration.getTypename()),
-                                derivedAtts);
+                                derivedAtts,
+                                rInfo);
                     } else {
                         RepeatableAttributeDataProvider<String> repeatableDataProvider =
                                 new RepeatableAttributeDataProvider<String>(
@@ -136,7 +143,8 @@ public class AttributesTablePanel extends Panel {
                                         attributeConfiguration,
                                         getMetadataModel());
                         return new RepeatableAttributesTablePanel(
-                                id, repeatableDataProvider, getMetadataModel(), derivedAtts);
+                                id, repeatableDataProvider, getMetadataModel(), derivedAtts,
+                                rInfo);
                     }
                 }
                 return null;

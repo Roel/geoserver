@@ -111,7 +111,7 @@ public class MetadataTemplatePage extends GeoServerBasePage {
         form.add(desicription);
 
         MetadataPanel metadataTemplatePanel =
-                new MetadataPanel("metadataTemplatePanel", metadataModel, null);
+                new MetadataPanel("metadataTemplatePanel", metadataModel, null, null);
         form.add(metadataTemplatePanel);
 
         this.add(form);

@@ -18,6 +18,7 @@ import org.apache.wicket.markup.repeater.ReuseIfModelsEqualStrategy;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.ResourceModel;
 import org.geoserver.catalog.LayerInfo;
+import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
 import org.geoserver.metadata.data.service.ComplexAttributeGenerator;
@@ -47,6 +48,8 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
     private ComplexAttributeGenerator generator;
 
     private AttributeConfiguration attributeConfiguration;
+    
+    private ResourceInfo rInfo;
 
     public RepeatableComplexAttributesTablePanel(
             String id,
@@ -54,13 +57,15 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
             IModel<ComplexMetadataMap> metadataModel,
             AttributeConfiguration attributeConfiguration,
             ComplexAttributeGenerator generator,
-            Map<String, List<Integer>> derivedAtts) {
+            Map<String, List<Integer>> derivedAtts,
+            ResourceInfo rInfo) {
         super(id, metadataModel);
 
         this.dataProvider = dataProvider;
         this.derivedAtts = derivedAtts;
         this.generator = generator;
         this.attributeConfiguration = attributeConfiguration;
+        this.rInfo = rInfo;
     }
 
     @Override
@@ -190,9 +195,11 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                                     new AttributesTablePanel(
                                             id,
                                             new AttributeDataProvider(
-                                                    attributeConfiguration.getTypename()),
+                                                    attributeConfiguration.getTypename(),
+                                                    rInfo),
                                             itemModel,
-                                            null);
+                                            null,
+                                            rInfo);
                             component.setEnabled(enableInput);
 
                             return component;

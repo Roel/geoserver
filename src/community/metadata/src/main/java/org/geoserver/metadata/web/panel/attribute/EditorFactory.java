@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.model.ComplexMetadataAttribute;
 import org.geoserver.metadata.data.model.ComplexMetadataAttributeModel;
@@ -34,32 +35,35 @@ public class EditorFactory {
     }
 
     public <T extends Serializable> Component create(
-            AttributeConfiguration configuration, String id, ComplexMetadataMap metadataMap) {
+            AttributeConfiguration configuration, String id, ComplexMetadataMap metadataMap,
+            ResourceInfo rInfo) {
         IModel<T> model =
                 new ComplexMetadataAttributeModel<T>(
                         metadataMap.get(getItemClass(configuration), configuration.getKey()));
-        return create(configuration, id, model, metadataMap.subMap(configuration.getKey()), null);
-    }
-
-    public <T extends Serializable> Component create(
-            AttributeConfiguration configuration,
-            String id,
-            ComplexMetadataAttribute<T> metadataAttribute) {
-        return create(configuration, id, metadataAttribute, null);
+        return create(configuration, id, model, metadataMap.subMap(configuration.getKey()), null, rInfo);
     }
 
     public <T extends Serializable> Component create(
             AttributeConfiguration configuration,
             String id,
             ComplexMetadataAttribute<T> metadataAttribute,
-            IModel<List<String>> selection) {
+            ResourceInfo rInfo) {
+        return create(configuration, id, metadataAttribute, null, rInfo);
+    }
+
+    public <T extends Serializable> Component create(
+            AttributeConfiguration configuration,
+            String id,
+            ComplexMetadataAttribute<T> metadataAttribute,
+            IModel<List<String>> selection,
+            ResourceInfo rInfo) {
         IModel<T> model = new ComplexMetadataAttributeModel<T>(metadataAttribute);
         return create(
                 configuration,
                 id,
                 model,
                 new ComplexMetadataMapImpl(new HashMap<String, Serializable>()),
-                selection);
+                selection, rInfo);
     }
 
     @SuppressWarnings("unchecked")
@@ -68,7 +72,8 @@ public class EditorFactory {
             String id,
             IModel<?> model,
             ComplexMetadataMap submap,
-            IModel<List<String>> selection) {
+            IModel<List<String>> selection,
+            ResourceInfo rInfo) {
 
         switch (configuration.getFieldType()) {
             case TEXT:
@@ -111,9 +116,11 @@ public class EditorFactory {
             case COMPLEX:
                 return new AttributesTablePanel(
                         id,
-                        new AttributeDataProvider(configuration.getTypename()),
+                        new AttributeDataProvider(
+                                configuration.getTypename(),
+                                rInfo),
                         new Model<ComplexMetadataMap>(submap),
-                        null);
+                        null, rInfo);
             default:
                 break;
         }

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.Session;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.extensions.markup.html.tabs.TabbedPanel;
@@ -718,6 +719,10 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
 
     @Test
     public void testGenerateFeatureCatalogueAndDomain() {
+        MarkupContainer c = (MarkupContainer) tester.getComponentFromLastRenderedPage(
+                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items");
+        assertEquals(14, c.size());
+        
         tester.assertComponent(
                 "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:13:itemProperties:1:component:attributesTablePanel:listContainer:items:2:itemProperties:1:component:generate",
                 AjaxSubmitLink.class);
