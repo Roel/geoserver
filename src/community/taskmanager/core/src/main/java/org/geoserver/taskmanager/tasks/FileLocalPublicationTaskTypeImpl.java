@@ -4,6 +4,7 @@
  */
 package org.geoserver.taskmanager.tasks;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -195,6 +196,9 @@ public class FileLocalPublicationTaskTypeImpl implements TaskType {
                         builder.setupBounds(resource);
                     } else {
                         resource = builder.buildCoverage();
+                    }
+                    if (resource.getSRS() == null) {
+                        throw new IOException("Cannot determine SRS");
                     }
                     resource.setName(layerName.getLocalPart());
                     resource.setTitle(layerName.getLocalPart());
