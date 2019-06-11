@@ -47,7 +47,7 @@ attributes:
     key: feature-catalog
     fieldType: COMPLEX
     typename: featureCatalog    
-    condition: equals(typeOf("."), 'FeatureTypeInfo')
+    condition: equalTo(typeOf("."), 'FeatureTypeInfo')
   - key: source
     fieldType: DROPDOWN
     occurrence: REPEAT
