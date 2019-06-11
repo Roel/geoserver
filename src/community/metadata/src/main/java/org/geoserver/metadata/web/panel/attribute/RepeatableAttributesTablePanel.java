@@ -36,7 +36,7 @@ public class RepeatableAttributesTablePanel extends Panel {
     private GeoServerTablePanel<ComplexMetadataAttribute<String>> tablePanel;
 
     private Label noData;
-    
+
     private ResourceInfo rInfo;
 
     public RepeatableAttributesTablePanel(

@@ -48,7 +48,7 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
     private ComplexAttributeGenerator generator;
 
     private AttributeConfiguration attributeConfiguration;
-    
+
     private ResourceInfo rInfo;
 
     public RepeatableComplexAttributesTablePanel(
@@ -195,8 +195,7 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                                     new AttributesTablePanel(
                                             id,
                                             new AttributeDataProvider(
-                                                    attributeConfiguration.getTypename(),
-                                                    rInfo),
+                                                    attributeConfiguration.getTypename(), rInfo),
                                             itemModel,
                                             null,
                                             rInfo);

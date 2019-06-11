@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
+import org.apache.wicket.Application;
+import org.apache.wicket.IApplicationListener;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.metadata.data.dto.AttributeCollection;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
@@ -31,6 +33,7 @@ import org.geoserver.metadata.data.dto.impl.CustomNativeMappingsConfigurationImp
 import org.geoserver.metadata.data.dto.impl.GeonetworkMappingConfigurationImpl;
 import org.geoserver.metadata.data.dto.impl.MetadataConfigurationImpl;
 import org.geoserver.metadata.data.service.ConfigurationService;
+import org.geoserver.metadata.web.resource.WicketFileResourceLoader;
 import org.geoserver.platform.resource.Resource;
 import org.geoserver.platform.resource.ResourceListener;
 import org.geoserver.platform.resource.ResourceNotification;
@@ -55,6 +58,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Autowired private GeoServerDataDirectory dataDirectory;
 
+    @Autowired private Application application;
+
     private MetadataConfiguration configuration;
 
     private GeonetworkMappingConfiguration geonetworkMappingConfig;
@@ -67,6 +72,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 
     @PostConstruct
     public void init() {
+        readCustomTranslations();
         readConfiguration();
         getFolder()
                 .addListener(
@@ -75,6 +81,31 @@ public class ConfigurationServiceImpl implements ConfigurationService {
                             public void changed(ResourceNotification notify) {
                                 readConfiguration();
                             }
+                        });
+    }
+
+    private void readCustomTranslations() {
+        application
+                .getApplicationListeners()
+                .add(
+                        new IApplicationListener() {
+
+                            @Override
+                            public void onAfterInitialized(Application application) {
+                                Resource metadataFolder =
+                                        dataDirectory.get(MetadataConstants.DIRECTORY);
+                                WicketFileResourceLoader loader =
+                                        new WicketFileResourceLoader(
+                                                metadataFolder.toString(), "metadata");
+                                loader.setShouldThrowException(false);
+                                application
+                                        .getResourceSettings()
+                                        .getStringResourceLoaders()
+                                        .add(0, loader);
+                            }
+
+                            @Override
+                            public void onBeforeDestroyed(Application application) {}
                         });
     }
 

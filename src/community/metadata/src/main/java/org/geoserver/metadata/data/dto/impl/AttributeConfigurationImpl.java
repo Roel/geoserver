@@ -34,7 +34,7 @@ public class AttributeConfigurationImpl implements AttributeConfiguration {
     String typename;
 
     String derivedFrom;
-    
+
     String condition;
 
     public AttributeConfigurationImpl() {}
@@ -97,7 +97,7 @@ public class AttributeConfigurationImpl implements AttributeConfiguration {
     public String getDerivedFrom() {
         return derivedFrom;
     }
-    
+
     @Override
     public String getCondition() {
         return condition;

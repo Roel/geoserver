@@ -113,7 +113,9 @@ public class MetadataTabPanel extends PublishedEditTabPanel<LayerInfo> {
                     }
                 });
 
-        add(new MetadataPanel("metadataPanel", metadataModel, derivedAtts, resource).setOutputMarkupId(true));
+        add(
+                new MetadataPanel("metadataPanel", metadataModel, derivedAtts, resource)
+                        .setOutputMarkupId(true));
 
         // Geonetwork import panel
         ImportGeonetworkPanel geonetworkPanel =

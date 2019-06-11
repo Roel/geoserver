@@ -35,12 +35,15 @@ public class EditorFactory {
     }
 
     public <T extends Serializable> Component create(
-            AttributeConfiguration configuration, String id, ComplexMetadataMap metadataMap,
+            AttributeConfiguration configuration,
+            String id,
+            ComplexMetadataMap metadataMap,
             ResourceInfo rInfo) {
         IModel<T> model =
                 new ComplexMetadataAttributeModel<T>(
                         metadataMap.get(getItemClass(configuration), configuration.getKey()));
-        return create(configuration, id, model, metadataMap.subMap(configuration.getKey()), null, rInfo);
+        return create(
+                configuration, id, model, metadataMap.subMap(configuration.getKey()), null, rInfo);
     }
 
     public <T extends Serializable> Component create(
@@ -63,7 +66,8 @@ public class EditorFactory {
                 id,
                 model,
                 new ComplexMetadataMapImpl(new HashMap<String, Serializable>()),
-                selection, rInfo);
+                selection,
+                rInfo);
     }
 
     @SuppressWarnings("unchecked")
@@ -116,11 +120,10 @@ public class EditorFactory {
             case COMPLEX:
                 return new AttributesTablePanel(
                         id,
-                        new AttributeDataProvider(
-                                configuration.getTypename(),
-                                rInfo),
+                        new AttributeDataProvider(configuration.getTypename(), rInfo),
                         new Model<ComplexMetadataMap>(submap),
-                        null, rInfo);
+                        null,
+                        rInfo);
             default:
                 break;
         }

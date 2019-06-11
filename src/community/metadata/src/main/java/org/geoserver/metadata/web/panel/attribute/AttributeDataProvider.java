@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.AttributeCollection;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
@@ -24,7 +23,7 @@ import org.geotools.util.logging.Logging;
 public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfiguration> {
 
     private static final long serialVersionUID = -4454769618643460913L;
-    
+
     private static final Logger LOGGER = Logging.getLogger(AttributeDataProvider.class);
 
     public static Property<AttributeConfiguration> NAME =
@@ -41,7 +40,7 @@ public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfig
             };
 
     private List<AttributeConfiguration> items = new ArrayList<>();
-    
+
     private ResourceInfo rInfo;
 
     public AttributeDataProvider(ResourceInfo rInfo) {
@@ -73,7 +72,7 @@ public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfig
 
     protected void load(AttributeCollection coll) {
         for (AttributeConfiguration config : coll.getAttributes()) {
-            if (shouldDisplay(config)) { 
+            if (shouldDisplay(config)) {
                 items.add(config);
             }
         }
@@ -85,9 +84,7 @@ public class AttributeDataProvider extends GeoServerDataProvider<AttributeConfig
         }
         if (config.getCondition() != null && rInfo != null) {
             try {
-                Object result = CQL.toExpression(
-                        config.getCondition())
-                        .evaluate(rInfo);
+                Object result = CQL.toExpression(config.getCondition()).evaluate(rInfo);
                 if (!Boolean.TRUE.equals(result)) {
                     return false;
                 }

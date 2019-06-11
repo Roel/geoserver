@@ -23,11 +23,11 @@ public class MetadataPanel extends Panel {
     private static final long serialVersionUID = 1297739738862860160L;
 
     private final Map<String, List<Integer>> derivedAtts;
-    
+
     private final ResourceInfo rInfo;
 
     public MetadataPanel(
-            String id,            
+            String id,
             IModel<ComplexMetadataMap> metadataModel,
             Map<String, List<Integer>> derivedAtts,
             ResourceInfo rInfo) {
@@ -46,7 +46,7 @@ public class MetadataPanel extends Panel {
                         new AttributeDataProvider(rInfo),
                         getMetadataModel(),
                         derivedAtts,
-                        rInfo);        
+                        rInfo);
 
         attributesPanel.setOutputMarkupId(true);
         add(attributesPanel);

@@ -11,11 +11,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.Session;
 import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.extensions.markup.html.tabs.TabbedPanel;
 import org.apache.wicket.feedback.FeedbackMessage;
@@ -53,8 +51,6 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
 
     @Before
     public void before() throws IOException {
-        Session.get().setLocale(new Locale("nl"));
-
         layer = geoServer.getCatalog().getLayerByName("mylayer");
         login();
         ResourceConfigurationPage page = new ResourceConfigurationPage(layer, false);
@@ -100,30 +96,6 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
                                         .getMetadata()
                                         .get(MetadataConstants.CUSTOM_METADATA_KEY))
                         .get(MetadataConstants.TIMESTAMP_KEY));
-    }
-
-    @Test
-    public void testLocalizationLabels() {
-        tester.assertLabel(
-                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:2:itemProperties:0:component",
-                "identifier single field");
-        tester.assertLabel(
-                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:3:itemProperties:0:component",
-                "Getal veld");
-        tester.assertLabel(
-                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:5:itemProperties:0:component",
-                "the refsystem as list field");
-        tester.assertLabel(
-                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:6:itemProperties:1:component:attributesTablePanel:listContainer:items:1:itemProperties:0:component",
-                "Het code veld");
-
-        @SuppressWarnings("unchecked")
-        DropDownChoice<String> choice =
-                (DropDownChoice<String>)
-                        tester.getComponentFromLastRenderedPage(
-                                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:4:itemProperties:1:component:dropdown");
-        assertEquals(
-                "The Final Choice", choice.getChoiceRenderer().getDisplayValue("the-final-choice"));
     }
 
     /** The layer is linked to the 'simple field' template. */
@@ -719,10 +691,12 @@ public class LayerMetadataTabTest extends AbstractWicketMetadataTest {
 
     @Test
     public void testGenerateFeatureCatalogueAndDomain() {
-        MarkupContainer c = (MarkupContainer) tester.getComponentFromLastRenderedPage(
-                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items");
+        MarkupContainer c =
+                (MarkupContainer)
+                        tester.getComponentFromLastRenderedPage(
+                                "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items");
         assertEquals(14, c.size());
-        
+
         tester.assertComponent(
                 "publishedinfo:tabs:panel:metadataPanel:attributesPanel:attributesTablePanel:listContainer:items:13:itemProperties:1:component:attributesTablePanel:listContainer:items:2:itemProperties:1:component:generate",
                 AjaxSubmitLink.class);

@@ -7,9 +7,7 @@ package org.geoserver.metadata.wicket;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.util.Locale;
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.Session;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.html.basic.MultiLineLabel;
@@ -36,14 +34,12 @@ public class TemplatesPageTest extends AbstractWicketMetadataTest {
 
     @Before
     public void before() throws IOException {
-        // Load the page
-        Session.get().setLocale(new Locale("nl"));
-
         // Make sure the catalog is loaded
         LayerInfo layer = geoServer.getCatalog().getLayers().get(0);
         login();
         new ResourceConfigurationPage(layer, false);
 
+        // Load the page
         tester.startPage(new MetadataTemplatesPage());
         tester.assertRenderedPage(MetadataTemplatesPage.class);
     }

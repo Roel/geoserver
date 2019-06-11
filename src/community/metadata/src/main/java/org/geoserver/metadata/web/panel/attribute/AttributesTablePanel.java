@@ -11,17 +11,12 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.ReuseIfModelsEqualStrategy;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.resource.loader.IStringResourceLoader;
 import org.geoserver.catalog.ResourceInfo;
-import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.dto.FieldTypeEnum;
 import org.geoserver.metadata.data.dto.OccurrenceEnum;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
 import org.geoserver.metadata.data.service.GeneratorService;
-import org.geoserver.metadata.data.service.impl.MetadataConstants;
-import org.geoserver.metadata.web.resource.WicketFileResourceLoader;
-import org.geoserver.platform.resource.Resource;
 import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.wicket.GeoServerDataProvider;
 import org.geoserver.web.wicket.GeoServerTablePanel;
@@ -34,7 +29,7 @@ import org.geoserver.web.wicket.GeoServerTablePanel;
  */
 public class AttributesTablePanel extends Panel {
     private static final long serialVersionUID = 1297739738862860160L;
-    
+
     private ResourceInfo rInfo;
 
     public AttributesTablePanel(
@@ -45,31 +40,6 @@ public class AttributesTablePanel extends Panel {
             ResourceInfo rInfo) {
         super(id, metadataModel);
         this.rInfo = rInfo;
-        
-        List<IStringResourceLoader> loaders =
-                getApplication().getResourceSettings().getStringResourceLoaders();
-        boolean loaded = false;
-        for (IStringResourceLoader loader : loaders) {
-            if (loader instanceof WicketFileResourceLoader) {
-                if (((WicketFileResourceLoader) loader)
-                        .getResourceBundleName()
-                        .equals("metadata")) {
-                    loaded = true;
-                    break;
-                }
-            }
-        }
-        if (!loaded) {
-            GeoServerDataDirectory data =
-                    GeoServerApplication.get()
-                            .getApplicationContext()
-                            .getBean(GeoServerDataDirectory.class);
-            Resource metadataFolder = data.get(MetadataConstants.DIRECTORY);
-            WicketFileResourceLoader loader =
-                    new WicketFileResourceLoader(metadataFolder.toString(), "metadata");
-            loader.setShouldThrowException(false);
-            loaders.add(loader);
-        }
 
         GeoServerTablePanel<AttributeConfiguration> tablePanel =
                 createAttributesTablePanel(dataProvider, derivedAtts);
@@ -143,8 +113,7 @@ public class AttributesTablePanel extends Panel {
                                         attributeConfiguration,
                                         getMetadataModel());
                         return new RepeatableAttributesTablePanel(
-                                id, repeatableDataProvider, getMetadataModel(), derivedAtts,
-                                rInfo);
+                                id, repeatableDataProvider, getMetadataModel(), derivedAtts, rInfo);
                     }
                 }
                 return null;
