@@ -16,7 +16,8 @@ import org.geoserver.catalog.LayerInfo;
 import org.geoserver.metadata.AbstractWicketMetadataTest;
 import org.geoserver.metadata.web.MetadataTemplatesPage;
 import org.geoserver.metadata.web.panel.MetadataPanel;
-import org.geoserver.metadata.web.resource.WicketFileResourceLoader;
+import org.geoserver.metadata.web.resource.WicketResourceResourceLoader;
+import org.geoserver.platform.resource.Files;
 import org.geoserver.web.data.resource.ResourceConfigurationPage;
 import org.junit.After;
 import org.junit.Assert;
@@ -54,8 +55,8 @@ public class ExternalResourceLoaderTest extends AbstractWicketMetadataTest {
     @Test
     public void testExternalResourceLoader() throws IOException {
         File metadata = new File(DATA_DIRECTORY.getDataDirectoryRoot(), "metadata");
-        WicketFileResourceLoader loader =
-                new WicketFileResourceLoader(metadata.toString(), "metadata.properties");
+        WicketResourceResourceLoader loader =
+                new WicketResourceResourceLoader(Files.asResource(metadata), "metadata.properties");
 
         String actual =
                 loader.loadStringResource(
@@ -73,8 +74,8 @@ public class ExternalResourceLoaderTest extends AbstractWicketMetadataTest {
     public void testExternalResourceLoaderDutch() throws IOException {
         Session.get().setLocale(new Locale("nl"));
         File metadata = new File(DATA_DIRECTORY.getDataDirectoryRoot(), "metadata");
-        WicketFileResourceLoader loader =
-                new WicketFileResourceLoader(metadata.toString(), "metadata.properties");
+        WicketResourceResourceLoader loader =
+                new WicketResourceResourceLoader(Files.asResource(metadata), "metadata.properties");
 
         String actual =
                 loader.loadStringResource(
