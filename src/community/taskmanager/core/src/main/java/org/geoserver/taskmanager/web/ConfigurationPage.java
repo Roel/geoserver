@@ -59,6 +59,7 @@ import org.geoserver.taskmanager.web.panel.SimpleAjaxSubmitLink;
 import org.geoserver.taskmanager.web.panel.TaskParameterPanel;
 import org.geoserver.taskmanager.web.panel.TextAreaPanel;
 import org.geoserver.taskmanager.web.panel.TextFieldPanel;
+import org.geoserver.web.ComponentAuthorizer;
 import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.GeoServerBasePage;
 import org.geoserver.web.GeoServerSecuredPage;
@@ -947,5 +948,9 @@ public class ConfigurationPage extends GeoServerSecuredPage {
 
     public void addAttributesPanel(AjaxRequestTarget target) {
         target.add(attributesPanel);
+    }
+
+    protected ComponentAuthorizer getPageAuthorizer() {
+        return ComponentAuthorizer.WORKSPACE_ADMIN;
     }
 }
