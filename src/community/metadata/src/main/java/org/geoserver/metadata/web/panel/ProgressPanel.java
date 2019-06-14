@@ -6,6 +6,7 @@
 package org.geoserver.metadata.web.panel;
 
 import java.io.Serializable;
+import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
@@ -67,9 +68,13 @@ public class ProgressPanel extends Panel {
 
                     @Override
                     public boolean onCloseButtonClicked(AjaxRequestTarget target) {
-                        for (AjaxSelfUpdatingTimerBehavior behavior :
-                                progressBar.getBehaviors(AjaxSelfUpdatingTimerBehavior.class)) {
+                        // prevent the timer from being called after the modal has been closed
+                        // causing an exception
+                        List<AjaxSelfUpdatingTimerBehavior> behaviors =
+                                progressBar.getBehaviors(AjaxSelfUpdatingTimerBehavior.class);
+                        for (AjaxSelfUpdatingTimerBehavior behavior : behaviors) {
                             behavior.stop(target);
+                            progressBar.remove(behavior);
                         }
                         handler.onCanceled(target);
                         return true;
