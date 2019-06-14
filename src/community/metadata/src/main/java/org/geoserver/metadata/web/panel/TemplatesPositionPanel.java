@@ -73,9 +73,9 @@ public class TemplatesPositionPanel extends Panel {
                     @Override
                     protected void onClick(AjaxRequestTarget target) {
                         int index = templates.getObject().indexOf(model.getObject());
-                        templates.getObject().add(index + 1, templates.getObject().remove(index));
                         tracker.switchTemplates(
                                 model.getObject(), templates.getObject().get(index + 1));
+                        templates.getObject().add(index + 1, templates.getObject().remove(index));
 
                         ((MarkupContainer) tablePanel.get("listContainer").get("items"))
                                 .removeAll();
