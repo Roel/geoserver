@@ -7,6 +7,7 @@ package org.geoserver.metadata.web.panel;
 
 import java.io.Serializable;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow.CloseButtonCallback;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -66,6 +67,10 @@ public class ProgressPanel extends Panel {
 
                     @Override
                     public boolean onCloseButtonClicked(AjaxRequestTarget target) {
+                        for (AjaxSelfUpdatingTimerBehavior behavior :
+                                progressBar.getBehaviors(AjaxSelfUpdatingTimerBehavior.class)) {
+                            behavior.stop(target);
+                        }
                         handler.onCanceled(target);
                         return true;
                     }
