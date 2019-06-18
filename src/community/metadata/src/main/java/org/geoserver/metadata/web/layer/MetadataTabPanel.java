@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -47,7 +46,7 @@ public class MetadataTabPanel extends PublishedEditTabPanel<LayerInfo> {
 
     private IModel<List<MetadataTemplate>> selectedTemplatesModel;
 
-    private HashMap<String, List<Integer>> derivedAtts;
+    private Map<String, List<Integer>> derivedAtts;
 
     private IModel<ComplexMetadataMap> metadataModel;
 
@@ -57,29 +56,28 @@ public class MetadataTabPanel extends PublishedEditTabPanel<LayerInfo> {
         super(id, model);
         this.selectedTemplatesModel = templatesModel;
 
-        // we must always copy the data, to avoid references escaping the modification proxy commit
-        HashMap<String, Serializable> custom = new HashMap<>();
-
+        Map<String, Serializable> custom;
         ResourceInfo resource = model.getObject().getResource();
         Serializable oldCustom = resource.getMetadata().get(MetadataConstants.CUSTOM_METADATA_KEY);
         if (oldCustom instanceof HashMap<?, ?>) {
-            for (Entry<? extends String, ? extends Serializable> entry :
-                    ((Map<? extends String, ? extends Serializable>) oldCustom).entrySet()) {
-                custom.put(entry.getKey(), ComplexMetadataMapImpl.dimCopy(entry.getValue()));
-            }
+            custom = (Map<String, Serializable>) oldCustom;
+        } else {
+            resource.getMetadata()
+                    .put(
+                            MetadataConstants.CUSTOM_METADATA_KEY,
+                            (Serializable) (custom = new HashMap<>()));
         }
-        resource.getMetadata().put(MetadataConstants.CUSTOM_METADATA_KEY, custom);
         metadataModel = new Model<ComplexMetadataMap>(new ComplexMetadataMapImpl(custom));
 
-        derivedAtts = new HashMap<>();
         Serializable oldDerivedAtts = resource.getMetadata().get(MetadataConstants.DERIVED_KEY);
         if (oldDerivedAtts instanceof HashMap<?, ?>) {
-            for (Entry<? extends String, ? extends List<Integer>> entry :
-                    ((Map<? extends String, ? extends List<Integer>>) oldDerivedAtts).entrySet()) {
-                derivedAtts.put(entry.getKey(), new ArrayList<Integer>(entry.getValue()));
-            }
+            derivedAtts = (Map<String, List<Integer>>) oldDerivedAtts;
+        } else {
+            resource.getMetadata()
+                    .put(
+                            MetadataConstants.DERIVED_KEY,
+                            (Serializable) (derivedAtts = new HashMap<>()));
         }
-        resource.getMetadata().put(MetadataConstants.DERIVED_KEY, derivedAtts);
     }
 
     @Override

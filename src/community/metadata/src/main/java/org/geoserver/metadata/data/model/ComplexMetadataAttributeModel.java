@@ -13,7 +13,6 @@ public class ComplexMetadataAttributeModel<T extends Serializable> implements IM
     private ComplexMetadataAttribute<T> att;
 
     public ComplexMetadataAttributeModel(ComplexMetadataAttribute<T> att) {
-        super();
         this.att = att;
     }
 
