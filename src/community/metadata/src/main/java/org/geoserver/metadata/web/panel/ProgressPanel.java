@@ -6,9 +6,7 @@
 package org.geoserver.metadata.web.panel;
 
 import java.io.Serializable;
-import java.util.List;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.AjaxSelfUpdatingTimerBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow.CloseButtonCallback;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -31,6 +29,8 @@ public class ProgressPanel extends Panel {
 
     private ModalWindow window;
 
+    private boolean cancelMe = false;
+
     public ProgressPanel(String id, IModel<String> title) {
         super(id);
 
@@ -50,14 +50,19 @@ public class ProgressPanel extends Panel {
                             private static final long serialVersionUID = 5716227987463146386L;
 
                             protected Progression getProgression() {
-                                return new Progression(Math.round(100 * model.getObject()));
+                                return new Progression(
+                                        cancelMe ? 100 : Math.round(100 * model.getObject()));
                             }
                         }) {
                     private static final long serialVersionUID = 6384204231727968702L;
 
                     protected void onFinished(AjaxRequestTarget target) {
                         window.close(target);
-                        handler.onFinished(target);
+                        if (cancelMe) {
+                            handler.onCanceled(target);
+                        } else {
+                            handler.onFinished(target);
+                        }
                     }
                 };
 
@@ -68,16 +73,8 @@ public class ProgressPanel extends Panel {
 
                     @Override
                     public boolean onCloseButtonClicked(AjaxRequestTarget target) {
-                        // prevent the timer from being called after the modal has been closed
-                        // causing an exception
-                        List<AjaxSelfUpdatingTimerBehavior> behaviors =
-                                progressBar.getBehaviors(AjaxSelfUpdatingTimerBehavior.class);
-                        for (AjaxSelfUpdatingTimerBehavior behavior : behaviors) {
-                            behavior.stop(target);
-                            progressBar.remove(behavior);
-                        }
-                        handler.onCanceled(target);
-                        return true;
+                        cancelMe = true;
+                        return false;
                     }
                 });
         window.show(target);
