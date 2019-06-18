@@ -194,7 +194,9 @@ public class CustomNativeMappingServiceImpl implements CustomNativeMappingServic
         List<String> values = PlaceHolderUtil.replacePlaceHolder(mapping.get(VALUE), custom);
         List<T> result = new ArrayList<>();
         for (int i = 0; i < values.size(); i++) {
-            result.add((T) mappingType.create(values.get(i)));
+            if (values.get(i) != null) {
+                result.add((T) mappingType.create(values.get(i)));
+            }
         }
         List<Integer> indexList = indexMap.get(PlaceHolderUtil.getPlaceHolder(mapping.get(VALUE)));
         for (Entry<String, String> entry : mapping.entrySet()) {

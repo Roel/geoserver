@@ -38,6 +38,7 @@ public class CustomNativeMappingServiceTest extends AbstractMetadataTest {
 
         map.get(String.class, "refsystem-as-list", 0).setValue("foo");
         map.get(String.class, "refsystem-as-list", 1).setValue("bar");
+        map.get(String.class, "refsystem-as-list", 2).setValue(null);
         map.subMap("contact", 0).get(String.class, "name").setValue("DOV");
         map.subMap("contact", 1).get(String.class, "name").setValue("Vlaanderen");
         map.get(String.class, "identifier-single").setValue("1234");
