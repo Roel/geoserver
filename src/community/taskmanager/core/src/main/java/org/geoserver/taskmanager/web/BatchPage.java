@@ -312,7 +312,7 @@ public class BatchPage extends GeoServerSecuredPage {
                                     if (!addedTasks.contains(task)
                                             && TaskManagerBeans.get()
                                                     .getSecUtil()
-                                                    .isWriteable(
+                                                    .isWritable(
                                                             BatchPage.this
                                                                     .getSession()
                                                                     .getAuthentication(),

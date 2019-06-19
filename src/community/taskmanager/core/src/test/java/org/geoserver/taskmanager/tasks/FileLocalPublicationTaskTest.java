@@ -42,11 +42,11 @@ public class FileLocalPublicationTaskTest extends AbstractTaskManagerTest {
     private static final String FILE_SERVICE = "data-directory";
     private static final String WORKSPACE = "gs";
     private static final String COVERAGE_NAME = "world";
-    private static final String LAYER_NAME = WORKSPACE + ":" + COVERAGE_NAME;
 
     // attributes
     private static final String ATT_FILE_SERVICE = "fileService";
     private static final String ATT_FILE = "file";
+    private static final String ATT_WORKSPACE = "workspace";
     private static final String ATT_LAYER = "layer";
     private static final String ATT_FAIL = "fail";
 
@@ -97,6 +97,8 @@ public class FileLocalPublicationTaskTest extends AbstractTaskManagerTest {
         dataUtil.setTaskParameterToAttribute(
                 task1, FileLocalPublicationTaskTypeImpl.PARAM_FILE, ATT_FILE);
         dataUtil.setTaskParameterToAttribute(
+                task1, FileLocalPublicationTaskTypeImpl.PARAM_WORKSPACE, ATT_WORKSPACE);
+        dataUtil.setTaskParameterToAttribute(
                 task1, FileLocalPublicationTaskTypeImpl.PARAM_LAYER, ATT_LAYER);
         dataUtil.addTaskToConfiguration(config, task1);
 
@@ -124,7 +126,8 @@ public class FileLocalPublicationTaskTest extends AbstractTaskManagerTest {
     public void testSuccessAndCleanup() throws SchedulerException {
         dataUtil.setConfigurationAttribute(config, ATT_FILE_SERVICE, FILE_SERVICE);
         dataUtil.setConfigurationAttribute(config, ATT_FILE, FILE_LOCATION);
-        dataUtil.setConfigurationAttribute(config, ATT_LAYER, LAYER_NAME);
+        dataUtil.setConfigurationAttribute(config, ATT_WORKSPACE, WORKSPACE);
+        dataUtil.setConfigurationAttribute(config, ATT_LAYER, COVERAGE_NAME);
         config = dao.save(config);
 
         Trigger trigger =
@@ -133,18 +136,18 @@ public class FileLocalPublicationTaskTest extends AbstractTaskManagerTest {
 
         while (scheduler.getTriggerState(trigger.getKey()) != TriggerState.NONE) {}
 
-        assertNotNull(catalog.getLayerByName(LAYER_NAME));
+        assertNotNull(catalog.getLayerByName(COVERAGE_NAME));
         CoverageStoreInfo csi =
                 catalog.getStoreByName(WORKSPACE, COVERAGE_NAME, CoverageStoreInfo.class);
         assertNotNull(csi);
         assertEquals(fileServices.get(FILE_SERVICE).getURI(FILE_LOCATION).toString(), csi.getURL());
-        assertNotNull(catalog.getResourceByName(LAYER_NAME, CoverageInfo.class));
+        assertNotNull(catalog.getResourceByName(COVERAGE_NAME, CoverageInfo.class));
 
         taskUtil.cleanup(config);
 
-        assertNull(catalog.getLayerByName(LAYER_NAME));
+        assertNull(catalog.getLayerByName(COVERAGE_NAME));
         assertNull(catalog.getStoreByName(WORKSPACE, COVERAGE_NAME, CoverageStoreInfo.class));
-        assertNull(catalog.getResourceByName(LAYER_NAME, CoverageInfo.class));
+        assertNull(catalog.getResourceByName(COVERAGE_NAME, CoverageInfo.class));
     }
 
     @Test
@@ -157,7 +160,8 @@ public class FileLocalPublicationTaskTest extends AbstractTaskManagerTest {
 
         dataUtil.setConfigurationAttribute(config, ATT_FILE_SERVICE, FILE_SERVICE);
         dataUtil.setConfigurationAttribute(config, ATT_FILE, FILE_LOCATION);
-        dataUtil.setConfigurationAttribute(config, ATT_LAYER, LAYER_NAME);
+        dataUtil.setConfigurationAttribute(config, ATT_WORKSPACE, WORKSPACE);
+        dataUtil.setConfigurationAttribute(config, ATT_LAYER, COVERAGE_NAME);
         dataUtil.setConfigurationAttribute(config, ATT_FAIL, Boolean.TRUE.toString());
         config = dao.save(config);
         task2 = config.getTasks().get("task2");
@@ -170,8 +174,8 @@ public class FileLocalPublicationTaskTest extends AbstractTaskManagerTest {
 
         while (scheduler.getTriggerState(trigger.getKey()) != TriggerState.NONE) {}
 
-        assertNull(catalog.getLayerByName(LAYER_NAME));
+        assertNull(catalog.getLayerByName(COVERAGE_NAME));
         assertNull(catalog.getStoreByName(WORKSPACE, COVERAGE_NAME, CoverageStoreInfo.class));
-        assertNull(catalog.getResourceByName(LAYER_NAME, CoverageInfo.class));
+        assertNull(catalog.getResourceByName(COVERAGE_NAME, CoverageInfo.class));
     }
 }

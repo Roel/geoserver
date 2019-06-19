@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.geoserver.catalog.LayerInfo;
+import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.data.test.MockData;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
 import org.geotools.feature.NameImpl;
@@ -120,8 +121,25 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
     }
 
     @Test
+    public void testWorkspace() {
+        List<String> domain = extTypes.workspace.getDomain(Collections.emptyList());
+        assertEquals(2, domain.size());
+        assertEquals("gs", domain.get(0));
+        assertEquals("wcs", domain.get(1));
+        assertTrue(extTypes.workspace.validate("gs", Collections.emptyList()));
+        assertTrue(extTypes.workspace.validate("wcs", Collections.emptyList()));
+        assertFalse(extTypes.workspace.validate("doesntexist", Collections.emptyList()));
+        assertTrue(
+                extTypes.workspace.parse("gs", Collections.emptyList()) instanceof WorkspaceInfo);
+        assertTrue(
+                extTypes.workspace.parse("wcs", Collections.emptyList()) instanceof WorkspaceInfo);
+        assertNull(extTypes.internalLayer.parse("doesntexist", Collections.emptyList()));
+    }
+
+    @Test
     public void testInternalLayer() {
-        List<String> domain = extTypes.internalLayer.getDomain(null);
+        // without workspace
+        List<String> domain = extTypes.internalLayer.getDomain(Collections.emptyList());
         assertEquals(6, domain.size());
         assertEquals("Tazbyte", domain.get(0));
         assertEquals("gs:Tazbyte", domain.get(1));
@@ -129,24 +147,48 @@ public class ExtTypesTest extends AbstractTaskManagerTest {
         assertEquals("wcs:DEM", domain.get(3));
         assertEquals("wcs:RotatedCad", domain.get(4));
         assertEquals("wcs:World", domain.get(5));
-        assertTrue(extTypes.internalLayer.validate("Tazbyte", null));
-        assertTrue(extTypes.internalLayer.validate("gs:Tazbyte", null));
-        assertTrue(extTypes.internalLayer.validate("wcs:BlueMarble", null));
-        assertFalse(extTypes.internalLayer.validate("doesntexist", null));
-        assertTrue(extTypes.internalLayer.parse("Tazbyte", null) instanceof LayerInfo);
-        assertTrue(extTypes.internalLayer.parse("gs:Tazbyte", null) instanceof LayerInfo);
-        assertTrue(extTypes.internalLayer.parse("wcs:BlueMarble", null) instanceof LayerInfo);
-        assertNull(extTypes.internalLayer.parse("doesntexist", null));
+        assertTrue(extTypes.internalLayer.validate("Tazbyte", Collections.emptyList()));
+        assertTrue(extTypes.internalLayer.validate("gs:Tazbyte", Collections.emptyList()));
+        assertTrue(extTypes.internalLayer.validate("wcs:BlueMarble", Collections.emptyList()));
+        assertFalse(extTypes.internalLayer.validate("doesntexist", Collections.emptyList()));
+        assertTrue(
+                extTypes.internalLayer.parse("Tazbyte", Collections.emptyList())
+                        instanceof LayerInfo);
+        assertTrue(
+                extTypes.internalLayer.parse("gs:Tazbyte", Collections.emptyList())
+                        instanceof LayerInfo);
+        assertTrue(
+                extTypes.internalLayer.parse("wcs:BlueMarble", Collections.emptyList())
+                        instanceof LayerInfo);
+        assertNull(extTypes.internalLayer.parse("doesntexist", Collections.emptyList()));
+
+        // with workspace
+        domain = extTypes.internalLayer.getDomain(Lists.newArrayList("gs"));
+        assertEquals(1, domain.size());
+        assertEquals("Tazbyte", domain.get(0));
+        assertTrue(extTypes.internalLayer.validate("Tazbyte", Lists.newArrayList("gs")));
+        assertTrue(
+                extTypes.internalLayer.parse("Tazbyte", Lists.newArrayList("gs"))
+                        instanceof LayerInfo);
+        assertFalse(extTypes.internalLayer.validate("wcs:BlueMarble", Lists.newArrayList("gs")));
+        assertNull(extTypes.internalLayer.parse("wcs:BlueMarble", Lists.newArrayList("gs")));
     }
 
     @Test
     public void testNames() {
         assertTrue(extTypes.name.validate("bla", null));
         assertTrue(extTypes.name.validate("gs:bla", null));
+        assertTrue(extTypes.name.validate("bla", Lists.newArrayList("gs")));
         assertFalse(extTypes.name.validate("doesntexist:bla", null));
-        assertEquals(new NameImpl("http://geoserver.org", "bla"), extTypes.name.parse("bla", null));
         assertEquals(
-                new NameImpl("http://geoserver.org", "bla"), extTypes.name.parse("gs:bla", null));
+                new NameImpl("http://geoserver.org", "bla"),
+                extTypes.name.parse("bla", Collections.emptyList()));
+        assertEquals(
+                new NameImpl("http://geoserver.org", "bla"),
+                extTypes.name.parse("gs:bla", Collections.emptyList()));
+        assertEquals(
+                new NameImpl("http://geoserver.org", "bla"),
+                extTypes.name.parse("bla", Lists.newArrayList("gs")));
     }
 
     @Test

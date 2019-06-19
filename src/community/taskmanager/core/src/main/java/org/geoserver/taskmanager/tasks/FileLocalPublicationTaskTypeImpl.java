@@ -44,6 +44,8 @@ public class FileLocalPublicationTaskTypeImpl implements TaskType {
 
     public static final String NAME = "LocalFilePublication";
 
+    public static final String PARAM_WORKSPACE = "workspace";
+
     public static final String PARAM_LAYER = "layer";
 
     public static final String PARAM_FILE = "file";
@@ -71,7 +73,13 @@ public class FileLocalPublicationTaskTypeImpl implements TaskType {
                 PARAM_FILE,
                 new ParameterInfo(PARAM_FILE, extTypes.file(true, true), true)
                         .dependsOn(fileService));
-        paramInfo.put(PARAM_LAYER, new ParameterInfo(PARAM_LAYER, extTypes.name, true));
+        ParameterInfo paramWorkspace =
+                new ParameterInfo(PARAM_WORKSPACE, extTypes.workspace, false);
+        paramInfo.put(PARAM_WORKSPACE, paramWorkspace);
+        paramInfo.put(
+                PARAM_LAYER,
+                new ParameterInfo(PARAM_LAYER, extTypes.name, true)
+                        .dependsOn(false, paramWorkspace));
     }
 
     @Override
