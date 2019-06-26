@@ -26,7 +26,6 @@ import org.geoserver.metadata.web.layer.MetadataTabPanel;
 import org.geoserver.web.wicket.GeoServerDataProvider;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.GeoServerTablePanel;
-import org.geoserver.web.wicket.ParamResourceModel;
 
 /**
  * Generate the gui as a list of Complex Objects(an object contains multiple simple fields or
@@ -97,7 +96,6 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                 }.setVisible(isEnabledInHierarchy()));
 
         GeoServerDialog dialog = new GeoServerDialog("dialog");
-        dialog.setInitialHeight(100);
         add(dialog);
 
         MetadataTabPanel tabPanel = findParent(MetadataTabPanel.class);
@@ -109,6 +107,7 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
 
                     @Override
                     public void onSubmit(AjaxRequestTarget target, Form<?> form) {
+                        dialog.setInitialHeight(generator.getDialogContentHeight());
                         dialog.showOkCancel(
                                 target,
                                 new GeoServerDialog.DialogDelegate() {
@@ -117,12 +116,8 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
 
                                     @Override
                                     protected Component getContents(String id) {
-                                        return new Label(
-                                                id,
-                                                new ParamResourceModel(
-                                                        "confirmGenerate",
-                                                        RepeatableComplexAttributesTablePanel
-                                                                .this));
+                                        return generator.getDialogContent(
+                                                id, (LayerInfo) tabPanel.getDefaultModelObject());
                                     }
 
                                     @Override
@@ -131,7 +126,8 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                                         generator.generate(
                                                 attributeConfiguration,
                                                 getMetadataModel().getObject(),
-                                                (LayerInfo) tabPanel.getDefaultModelObject());
+                                                (LayerInfo) tabPanel.getDefaultModelObject(),
+                                                contents.getDefaultModelObject());
                                         dataProvider.reset();
                                         target.add(
                                                 RepeatableComplexAttributesTablePanel.this

@@ -37,7 +37,8 @@ public class FeatureCatalogGenerator implements ComplexAttributeGenerator {
     public void generate(
             AttributeConfiguration attributeConfiguration,
             ComplexMetadataMap metadata,
-            LayerInfo layerInfo) {
+            LayerInfo layerInfo,
+            Object data) {
         ComplexMetadataService service =
                 GeoServerApplication.get()
                         .getApplicationContext()

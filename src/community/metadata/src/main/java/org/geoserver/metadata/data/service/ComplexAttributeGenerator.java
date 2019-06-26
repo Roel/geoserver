@@ -5,6 +5,9 @@
 package org.geoserver.metadata.data.service;
 
 import java.io.Serializable;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.StringResourceModel;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
@@ -16,9 +19,20 @@ public interface ComplexAttributeGenerator extends Serializable {
     void generate(
             AttributeConfiguration attributeConfiguration,
             ComplexMetadataMap metadata,
-            LayerInfo layerInfo);
+            LayerInfo layerInfo,
+            Object data);
 
     default boolean supports(ComplexMetadataMap metadata, LayerInfo layerInfo) {
         return true;
+    }
+
+    default Component getDialogContent(String id, LayerInfo layerInfo) {
+        return new Label(
+                id,
+                new StringResourceModel("RepeatableComplexAttributesTablePanel.confirmGenerate"));
+    }
+
+    default int getDialogContentHeight() {
+        return 100;
     }
 }
