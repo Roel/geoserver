@@ -334,6 +334,9 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                                 .getSelection()
                                                                 .get(0)
                                                                 .getName());
+                                // re-order attributes, useful if new attributes were added since
+                                // old config/template was made
+                                TaskManagerBeans.get().getTaskUtil().reorderConfiguration(copy);
                                 // make sure we can't copy with workspace we don't have access to
                                 WorkspaceInfo wi =
                                         GeoServerApplication.get()

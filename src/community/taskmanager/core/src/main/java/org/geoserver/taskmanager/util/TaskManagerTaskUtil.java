@@ -343,6 +343,7 @@ public class TaskManagerTaskUtil {
                 new HashMap<String, Attribute>(config.getAttributes());
         config.getAttributes().clear();
         for (Task task : config.getTasks().values()) {
+            fixTask(task);
             reorderTask(task);
             for (Parameter pam : task.getParameters().values()) {
                 String attName =

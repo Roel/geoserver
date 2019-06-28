@@ -169,25 +169,6 @@ public class ConfigurationPage extends GeoServerSecuredPage {
         form.add(saveButton);
         AjaxSubmitLink applyButton = saveOrApplyButton("apply", false);
         form.add(applyButton);
-        form.add(
-                new AjaxSubmitLink("reorder") {
-                    private static final long serialVersionUID = -3222400506834761832L;
-
-                    @Override
-                    public void onSubmit(AjaxRequestTarget target, Form<?> form) {
-                        TaskManagerBeans.get()
-                                .getTaskUtil()
-                                .reorderConfiguration(configurationModel.getObject());
-                        attributesModel.refresh();
-                        ((MarkupContainer) attributesPanel.get("listContainer").get("items"))
-                                .removeAll();
-                        ((MarkupContainer) tasksPanel.get("listContainer").get("items"))
-                                .removeAll();
-                        target.add(attributesPanel);
-                        target.add(tasksPanel);
-                    }
-                }.setVisible(configurationModel.getObject().getId() == null)
-                        .setOutputMarkupId(true));
 
         form.add(
                 new TextField<String>(
@@ -926,7 +907,6 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                         batchesPanel.get("form:batchesPanel:listContainer:items"))
                                 .removeAll();
                         addFeedbackPanels(target);
-                        target.add(form.get("reorder").setVisible(false));
                         if (initMode) {
                             setResponsePage(new InitConfigurationPage(configurationModel));
                         }
