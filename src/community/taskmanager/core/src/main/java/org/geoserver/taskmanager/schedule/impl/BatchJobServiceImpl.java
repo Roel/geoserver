@@ -4,6 +4,8 @@
  */
 package org.geoserver.taskmanager.schedule.impl;
 
+import java.util.Collection;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geoserver.taskmanager.data.Batch;
@@ -240,6 +242,32 @@ public class BatchJobServiceImpl
         }
 
         return trigger.getKey().getName();
+    }
+
+    @Override
+    @Transactional("tmTransactionManager")
+    public void scheduleNow(Collection<Batch> batches, int waitInSeconds, int intervalInSeconds) {
+        long time = System.currentTimeMillis() + waitInSeconds * 1000;
+        for (Batch batch : batches) {
+            batch = dao.reload(batch);
+            if (batch.getElements().isEmpty()) {
+                LOGGER.log(
+                        Level.WARNING, "Ignoring manual empty batch run: " + batch.getFullName());
+            }
+
+            Trigger trigger =
+                    TriggerBuilder.newTrigger()
+                            .forJob(batch.getId().toString())
+                            .startAt(new Date(time))
+                            .build();
+            try {
+                scheduler.scheduleJob(trigger);
+            } catch (SchedulerException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+
+            time += intervalInSeconds * 1000;
+        }
     }
 
     @Override

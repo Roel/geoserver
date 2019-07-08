@@ -303,15 +303,50 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
             criteria.createAlias("configuration", "configuration")
                     .add(Restrictions.eq("configuration.name", splitName[0]))
                     .add(Restrictions.eq("name", splitName[1]))
-                    .add(Restrictions.eq("removeStamp", 0L))
                     .add(Restrictions.eq("configuration.removeStamp", 0L));
         } else {
             criteria.add(Restrictions.isNull("configuration"))
-                    .add(Restrictions.eq("name", splitName[0]))
-                    .add(Restrictions.eq("removeStamp", 0L));
+                    .add(Restrictions.eq("name", splitName[0]));
         }
 
         return (Batch) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Batch> findBatches(
+            final String workspacePattern,
+            final String configNamePattern,
+            final String namePattern) {
+        Criteria criteria =
+                getSession()
+                        .createCriteria(BatchImpl.class)
+                        .add(Restrictions.eq("removeStamp", 0L));
+
+        if (configNamePattern != null) {
+            criteria.createAlias("configuration", "configuration")
+                    .add(Restrictions.like("configuration.name", configNamePattern))
+                    .add(Restrictions.not(Restrictions.like("name", "@%")))
+                    .add(Restrictions.like("name", namePattern))
+                    .add(Restrictions.eq("configuration.removeStamp", 0L))
+                    .add(Restrictions.eq("configuration.template", false))
+                    .add(Restrictions.eq("configuration.validated", true));
+            if (workspacePattern == null) {
+                criteria.add(Restrictions.isNull("configuration.workspace"));
+            } else if (!"%".equals(workspacePattern)) {
+                criteria.add(Restrictions.like("configuration.workspace", workspacePattern));
+            }
+        } else {
+            criteria.add(Restrictions.isNull("configuration"))
+                    .add(Restrictions.like("name", namePattern));
+            if (workspacePattern == null) {
+                criteria.add(Restrictions.isNull("workspace"));
+            } else if (!"%".equals(workspacePattern)) {
+                criteria.add(Restrictions.like("workspace", workspacePattern));
+            }
+        }
+
+        return (List<Batch>) criteria.list();
     }
 
     @Override

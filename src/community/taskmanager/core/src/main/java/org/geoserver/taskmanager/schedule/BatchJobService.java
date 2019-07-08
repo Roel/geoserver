@@ -4,6 +4,7 @@
  */
 package org.geoserver.taskmanager.schedule;
 
+import java.util.Collection;
 import org.geoserver.taskmanager.data.Batch;
 import org.geoserver.taskmanager.data.BatchRun;
 import org.geoserver.taskmanager.data.Configuration;
@@ -58,7 +59,19 @@ public interface BatchJobService {
      */
     String scheduleNow(Batch batch);
 
+    /** Remove configuration from database and scheduler at once */
     Configuration remove(Configuration config);
 
+    /** Remove batch from database and scheduler at once */
     Batch remove(Batch batch);
+
+    /**
+     * Start a collection of batches right now.
+     *
+     * @param batches the batches to be run
+     * @param waitInSeconds number of seconds to wait before the first batch
+     * @param intervalInSeconds number of seconds to wait between batches, may be be zero to
+     *     schedule all at once.
+     */
+    void scheduleNow(Collection<Batch> batches, int waitInSeconds, int intervalInSeconds);
 }
