@@ -109,7 +109,7 @@ public class DropDownPanel extends Panel {
 
             @Override
             public String getObject(String id, IModel<? extends List<? extends String>> choices) {
-                return id;
+                return Strings.isEmpty(id) ? null : id;
             }
         };
     }
