@@ -59,6 +59,12 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
             throws IOException {
         for (AttributeMappingConfiguration attributeMapping :
                 configService.getGeonetworkMappingConfiguration().getGeonetworkmapping()) {
+            if (attributeMapping.getMappingType() != MappingTypeEnum.NATIVE) {
+                clearAttribute(metadataMap, attributeMapping);
+            }
+        }
+        for (AttributeMappingConfiguration attributeMapping :
+                configService.getGeonetworkMappingConfiguration().getGeonetworkmapping()) {
             if (attributeMapping.getMappingType() == MappingTypeEnum.NATIVE) {
                 addNativeAttribute(rInfo, attributeMapping, doc);
             } else {
@@ -116,6 +122,11 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
         }
     }
 
+    private void clearAttribute(
+            ComplexMetadataMap metadataMap, AttributeMappingConfiguration attributeMapping) {
+        metadataMap.delete(attributeMapping.getGeoserver());
+    }
+
     private void addAttribute(
             ComplexMetadataMap metadataMap,
             AttributeMappingConfiguration attributeMapping,
@@ -134,7 +145,6 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
                 }
                 break;
             case REPEAT:
-                metadataMap.delete(attributeMapping.getGeoserver());
                 if (nodes != null) {
                     for (int count = 0; count < nodes.getLength(); count++) {
                         mapNode(metadataMap, attributeMapping, attConfig, doc, nodes.item(count));
@@ -174,6 +184,9 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
                 submap = metadataMap.subMap(attributeMapping.getGeoserver(), currentSize);
             }
             for (AttributeMappingConfiguration aMapping : typeMapping.getMapping()) {
+                clearAttribute(submap, aMapping);
+            }
+            for (AttributeMappingConfiguration aMapping : typeMapping.getMapping()) {
                 AttributeConfiguration att = type.findAttribute(aMapping.getGeoserver());
                 if (att == null) {
                     throw new IOException(
@@ -192,7 +205,9 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
                 int currentSize = metadataMap.size(attributeMapping.getGeoserver());
                 att = metadataMap.get(String.class, attributeMapping.getGeoserver(), currentSize);
             }
-            att.setValue(node == null ? null : node.getNodeValue());
+            if (node != null) {
+                att.setValue(node.getNodeValue());
+            }
         }
     }
 

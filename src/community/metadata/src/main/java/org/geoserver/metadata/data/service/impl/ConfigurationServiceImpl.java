@@ -226,12 +226,8 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     private void readMapping(InputStream in, ObjectMapper mapper) throws IOException {
         GeonetworkMappingConfiguration config =
                 mapper.readValue(in, GeonetworkMappingConfigurationImpl.class);
-        Set<String> attKeys = new HashSet<>();
         for (AttributeMappingConfiguration mapping : config.getGeonetworkmapping()) {
-            if (!attKeys.contains(mapping.getGeoserver())) {
-                geonetworkMappingConfig.getGeonetworkmapping().add(mapping);
-                attKeys.add(mapping.getGeoserver());
-            }
+            geonetworkMappingConfig.getGeonetworkmapping().add(mapping);
         }
 
         Set<String> objectKay = new HashSet<>();

@@ -15,10 +15,14 @@ geonetworkmapping:
        geonetwork: //gmd:fileIdentifier//gco:CharacterString/text()
     -  geoserver: refsystem-as-list
        geonetwork: //gmd:referenceSystemInfo//gmd:code//gco:CharacterString/text()
+    -  geoserver: refsystem-as-list
+       geonetwork: //gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString/text()
     -  geoserver: referencesystem-object
        geonetwork: //gmd:referenceSystemInfo
     -  geoserver: referencesystem-object-list
        geonetwork: //gmd:referenceSystemInfo
+    -  geoserver: referencesystem-object-list
+       geonetwork: //gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
     -  geoserver: contact
        geonetwork: //gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
     -  geoserver: title
@@ -35,6 +39,10 @@ objectmapping:
             geonetwork: .//gmd:code//gco:CharacterString/text()
           - geoserver: code-space
             geonetwork: .//gmd:codeSpace//gco:CharacterString/text()
+          - geoserver: code
+            geonetwork: ./gmd:organisationName/gco:CharacterString/text()
+          - geoserver: code-space
+            geonetwork: ./gmd:contactInfo/gmd:CI_Contact/gmd:onlineResource/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
     - typename: contact
       mapping:
           - geoserver: name

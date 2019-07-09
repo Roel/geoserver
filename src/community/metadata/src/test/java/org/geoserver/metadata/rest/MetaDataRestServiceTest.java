@@ -56,7 +56,7 @@ public class MetaDataRestServiceTest extends AbstractMetadataTest {
         // simple list
         Serializable actualList = metadataMap.get("refsystem-as-list");
         Assert.assertTrue(actualList instanceof List);
-        Assert.assertEquals(3, ((List<?>) actualList).size());
+        Assert.assertEquals(4, ((List<?>) actualList).size());
         Assert.assertEquals("Belge_Lambert_1972 (31370)", ((List<?>) actualList).get(0));
         Assert.assertEquals("TAW", ((List<?>) actualList).get(1));
         Assert.assertEquals(
@@ -71,14 +71,14 @@ public class MetaDataRestServiceTest extends AbstractMetadataTest {
         Serializable actualObjectCodeSpaceList =
                 metadataMap.get("referencesystem-object-list/code-space");
         Assert.assertTrue(actualObjectCodeSpaceList instanceof List);
-        Assert.assertEquals(3, ((List<?>) actualObjectCodeSpaceList).size());
+        Assert.assertEquals(6, ((List<?>) actualObjectCodeSpaceList).size());
         Assert.assertEquals("EPSG", ((List<?>) actualObjectCodeSpaceList).get(0));
         Assert.assertEquals("NGI", ((List<?>) actualObjectCodeSpaceList).get(1));
         Assert.assertEquals("EPSG", ((List<?>) actualObjectCodeSpaceList).get(2));
 
         Serializable actualObjectCodeList = metadataMap.get("referencesystem-object-list/code");
         Assert.assertTrue(actualObjectCodeList instanceof List);
-        Assert.assertEquals(3, ((List<?>) actualObjectCodeList).size());
+        Assert.assertEquals(6, ((List<?>) actualObjectCodeList).size());
         Assert.assertEquals("Belge_Lambert_1972 (31370)", ((List<?>) actualObjectCodeList).get(0));
         Assert.assertEquals("TAW", ((List<?>) actualObjectCodeList).get(1));
         Assert.assertEquals(

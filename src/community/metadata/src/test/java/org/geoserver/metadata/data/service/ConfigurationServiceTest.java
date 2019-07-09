@@ -58,7 +58,7 @@ public class ConfigurationServiceTest extends AbstractMetadataTest {
         GeonetworkMappingConfiguration configuration =
                 yamlService.getGeonetworkMappingConfiguration();
         Assert.assertNotNull(configuration);
-        Assert.assertEquals(8, configuration.getGeonetworkmapping().size());
+        Assert.assertEquals(10, configuration.getGeonetworkmapping().size());
         Assert.assertEquals(2, configuration.getObjectmapping().size());
     }
 
