@@ -108,12 +108,19 @@ public class BulkRunPanel extends Panel {
 
                                         @Override
                                         protected Component getContents(String id) {
+                                            int time =
+                                                    ((batches.size() - 1)
+                                                                            * betweenDelay
+                                                                                    .getModelObject()
+                                                                    + startDelay.getModelObject())
+                                                            / 60;
                                             return new Label(
                                                     id,
                                                     new ParamResourceModel(
                                                             "runBatches",
                                                             BulkRunPanel.this,
-                                                            Integer.toString(batches.size())));
+                                                            Integer.toString(batches.size()),
+                                                            Integer.toString(time)));
                                         }
 
                                         @Override

@@ -67,6 +67,8 @@ public class BulkOperationsTest extends AbstractWicketTaskManagerTest {
 
         formTester.setValue("bulkRunPanel:configuration", null);
 
+        formTester.setValue("bulkRunPanel:betweenDelay", "60");
+
         tester.executeAjaxEvent("form:bulkRunPanel:configuration", "change");
 
         tester.assertModelValue(
@@ -81,11 +83,15 @@ public class BulkOperationsTest extends AbstractWicketTaskManagerTest {
                 "form:bulkRunPanel:batchesFound",
                 "Found 1 batches that match the specified criteria");
 
+        formTester.setValue("bulkRunPanel:name", "%");
+
+        tester.executeAjaxEvent("form:bulkRunPanel:name", "change");
+
         formTester.submit("bulkRunPanel:run");
 
         tester.assertModelValue(
                 "form:bulkRunPanel:dialog:dialog:content:form:userPanel",
-                "Are you sure you want to run 1 batches?");
+                "Are you sure you want to run 2 batches? This will take at least 1 minutes.");
 
         dao.delete(batch1);
 
