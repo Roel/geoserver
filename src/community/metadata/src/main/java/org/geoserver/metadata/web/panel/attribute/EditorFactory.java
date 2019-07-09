@@ -107,7 +107,7 @@ public class EditorFactory {
                         (IModel<String>) model,
                         configuration.getValues(),
                         false,
-                        configuration.getLabel(),
+                        configuration,
                         selection);
             case REQUIREBOX:
                 return new AutoCompletePanel(
@@ -115,7 +115,7 @@ public class EditorFactory {
                         (IModel<String>) model,
                         configuration.getValues(),
                         true,
-                        configuration.getLabel(),
+                        configuration,
                         selection);
             case COMPLEX:
                 return new AttributesTablePanel(

@@ -18,6 +18,7 @@ import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
+import org.geoserver.metadata.data.dto.AttributeConfiguration;
 
 public class AutoCompletePanel extends Panel {
 
@@ -28,7 +29,7 @@ public class AutoCompletePanel extends Panel {
             IModel<String> model,
             List<String> values,
             boolean forceValues,
-            String fieldLabel,
+            AttributeConfiguration configuration,
             IModel<List<String>> selectedValues) {
 
         super(id, model);
@@ -84,7 +85,8 @@ public class AutoCompletePanel extends Panel {
                                         new ValidationError(
                                                 new StringResourceModel(
                                                                 "invalid", AutoCompletePanel.this)
-                                                        .setParameters(fieldLabel)
+                                                        .setParameters(
+                                                                resolveLabelValue(configuration))
                                                         .getString()));
                             }
                         }
@@ -92,5 +94,16 @@ public class AutoCompletePanel extends Panel {
         }
 
         add(field);
+    }
+
+    /**
+     * Try to find the label from the resource bundle
+     *
+     * @param attribute
+     * @return
+     */
+    private String resolveLabelValue(AttributeConfiguration attribute) {
+        return getString(
+                AttributeConfiguration.PREFIX + attribute.getKey(), null, attribute.getLabel());
     }
 }
