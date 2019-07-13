@@ -7,7 +7,6 @@ package org.geoserver.taskmanager.tasks;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -22,6 +21,7 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.geoserver.taskmanager.external.DbSource;
 import org.geoserver.taskmanager.external.DbTable;
+import org.geoserver.taskmanager.external.Dialect;
 import org.geoserver.taskmanager.external.ExtTypes;
 import org.geoserver.taskmanager.external.impl.DbTableImpl;
 import org.geoserver.taskmanager.schedule.ParameterInfo;
@@ -94,7 +94,7 @@ public class CopyTableTaskTypeImpl implements TaskType {
         final DbSource targetdb = (DbSource) ctx.getParameterValues().get(PARAM_TARGET_DB_NAME);
         final DbTable table =
                 (DbTable) ctx.getBatchContext().get(ctx.getParameterValues().get(PARAM_TABLE_NAME));
-
+        final String sourceTableName = sourcedb.getDialect().quote(table.getTableName());
         final DbTable targetTable =
                 ctx.getParameterValues().containsKey(PARAM_TARGET_TABLE_NAME)
                         ? (DbTable) ctx.getParameterValues().get(PARAM_TARGET_TABLE_NAME)
@@ -109,12 +109,7 @@ public class CopyTableTaskTypeImpl implements TaskType {
             sourceConn.setAutoCommit(false);
             try (Statement stmt = sourceConn.createStatement()) {
                 stmt.setFetchSize(BATCH_SIZE);
-                try (ResultSet rs =
-                        stmt.executeQuery(
-                                "SELECT * FROM "
-                                        + sourcedb.getDialect().quote(table.getTableName()))) {
-
-                    ResultSetMetaData rsmd = rs.getMetaData();
+                try (ResultSet rs = stmt.executeQuery("SELECT * FROM " + sourceTableName)) {
 
                     String tempSchema = SqlUtil.schema(tempTableName);
 
@@ -123,26 +118,15 @@ public class CopyTableTaskTypeImpl implements TaskType {
                             new StringBuilder("CREATE TABLE ")
                                     .append(targetdb.getDialect().quote(tempTableName))
                                     .append(" ( ");
-                    int columnCount = rsmd.getColumnCount();
 
-                    for (int i = 1; i <= columnCount; i++) {
-                        String columnName = targetdb.getDialect().quote(rsmd.getColumnLabel(i));
-                        String typeName = rsmd.getColumnTypeName(i);
-                        sb.append(columnName).append(" ").append(typeName);
-                        if (("char".equals(typeName) || "varchar".equals(typeName))
-                                && rsmd.getColumnDisplaySize(i) > 0
-                                && rsmd.getColumnDisplaySize(i) < Integer.MAX_VALUE) {
-                            sb.append(" (").append(rsmd.getColumnDisplaySize(i)).append(" ) ");
-                        }
-                        switch (sourcedb.getDialect().isNullable(rsmd.isNullable(i))) {
-                            case ResultSetMetaData.columnNoNulls:
-                                sb.append(" NOT NULL");
-                                break;
-                            case ResultSetMetaData.columnNullable:
-                                sb.append(" NULL");
-                                break;
-                        }
-                        sb.append(", ");
+                    int columnCount = 0;
+                    for (Dialect.Column column :
+                            sourcedb.getDialect().getColumns(sourceConn, sourceTableName, rs)) {
+                        sb.append(column.getName())
+                                .append(" ")
+                                .append(column.getTypeEtc())
+                                .append(", ");
+                        columnCount++;
                     }
                     String primaryKey = getPrimaryKey(sourceConn, table.getTableName());
                     boolean hasPrimaryKeyColumn = !primaryKey.isEmpty();
@@ -221,7 +205,7 @@ public class CopyTableTaskTypeImpl implements TaskType {
                             int batchSize = 0;
                             int primaryKeyValue = 0;
                             while (rs.next()) {
-                                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
                                     pstmt.setObject(i, rs.getObject(i));
                                 }
                                 // generate the primary key value
