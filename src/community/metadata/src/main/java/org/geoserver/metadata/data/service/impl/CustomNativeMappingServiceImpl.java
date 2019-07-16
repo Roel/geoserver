@@ -235,9 +235,11 @@ public class CustomNativeMappingServiceImpl implements CustomNativeMappingServic
                     // two dimensions, make index map for cross-dimensional mapping
                     List<Integer> indexList = new ArrayList<Integer>();
                     for (int i = 0; i < items.size(); i++) {
-                        for (Object item : (List<?>) items.get(i)) {
-                            list.add(Converters.convert(item, String.class));
-                            indexList.add(i);
+                        if (items.get(i) instanceof List<?>) {
+                            for (Object item : (List<?>) items.get(i)) {
+                                list.add(Converters.convert(item, String.class));
+                                indexList.add(i);
+                            }
                         }
                     }
                     indexMap.put(entry.getKey(), indexList);
