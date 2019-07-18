@@ -10,6 +10,7 @@ import java.util.Collections;
 import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.GeonetworkConfiguration;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
+import org.geoserver.metadata.data.service.ComplexMetadataService;
 import org.geoserver.metadata.data.service.ConfigurationService;
 import org.geoserver.metadata.data.service.GeonetworkImportService;
 import org.geoserver.metadata.data.service.GeonetworkXmlParser;
@@ -27,6 +28,8 @@ public class GeonetworkImportServiceImpl implements GeonetworkImportService {
 
     @Autowired private GeonetworkXmlParser xmlParser;
 
+    @Autowired private ComplexMetadataService mapService;
+
     @Override
     public void importLayer(
             ResourceInfo resource, ComplexMetadataMap map, String geonetwork, String uuid)
@@ -34,6 +37,7 @@ public class GeonetworkImportServiceImpl implements GeonetworkImportService {
         Document doc =
                 geonetworkReader.readDocument(new URL(generateMetadataUrl(geonetwork, uuid)));
         xmlParser.parseMetadata(doc, resource, map);
+        mapService.init(map); // fix all multi-valued complex fields
     }
 
     private String generateMetadataUrl(String geonetworkName, String uuid) {
