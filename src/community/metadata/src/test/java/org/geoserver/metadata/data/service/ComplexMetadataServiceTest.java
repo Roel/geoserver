@@ -451,5 +451,11 @@ public class ComplexMetadataServiceTest extends AbstractMetadataTest {
         assertEquals("targetb", map.get(String.class, "target", 0).getValue());
         assertEquals(null, map.get(String.class, "target", 1).getValue());
         assertEquals("targetc", map.get(String.class, "target", 2).getValue());
+
+        // check removal
+        map.delete("source", 2);
+        service.derive(map);
+        ;
+        assertEquals(2, map.size("target"));
     }
 }

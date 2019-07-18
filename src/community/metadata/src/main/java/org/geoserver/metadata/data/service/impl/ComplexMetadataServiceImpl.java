@@ -291,6 +291,7 @@ public class ComplexMetadataServiceImpl implements ComplexMetadataService {
                             attCollection.findAttribute(config.getDerivedFrom());
                     if (derivedFrom != null) {
                         if (config.getOccurrence() == OccurrenceEnum.REPEAT) {
+                            map.delete(config.getKey());
                             for (int i = 0; i < map.size(derivedFrom.getKey()); i++) {
                                 String value =
                                         map.get(String.class, config.getDerivedFrom(), i)
