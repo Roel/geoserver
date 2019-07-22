@@ -67,4 +67,11 @@ public interface ComplexMetadataService {
      * @param map
      */
     void derive(ComplexMetadataMap map);
+
+    /**
+     * Clean the map of all rubbish metadata (not according to config)
+     *
+     * @param map the map
+     */
+    void clean(ComplexMetadataMap map);
 }

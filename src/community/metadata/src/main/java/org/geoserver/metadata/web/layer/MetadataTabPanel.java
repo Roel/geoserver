@@ -90,6 +90,7 @@ public class MetadataTabPanel extends PublishedEditTabPanel<LayerInfo> {
                 GeoServerApplication.get()
                         .getApplicationContext()
                         .getBean(ComplexMetadataService.class);
+        service.clean(metadataModel.getObject());
         service.init(metadataModel.getObject());
 
         // Link with templates panel

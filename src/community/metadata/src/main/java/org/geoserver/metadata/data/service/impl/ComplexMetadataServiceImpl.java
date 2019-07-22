@@ -277,6 +277,13 @@ public class ComplexMetadataServiceImpl implements ComplexMetadataService {
     }
 
     @Override
+    public void clean(ComplexMetadataMap map) {
+        ComplexMetadataMap copy = map.clone();
+        map.delete("");
+        copy(copy, map, null);
+    }
+
+    @Override
     public void derive(ComplexMetadataMap map) {
         derive(map, null);
     }

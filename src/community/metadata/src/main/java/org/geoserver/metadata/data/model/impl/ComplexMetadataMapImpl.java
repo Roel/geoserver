@@ -142,7 +142,7 @@ public class ComplexMetadataMapImpl implements ComplexMetadataMap {
         if (fullIndex.length > 0) {
             deleteFromList(strPath, fullIndex);
             for (String key : getDelegate().keySet()) {
-                if (key.startsWith(strPath + PATH_SEPARATOR)) {
+                if ("".equals(strPath) || key.startsWith(strPath + PATH_SEPARATOR)) {
                     deleteFromList(key, fullIndex);
                 }
             }
@@ -151,7 +151,7 @@ public class ComplexMetadataMapImpl implements ComplexMetadataMap {
             Iterator<String> it = getDelegate().keySet().iterator();
             while (it.hasNext()) {
                 String key = it.next();
-                if (key.startsWith(strPath + PATH_SEPARATOR)) {
+                if ("".equals(strPath) || key.startsWith(strPath + PATH_SEPARATOR)) {
                     it.remove();
                 }
             }
@@ -163,8 +163,8 @@ public class ComplexMetadataMapImpl implements ComplexMetadataMap {
         Map<String, Serializable> newDelegate = new HashMap<String, Serializable>();
         String strPath = String.join(PATH_SEPARATOR, basePath);
         for (String key : getDelegate().keySet()) {
-            if (key.startsWith(strPath + PATH_SEPARATOR)) {
-                String strippedKey = key.substring(strPath.length() + 1);
+            if ("".equals(strPath) || key.startsWith(strPath + PATH_SEPARATOR)) {
+                String strippedKey = "".equals(strPath) ? key : key.substring(strPath.length() + 1);
                 newDelegate.put(
                         strippedKey, dimCopy(get(Serializable.class, strippedKey).getValue()));
             }

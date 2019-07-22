@@ -29,6 +29,7 @@ import org.geoserver.metadata.data.model.MetadataTemplate;
 import org.geoserver.metadata.data.model.impl.ComplexMetadataMapImpl;
 import org.geoserver.metadata.data.model.impl.GlobalModel;
 import org.geoserver.metadata.data.model.impl.MetadataTemplateImpl;
+import org.geoserver.metadata.data.service.ComplexMetadataService;
 import org.geoserver.metadata.data.service.MetadataTemplateService;
 import org.geoserver.metadata.web.panel.MetadataPanel;
 import org.geoserver.metadata.web.panel.ProgressPanel;
@@ -87,6 +88,11 @@ public class MetadataTemplatePage extends GeoServerBasePage {
                 new Model<ComplexMetadataMap>(
                         new ComplexMetadataMapImpl(
                                 metadataTemplateModel.getObject().getMetadata()));
+        ComplexMetadataService service =
+                GeoServerApplication.get()
+                        .getApplicationContext()
+                        .getBean(ComplexMetadataService.class);
+        service.clean(metadataModel.getObject());
 
         add(
                 progressPanel =
