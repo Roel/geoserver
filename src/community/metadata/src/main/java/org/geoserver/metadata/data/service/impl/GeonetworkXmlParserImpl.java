@@ -140,8 +140,6 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
             case SINGLE:
                 if (nodes != null && nodes.getLength() > 0) {
                     mapNode(metadataMap, attributeMapping, attConfig, doc, nodes.item(0));
-                } else {
-                    mapNode(metadataMap, attributeMapping, attConfig, doc, null);
                 }
                 break;
             case REPEAT:
