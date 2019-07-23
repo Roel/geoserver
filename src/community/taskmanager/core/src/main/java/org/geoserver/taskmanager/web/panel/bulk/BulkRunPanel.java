@@ -59,10 +59,12 @@ public class BulkRunPanel extends Panel {
 
         NumberTextField<Integer> startDelay =
                 new NumberTextField<>("startDelay", new Model<Integer>(0), Integer.class);
+        startDelay.setMinimum(0);
         add(startDelay);
 
         NumberTextField<Integer> betweenDelay =
                 new NumberTextField<>("betweenDelay", new Model<Integer>(0), Integer.class);
+        betweenDelay.setMinimum(0);
         add(betweenDelay);
 
         Label batchesFound =
