@@ -22,7 +22,9 @@ import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.metadata.data.dto.AttributeConfiguration;
 import org.geoserver.metadata.data.model.ComplexMetadataMap;
 import org.geoserver.metadata.data.service.ComplexAttributeGenerator;
+import org.geoserver.metadata.data.service.ComplexMetadataService;
 import org.geoserver.metadata.web.layer.MetadataTabPanel;
+import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.wicket.GeoServerDataProvider;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.GeoServerTablePanel;
@@ -128,6 +130,13 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                                                 getMetadataModel().getObject(),
                                                 (LayerInfo) tabPanel.getDefaultModelObject(),
                                                 contents.getDefaultModelObject());
+                                        ComplexMetadataService service =
+                                                GeoServerApplication.get()
+                                                        .getApplicationContext()
+                                                        .getBean(ComplexMetadataService.class);
+                                        service.init(
+                                                getMetadataModel().getObject(),
+                                                attributeConfiguration.getTypename());
                                         dataProvider.reset();
                                         target.add(
                                                 RepeatableComplexAttributesTablePanel.this
