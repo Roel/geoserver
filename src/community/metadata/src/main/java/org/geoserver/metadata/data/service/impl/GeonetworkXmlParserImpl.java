@@ -7,8 +7,10 @@ package org.geoserver.metadata.data.service.impl;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -86,9 +88,9 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
     private void addNativeAttribute(
             ResourceInfo rInfo, AttributeMappingConfiguration attributeMapping, Document doc)
             throws IOException {
-        NodeList nodes = findNode(doc, attributeMapping.getGeonetwork(), null);
+        List<String> values = findValues(doc, attributeMapping.getGeonetwork(), null);
 
-        if (nodes.getLength() > 0) {
+        if (values.size() > 0) {
             try {
                 Class<?> clazz =
                         PropertyUtils.getPropertyDescriptor(rInfo, attributeMapping.getGeoserver())
@@ -96,8 +98,8 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
 
                 if (List.class.isAssignableFrom(clazz)) {
                     List<String> list = new ArrayList<String>();
-                    for (int i = 0; i < nodes.getLength(); i++) {
-                        list.add(nodes.item(i).getNodeValue());
+                    for (String value : values) {
+                        list.add(value);
                     }
                     @SuppressWarnings("unchecked")
                     List<Object> propList =
@@ -109,8 +111,8 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
                 } else {
                     Object value =
                             clazz == null
-                                    ? nodes.item(0).getNodeValue()
-                                    : Converters.convert(nodes.item(0).getNodeValue(), clazz);
+                                    ? values.get(0)
+                                    : Converters.convert(values.get(0), clazz);
                     BeanUtils.setProperty(rInfo, attributeMapping.getGeoserver(), value);
                 }
             } catch (IllegalAccessException
@@ -134,95 +136,153 @@ public class GeonetworkXmlParserImpl implements GeonetworkXmlParser {
             Document doc,
             Node node)
             throws IOException {
-        NodeList nodes = findNode(doc, attributeMapping.getGeonetwork(), node);
 
-        switch (attConfig.getOccurrence()) {
-            case SINGLE:
-                if (nodes != null && nodes.getLength() > 0) {
-                    mapNode(metadataMap, attributeMapping, attConfig, doc, nodes.item(0));
-                }
-                break;
-            case REPEAT:
-                if (nodes != null) {
-                    for (int count = 0; count < nodes.getLength(); count++) {
-                        mapNode(metadataMap, attributeMapping, attConfig, doc, nodes.item(count));
+        if (FieldTypeEnum.COMPLEX.equals(attConfig.getFieldType())) {
+            NodeList nodes = findNodes(attributeMapping, doc, node);
+            switch (attConfig.getOccurrence()) {
+                case SINGLE:
+                    if (nodes != null && nodes.getLength() > 0) {
+                        mapComplexNode(
+                                metadataMap, attributeMapping, attConfig, doc, nodes.item(0));
                     }
-                }
-                break;
+                    break;
+                case REPEAT:
+                    if (nodes != null) {
+                        for (int count = 0; count < nodes.getLength(); count++) {
+                            mapComplexNode(
+                                    metadataMap,
+                                    attributeMapping,
+                                    attConfig,
+                                    doc,
+                                    nodes.item(count));
+                        }
+                    }
+                    break;
+            }
+        } else {
+            List<String> values = findValues(doc, attributeMapping.getGeonetwork(), node);
+            values.removeAll(Collections.singleton(null));
+            switch (attConfig.getOccurrence()) {
+                case SINGLE:
+                    if (values != null && values.size() > 0) {
+                        mapValue(metadataMap, attributeMapping, attConfig, doc, values.get(0));
+                    }
+                    break;
+                case REPEAT:
+                    if (values != null) {
+                        for (String value : values) {
+                            mapValue(metadataMap, attributeMapping, attConfig, doc, value);
+                        }
+                    }
+                    break;
+            }
         }
     }
 
-    private void mapNode(
+    private void mapComplexNode(
             ComplexMetadataMap metadataMap,
             AttributeMappingConfiguration attributeMapping,
             AttributeConfiguration attConfig,
             Document doc,
             Node node)
             throws IOException {
-        if (FieldTypeEnum.COMPLEX.equals(attConfig.getFieldType())) {
-            AttributeTypeMappingConfiguration typeMapping =
-                    configService
-                            .getGeonetworkMappingConfiguration()
-                            .findType(attConfig.getTypename());
-            if (typeMapping == null) {
-                throw new IOException(
-                        "type mapping " + attConfig.getTypename() + " not found in configuration");
-            }
-            AttributeTypeConfiguration type =
-                    configService.getMetadataConfiguration().findType(attConfig.getTypename());
-            if (type == null) {
-                throw new IOException(
-                        "type " + attConfig.getTypename() + " not found in configuration");
-            }
-            ComplexMetadataMap submap;
-            if (OccurrenceEnum.SINGLE.equals(attConfig.getOccurrence())) {
-                submap = metadataMap.subMap(attributeMapping.getGeoserver());
-            } else {
-                int currentSize = metadataMap.size(attributeMapping.getGeoserver());
-                submap = metadataMap.subMap(attributeMapping.getGeoserver(), currentSize);
-            }
-            for (AttributeMappingConfiguration aMapping : typeMapping.getMapping()) {
-                clearAttribute(submap, aMapping);
-            }
-            for (AttributeMappingConfiguration aMapping : typeMapping.getMapping()) {
-                AttributeConfiguration att = type.findAttribute(aMapping.getGeoserver());
-                if (att == null) {
-                    throw new IOException(
-                            "attribute "
-                                    + aMapping.getGeoserver()
-                                    + " not found in type "
-                                    + type.getTypename());
-                }
-                addAttribute(submap, aMapping, att, doc, node);
-            }
+        AttributeTypeMappingConfiguration typeMapping =
+                configService.getGeonetworkMappingConfiguration().findType(attConfig.getTypename());
+        if (typeMapping == null) {
+            throw new IOException(
+                    "type mapping " + attConfig.getTypename() + " not found in configuration");
+        }
+        AttributeTypeConfiguration type =
+                configService.getMetadataConfiguration().findType(attConfig.getTypename());
+        if (type == null) {
+            throw new IOException(
+                    "type " + attConfig.getTypename() + " not found in configuration");
+        }
+        ComplexMetadataMap submap;
+        if (OccurrenceEnum.SINGLE.equals(attConfig.getOccurrence())) {
+            submap = metadataMap.subMap(attributeMapping.getGeoserver());
         } else {
-            ComplexMetadataAttribute<String> att;
-            if (OccurrenceEnum.SINGLE.equals(attConfig.getOccurrence())) {
-                att = metadataMap.get(String.class, attributeMapping.getGeoserver());
-            } else {
-                int currentSize = metadataMap.size(attributeMapping.getGeoserver());
-                att = metadataMap.get(String.class, attributeMapping.getGeoserver(), currentSize);
+            int currentSize = metadataMap.size(attributeMapping.getGeoserver());
+            submap = metadataMap.subMap(attributeMapping.getGeoserver(), currentSize);
+        }
+        for (AttributeMappingConfiguration aMapping : typeMapping.getMapping()) {
+            clearAttribute(submap, aMapping);
+        }
+        for (AttributeMappingConfiguration aMapping : typeMapping.getMapping()) {
+            AttributeConfiguration att = type.findAttribute(aMapping.getGeoserver());
+            if (att == null) {
+                throw new IOException(
+                        "attribute "
+                                + aMapping.getGeoserver()
+                                + " not found in type "
+                                + type.getTypename());
             }
-            if (node != null) {
-                att.setValue(node.getNodeValue());
-            }
+            addAttribute(submap, aMapping, att, doc, node);
         }
     }
 
-    private NodeList findNode(Document doc, String geonetwork, Node node) throws IOException {
+    private void mapValue(
+            ComplexMetadataMap metadataMap,
+            AttributeMappingConfiguration attributeMapping,
+            AttributeConfiguration attConfig,
+            Document doc,
+            String value)
+            throws IOException {
+        ComplexMetadataAttribute<String> att;
+        if (OccurrenceEnum.SINGLE.equals(attConfig.getOccurrence())) {
+            att = metadataMap.get(String.class, attributeMapping.getGeoserver());
+        } else {
+            int currentSize = metadataMap.size(attributeMapping.getGeoserver());
+            att = metadataMap.get(String.class, attributeMapping.getGeoserver(), currentSize);
+        }
+        att.setValue(value);
+    }
+
+    private Object find(Document doc, String geonetwork, Node node, QName type)
+            throws XPathExpressionException {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        xpath.setNamespaceContext(namespaceContext);
+        XPathExpression expr = xpath.compile(geonetwork);
+        Object result;
+        if (node != null) {
+            result = expr.evaluate(node, type);
+        } else {
+            result = expr.evaluate(doc, type);
+        }
+        return result;
+    }
+
+    private NodeList findNodes(
+            AttributeMappingConfiguration attributeMapping, Document doc, Node node)
+            throws IOException {
         try {
-            XPathFactory factory = XPathFactory.newInstance();
-            XPath xpath = factory.newXPath();
-            xpath.setNamespaceContext(namespaceContext);
-            XPathExpression expr = xpath.compile(geonetwork);
-            Object result;
-            if (node != null) {
-                result = expr.evaluate(node, XPathConstants.NODESET);
-            } else {
-                result = expr.evaluate(doc, XPathConstants.NODESET);
+            return (NodeList)
+                    find(doc, attributeMapping.getGeonetwork(), node, XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            throw new IOException(e);
+        }
+    }
+
+    private List<String> findValues(Document doc, String geonetwork, Node node) throws IOException {
+        List<String> result = new ArrayList<>();
+        // try as NodeList
+        try {
+            NodeList nodeList = (NodeList) find(doc, geonetwork, node, XPathConstants.NODESET);
+            if (nodeList != null) {
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    result.add(nodeList.item(i).getNodeValue());
+                }
+                return result;
             }
-            NodeList nodes = (NodeList) result;
-            return nodes;
+        } catch (XPathExpressionException e) {
+            // do nothing
+        }
+        // try as String
+        try {
+            String value = (String) find(doc, geonetwork, node, XPathConstants.STRING);
+            result.add(value);
+            return result;
         } catch (XPathExpressionException e) {
             throw new IOException(e);
         }

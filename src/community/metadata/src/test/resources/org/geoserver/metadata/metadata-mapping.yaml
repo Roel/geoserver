@@ -12,7 +12,7 @@ namespaces:
 #//book[author="Neal Stephenson"]/title
 geonetworkmapping:
     -  geoserver: identifier-single
-       geonetwork: //gmd:fileIdentifier//gco:CharacterString/text()
+       geonetwork: substring-after(//gmd:fileIdentifier//gco:CharacterString/text(), "prefix/")
     -  geoserver: refsystem-as-list
        geonetwork: //gmd:referenceSystemInfo//gmd:code//gco:CharacterString/text()
     -  geoserver: refsystem-as-list

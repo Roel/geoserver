@@ -159,10 +159,12 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                 GeoServerApplication.get()
                         .getApplicationContext()
                         .getBean(ComplexMetadataService.class);
-        for (int i = 0; i < getMetadataModel().getObject().size(attributeConfiguration.getKey()); i++) {
+        for (int i = 0;
+                i < getMetadataModel().getObject().size(attributeConfiguration.getKey());
+                i++) {
             service.init(
                     getMetadataModel().getObject().subMap(attributeConfiguration.getKey(), i),
-                    attributeConfiguration.getTypename());            
+                    attributeConfiguration.getTypename());
         }
     }
 
