@@ -130,13 +130,7 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                                                 getMetadataModel().getObject(),
                                                 (LayerInfo) tabPanel.getDefaultModelObject(),
                                                 contents.getDefaultModelObject());
-                                        ComplexMetadataService service =
-                                                GeoServerApplication.get()
-                                                        .getApplicationContext()
-                                                        .getBean(ComplexMetadataService.class);
-                                        service.init(
-                                                getMetadataModel().getObject(),
-                                                attributeConfiguration.getTypename());
+                                        fixAll();
                                         dataProvider.reset();
                                         target.add(
                                                 RepeatableComplexAttributesTablePanel.this
@@ -158,6 +152,18 @@ public class RepeatableComplexAttributesTablePanel extends Panel {
                                 && generator.supports(
                                         getMetadataModel().getObject(),
                                         (LayerInfo) tabPanel.getDefaultModelObject())));
+    }
+
+    private void fixAll() {
+        ComplexMetadataService service =
+                GeoServerApplication.get()
+                        .getApplicationContext()
+                        .getBean(ComplexMetadataService.class);
+        for (int i = 0; i < getMetadataModel().getObject().size(attributeConfiguration.getKey()); i++) {
+            service.init(
+                    getMetadataModel().getObject().subMap(attributeConfiguration.getKey(), i),
+                    attributeConfiguration.getTypename());            
+        }
     }
 
     private GeoServerTablePanel<ComplexMetadataMap> createAttributesTablePanel(
