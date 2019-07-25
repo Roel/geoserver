@@ -140,10 +140,10 @@ public class ComplexMetadataMapImpl implements ComplexMetadataMap {
         String strPath = String.join(PATH_SEPARATOR, concat(basePath, path));
         int[] fullIndex = concat(baseIndexRef.getIndex(), index);
         if (fullIndex.length > 0) {
-            deleteFromList(strPath, fullIndex);
+            deleteFromList(strPath, fullIndex, index.length == 0);
             for (String key : getDelegate().keySet()) {
                 if ("".equals(strPath) || key.startsWith(strPath + PATH_SEPARATOR)) {
-                    deleteFromList(key, fullIndex);
+                    deleteFromList(key, fullIndex, index.length == 0);
                 }
             }
         } else {
@@ -173,7 +173,7 @@ public class ComplexMetadataMapImpl implements ComplexMetadataMap {
     }
 
     @SuppressWarnings("unchecked")
-    private void deleteFromList(String path, int[] index) {
+    private void deleteFromList(String path, int[] index, boolean keepSpace) {
         Object object = getDelegate().get(path);
         for (int i = 0; i < index.length - 1; i++) {
             if (object instanceof List<?>) {
@@ -188,26 +188,34 @@ public class ComplexMetadataMapImpl implements ComplexMetadataMap {
         }
         if (object instanceof List<?>) {
             if (index[index.length - 1] < ((List<Object>) object).size()) {
-                ((List<Object>) object).remove(index[index.length - 1]);
+                if (keepSpace) {
+                    ((List<Object>) object).set(index[index.length - 1], null);
+                } else {
+                    ((List<Object>) object).remove(index[index.length - 1]);
+                }
             } else {
                 return;
             }
         }
-        // update indexes
-        ArrayList<ComplexMetadataIndexReference> list = getIndexes().get(path);
-        if (list != null) {
-            Iterator<ComplexMetadataIndexReference> it = list.iterator();
-            while (it.hasNext()) {
-                ComplexMetadataIndexReference item = it.next();
-                if (item.getIndex().length >= index.length) {
-                    int[] rootItemIndex = Arrays.copyOfRange(item.getIndex(), 0, index.length - 1);
-                    int[] rootIndex = Arrays.copyOfRange(index, 0, index.length - 1);
-                    if (Arrays.equals(rootIndex, rootItemIndex)) {
-                        if (item.getIndex()[index.length - 1] == index[index.length - 1]) {
-                            item.setIndex(null);
-                            it.remove();
-                        } else if (item.getIndex()[index.length - 1] > index[index.length - 1]) {
-                            item.getIndex()[index.length - 1]--;
+        if (!keepSpace) {
+            // update indexes
+            ArrayList<ComplexMetadataIndexReference> list = getIndexes().get(path);
+            if (list != null) {
+                Iterator<ComplexMetadataIndexReference> it = list.iterator();
+                while (it.hasNext()) {
+                    ComplexMetadataIndexReference item = it.next();
+                    if (item.getIndex().length >= index.length) {
+                        int[] rootItemIndex =
+                                Arrays.copyOfRange(item.getIndex(), 0, index.length - 1);
+                        int[] rootIndex = Arrays.copyOfRange(index, 0, index.length - 1);
+                        if (Arrays.equals(rootIndex, rootItemIndex)) {
+                            if (item.getIndex()[index.length - 1] == index[index.length - 1]) {
+                                item.setIndex(null);
+                                it.remove();
+                            } else if (item.getIndex()[index.length - 1]
+                                    > index[index.length - 1]) {
+                                item.getIndex()[index.length - 1]--;
+                            }
                         }
                     }
                 }
