@@ -138,9 +138,10 @@ public class GetRecords {
                         List<FeatureCollection> results = new ArrayList<FeatureCollection>();
                         for (int i = 0; i < queries.size() && maxRecords > 0; i++) {
                             WrappedQuery q = queries.get(i);
+                            int remaining = counts[i] - offset;
                             if (offset > 0) {
                                 if (offset > counts[i]) {
-                                    // skip the query altogheter
+                                    // skip the query altogether
                                     offset -= counts[i];
                                     continue;
                                 } else {
@@ -151,7 +152,7 @@ public class GetRecords {
 
                             if (maxRecords > 0) {
                                 q.query.setMaxFeatures(maxRecords);
-                                maxRecords -= counts[i];
+                                maxRecords -= remaining;
                             } else {
                                 // skip the query, we already have enough results
                                 continue;
