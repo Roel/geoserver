@@ -11,7 +11,9 @@ import org.apache.commons.io.FileUtils;
 import org.geoserver.wms.map.RenderedImageMapOutputFormat;
 import org.geoserver.wms.map.RenderedImageMapOutputFormatTest;
 import org.junit.Before;
+import org.junit.Ignore;
 
+@Ignore
 public class DDSMapProducerTest extends RenderedImageMapOutputFormatTest {
 
     private String mapFormat = "image/dds";
