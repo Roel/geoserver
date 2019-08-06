@@ -612,10 +612,7 @@ public class StyleControllerTest extends CatalogRESTTestSupport {
                         RestBaseController.ROOT_PATH + "/workspaces/gs/styles/foo",
                         xml,
                         "application/xml");
-        assertEquals(200, response.getStatus());
-        assertNotNull("cite", getCatalog().getStyleByName("cite", "foo"));
-        assertNotNull("cite", getCatalog().getStyleByName("cite", "foo").getWorkspace());
-        assertEquals("cite", getCatalog().getStyleByName("cite", "foo").getWorkspace().getName());
+        assertEquals(403, response.getStatus());
     }
 
     @Test
