@@ -691,19 +691,23 @@ public class GeoServerPersistersTest extends GeoServerSystemTestSupport {
         File sldFile = new File(testData.getDataDirectoryRoot(), "styles/foostyle.sld");
         sldFile.createNewFile();
 
-        File sldFile1 = new File(testData.getDataDirectoryRoot(), "styles/foostyle1.sld");
+        File sldFile0 = new File(testData.getDataDirectoryRoot(), "styles/barstyle.sld");
+        sldFile0.createNewFile();
+
+        File sldFile1 = new File(testData.getDataDirectoryRoot(), "styles/barstyle1.sld");
         sldFile1.createNewFile();
 
-        File xmlFile1 = new File(testData.getDataDirectoryRoot(), "styles/foostyle1.xml");
+        File xmlFile1 = new File(testData.getDataDirectoryRoot(), "styles/barstyle1.xml");
         xmlFile1.createNewFile();
 
-        File sldFile2 = new File(testData.getDataDirectoryRoot(), "styles/foostyle2.sld");
+        File sldFile2 = new File(testData.getDataDirectoryRoot(), "styles/barstyle2.sld");
 
         StyleInfo s = catalog.getStyleByName("foostyle");
-        s.setName("foostyle");
+        s.setName("barstyle");
         catalog.save(s);
 
         assertThat(sldFile, not(fileExists()));
+        assertThat(sldFile0, fileExists());
         assertThat(sldFile1, fileExists());
         assertThat(xmlFile1, fileExists());
         assertThat(sldFile2, fileExists());
