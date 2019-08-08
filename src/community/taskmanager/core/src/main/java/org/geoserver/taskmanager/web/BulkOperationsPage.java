@@ -44,7 +44,6 @@ public class BulkOperationsPage extends GeoServerSecuredPage {
                     }
                 });
         form.add(new TabbedPanel<ITab>("tabs", tabs));
-        form.add();
 
         add(form);
     }
