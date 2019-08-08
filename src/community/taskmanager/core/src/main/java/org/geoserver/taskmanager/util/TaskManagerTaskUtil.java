@@ -348,7 +348,7 @@ public class TaskManagerTaskUtil {
             for (Parameter pam : task.getParameters().values()) {
                 String attName =
                         TaskManagerBeans.get().getDataUtil().getAssociatedAttributeName(pam);
-                if (attName != null) {
+                if (attName != null && oldAttributes.containsKey(attName)) {
                     config.getAttributes().put(attName, oldAttributes.remove(attName));
                 }
             }
