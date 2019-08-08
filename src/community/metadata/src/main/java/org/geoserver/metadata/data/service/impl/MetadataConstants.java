@@ -42,7 +42,7 @@ public final class MetadataConstants {
     public static final String DOMAIN_ATT_DEFINITION = "definition";
 
     public static final Class<?>[] FEATURE_CATALOG_KNOWN_TYPES =
-            new Class<?>[] {String.class, Number.class, Geometry.class, Date.class};
+            new Class<?>[] {String.class, Number.class, Geometry.class, Date.class, Boolean.class};
 
     public static final String FEATURECATALOG_TYPE_UNKNOWN = "unknown";
 
