@@ -18,7 +18,7 @@ types:
           fieldType: NUMBER
         - label: Definition
           key: definition
-          fieldType: TEXT
+          fieldType: TEXT_AREA
         - label: Minimal Cardinality
           key: min-occurrence
           fieldType: NUMBER
