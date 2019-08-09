@@ -1792,14 +1792,17 @@ public class ConfigDatabase {
                 layerGroup.setRootLayerStyle(
                         getById(layerGroup.getRootLayerStyle().getId(), StyleInfo.class));
             }
-            Set<StyleInfo> newStyles = new HashSet<>();
-            for (StyleInfo style : layerGroup.getStyles()) {
-                if (style != null) {
-                    newStyles.add(getById(style.getId(), StyleInfo.class));
+            for (int i = 0; i < layerGroup.getStyles().size(); i++) {
+                if (layerGroup.getStyles().get(i) != null) {
+                    layerGroup
+                            .getStyles()
+                            .set(
+                                    i,
+                                    getById(
+                                            layerGroup.getStyles().get(i).getId(),
+                                            StyleInfo.class));
                 }
             }
-            layerGroup.getStyles().clear();
-            layerGroup.getStyles().addAll(newStyles);
         }
 
         @Override
