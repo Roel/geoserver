@@ -12,6 +12,7 @@ types:
               - Date
               - Number
               - Geometry
+              - Boolean
               - Unknown
         - label: Length
           key: length
