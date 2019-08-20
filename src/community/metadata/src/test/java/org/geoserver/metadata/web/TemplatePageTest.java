@@ -2,7 +2,7 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.metadata.wicket;
+package org.geoserver.metadata.web;
 
 import java.io.IOException;
 import org.apache.wicket.feedback.FeedbackMessage;
@@ -11,7 +11,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.util.ListModel;
 import org.geoserver.metadata.AbstractWicketMetadataTest;
 import org.geoserver.metadata.data.model.MetadataTemplate;
-import org.geoserver.metadata.web.MetadataTemplatePage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

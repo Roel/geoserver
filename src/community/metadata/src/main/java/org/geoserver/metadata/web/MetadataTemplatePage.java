@@ -124,7 +124,7 @@ public class MetadataTemplatePage extends GeoServerBasePage {
     }
 
     protected ComponentAuthorizer getPageAuthorizer() {
-        return ComponentAuthorizer.AUTHENTICATED;
+        return ComponentAuthorizer.WORKSPACE_ADMIN;
     }
 
     private TextField<String> createNameField(final Form<?> form, final AjaxSubmitLink saveButton) {

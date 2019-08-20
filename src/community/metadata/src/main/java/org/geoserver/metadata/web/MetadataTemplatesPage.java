@@ -36,7 +36,11 @@ import org.geoserver.metadata.web.panel.TemplatesPositionPanel;
 import org.geoserver.web.ComponentAuthorizer;
 import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.GeoServerSecuredPage;
-import org.geoserver.web.wicket.*;
+import org.geoserver.web.wicket.GeoServerDataProvider;
+import org.geoserver.web.wicket.GeoServerDialog;
+import org.geoserver.web.wicket.GeoServerTablePanel;
+import org.geoserver.web.wicket.ParamResourceModel;
+import org.geoserver.web.wicket.SimpleAjaxLink;
 
 /**
  * Manages the metadata templates. Shows all existing templates,allows to create, edit and delete
@@ -355,7 +359,7 @@ public class MetadataTemplatesPage extends GeoServerSecuredPage {
 
     @Override
     protected ComponentAuthorizer getPageAuthorizer() {
-        return ComponentAuthorizer.AUTHENTICATED;
+        return ComponentAuthorizer.WORKSPACE_ADMIN;
     }
 
     private void save(AjaxRequestTarget target) {

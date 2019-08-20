@@ -2,7 +2,7 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.metadata.wicket;
+package org.geoserver.metadata.web;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,8 +15,6 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.metadata.AbstractWicketMetadataTest;
-import org.geoserver.metadata.web.MetadataTemplatePage;
-import org.geoserver.metadata.web.MetadataTemplatesPage;
 import org.geoserver.metadata.web.panel.MetadataPanel;
 import org.geoserver.web.data.resource.ResourceConfigurationPage;
 import org.geoserver.web.wicket.GeoServerTablePanel;
