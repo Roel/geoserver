@@ -19,6 +19,7 @@ import com.hazelcast.core.MessageListener;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
@@ -274,6 +275,7 @@ public class EventHzSynchronizer extends HzSynchronizer {
         final Class<? extends Info> clazz = ce.getObjectInterface();
         final String id = ce.getObjectId();
         final Catalog cat = cluster.getRawCatalog();
+        boolean extraArguments = false;
 
         Info subj;
         Method notifyMethod;
@@ -284,7 +286,12 @@ public class EventHzSynchronizer extends HzSynchronizer {
                 case MODIFY:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
-                                    "handleGlobalChange", GeoServerInfo.class);
+                                    "handleGlobalChange",
+                                    GeoServerInfo.class,
+                                    List.class,
+                                    List.class,
+                                    List.class);
+                    extraArguments = true;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -298,7 +305,12 @@ public class EventHzSynchronizer extends HzSynchronizer {
                 case MODIFY:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
-                                    "handleSettingsModified", SettingsInfo.class);
+                                    "handleSettingsModified",
+                                    SettingsInfo.class,
+                                    List.class,
+                                    List.class,
+                                    List.class);
+                    extraArguments = true;
                 case REMOVE:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -319,7 +331,12 @@ public class EventHzSynchronizer extends HzSynchronizer {
                 case MODIFY:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
-                                    "handleLoggingChange", LoggingInfo.class);
+                                    "handleLoggingChange",
+                                    LoggingInfo.class,
+                                    List.class,
+                                    List.class,
+                                    List.class);
+                    extraArguments = true;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -331,7 +348,12 @@ public class EventHzSynchronizer extends HzSynchronizer {
                 case MODIFY:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
-                                    "handleServiceChange", ServiceInfo.class);
+                                    "handleServiceChange",
+                                    ServiceInfo.class,
+                                    List.class,
+                                    List.class,
+                                    List.class);
+                    extraArguments = true;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -347,7 +369,7 @@ public class EventHzSynchronizer extends HzSynchronizer {
                         && // HACK-HACK-HACK -- prevent infinite loop with update sequence listener
                         !"org.geoserver.config.UpdateSequenceListener"
                                 .equals(l.getClass().getCanonicalName())) {
-                    if (ce.getPropertyNames() != null) {
+                    if (extraArguments) {
                         notifyMethod.invoke(
                                 l,
                                 subj,
