@@ -20,9 +20,13 @@ Translate keys to Dutch labels  :download:`metadata_nl.properties <files/metadat
 
 Content for gemet-concept dropdown  :download:`keyword-gemet-concept.csv <files/keyword-gemet-concept.csv>`
 
+Content for reference-system requirebox  :download:`keyword-gemet-concept.csv <files/reference-systems-epsg.csv>`
+
 Content for inspire-theme-label & inspire-theme-ref  :download:`keyword-inspire-theme.csv <files/keyword-inspire-theme.csv>`
 
 Geonetwork mapping  :download:`metadata-mapping.yaml <files/metadata-mapping.yaml>`
+
+Namespaces for geonetwork mapping :download:`metadata-mapping.yaml <files/metadata-namespaces.yaml>`
 
 Geonetwork endpoints  :download:`metadata-geonetwork.yaml <files/metadata-geonetwork.yaml>`
 
