@@ -128,15 +128,21 @@ public class CopyTableTaskTypeImpl implements TaskType {
                                 .append(", ");
                         columnCount++;
                     }
-                    String primaryKey = getPrimaryKey(sourceConn, table.getTableName());
+                    Set<String> primaryKey = getPrimaryKey(sourceConn, table.getTableName());
                     boolean hasPrimaryKeyColumn = !primaryKey.isEmpty();
                     if (!hasPrimaryKeyColumn) {
                         // create a Primary key column if none exist.
-                        sb.append(GENERATE_ID_COLUMN_NAME + " int PRIMARY KEY, ");
+                        sb.append(GENERATE_ID_COLUMN_NAME + " int PRIMARY KEY");
                         columnCount++;
+                    } else {
+                        sb.append("PRIMARY KEY(");
+                        for (String colName : primaryKey) {
+                            sb.append(targetdb.getDialect().quote(colName)).append(", ");
+                        }
+                        sb.setLength(sb.length() - 2);
+                        sb.append(")");
                     }
 
-                    sb.setLength(sb.length() - 2);
                     sb.append(" ); ");
 
                     // creating indexes
@@ -150,17 +156,20 @@ public class CopyTableTaskTypeImpl implements TaskType {
 
                     for (String indexName : indexAndColumnMap.keySet()) {
                         Set<String> columnNames = indexAndColumnMap.get(indexName);
-                        boolean isSpatialIndex =
-                                columnNames.size() == 1
-                                        && spatialColumns.contains(columnNames.iterator().next());
+                        if (!columnNames.equals(primaryKey)) {
+                            boolean isSpatialIndex =
+                                    columnNames.size() == 1
+                                            && spatialColumns.contains(
+                                                    columnNames.iterator().next());
 
-                        sb.append(
-                                targetdb.getDialect()
-                                        .createIndex(
-                                                tempTableName,
-                                                columnNames,
-                                                isSpatialIndex,
-                                                uniqueIndexes.contains(indexName)));
+                            sb.append(
+                                    targetdb.getDialect()
+                                            .createIndex(
+                                                    tempTableName,
+                                                    columnNames,
+                                                    isSpatialIndex,
+                                                    uniqueIndexes.contains(indexName)));
+                        }
                     }
                     // we are copying a view and need to create the spatial index.
                     if (indexAndColumnMap.isEmpty() && !spatialColumns.isEmpty()) {
@@ -323,32 +332,31 @@ public class CopyTableTaskTypeImpl implements TaskType {
         return schema;
     }
 
-    private static String getPrimaryKey(Connection conn, String tableName) throws SQLException {
+    private static Set<String> getPrimaryKey(Connection conn, String tableName)
+            throws SQLException {
         String schema = getSchema(conn, tableName);
         String name = getTableName(conn, tableName);
+        Set<String> primaryKey = new HashSet<String>();
 
         try (ResultSet rsPrimaryKeys = conn.getMetaData().getPrimaryKeys(null, schema, name)) {
-            StringBuilder sb = new StringBuilder();
             while (rsPrimaryKeys.next()) {
-                sb.append(rsPrimaryKeys.getString("COLUMN_NAME")).append(", ");
+                primaryKey.add(rsPrimaryKeys.getString("COLUMN_NAME"));
             }
-            if (sb.length() > 2) {
-                sb.setLength(sb.length() - 2);
-            }
-            // if there is no primary key column defined. Check if there is a generated key column
-            // available
-            if (sb.length() < 2) {
-                ResultSet rsColumns = conn.getMetaData().getColumns(null, schema, name, null);
-                while (rsColumns.next()) {
-                    if (GENERATE_ID_COLUMN_NAME.equalsIgnoreCase(
-                            rsColumns.getString("COLUMN_NAME"))) {
-                        return GENERATE_ID_COLUMN_NAME;
-                    }
+        }
+
+        // if there is no primary key column defined. Check if there is a generated key column
+        // available
+        if (primaryKey.isEmpty()) {
+            ResultSet rsColumns = conn.getMetaData().getColumns(null, schema, name, null);
+            while (rsColumns.next()) {
+                String colName = rsColumns.getString("COLUMN_NAME");
+                if (GENERATE_ID_COLUMN_NAME.equalsIgnoreCase(colName)) {
+                    primaryKey.add(colName);
                 }
             }
-
-            return sb.toString();
         }
+
+        return primaryKey;
     }
 
     private Set<String> getUniqueIndexes(Connection conn, String tableName) throws SQLException {
