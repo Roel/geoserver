@@ -347,7 +347,16 @@ public class EventHzSynchronizer extends HzSynchronizer {
                         && // HACK-HACK-HACK -- prevent infinite loop with update sequence listener
                         !"org.geoserver.config.UpdateSequenceListener"
                                 .equals(l.getClass().getCanonicalName())) {
-                    notifyMethod.invoke(l, subj);
+                    if (ce.getPropertyNames() != null) {
+                        notifyMethod.invoke(
+                                l,
+                                subj,
+                                ce.getPropertyNames(),
+                                ce.getOldValues(),
+                                ce.getNewValues());
+                    } else {
+                        notifyMethod.invoke(l, subj);
+                    }
                 }
             } catch (Exception ex) {
                 LOGGER.log(
