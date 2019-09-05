@@ -280,26 +280,63 @@ public class EventHzSynchronizer extends HzSynchronizer {
 
         if (GeoServerInfo.class.isAssignableFrom(clazz)) {
             subj = gs.getGlobal();
-            notifyMethod =
-                    ConfigurationListener.class.getMethod(
-                            "handlePostGlobalChange", GeoServerInfo.class);
+            switch (ce.getChangeType()) {
+                case MODIFY:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleGlobalChange", GeoServerInfo.class);
+                default:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handlePostGlobalChange", GeoServerInfo.class);
+            }
         } else if (SettingsInfo.class.isAssignableFrom(clazz)) {
             WorkspaceInfo ws =
                     ce.getWorkspaceId() != null ? cat.getWorkspace(ce.getWorkspaceId()) : null;
             subj = ws != null ? gs.getSettings(ws) : gs.getSettings();
-            notifyMethod =
-                    ConfigurationListener.class.getMethod(
-                            "handleSettingsPostModified", SettingsInfo.class);
+            switch (ce.getChangeType()) {
+                case MODIFY:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleSettingsModified", SettingsInfo.class);
+                case REMOVE:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleSettingsRemoved", SettingsInfo.class);
+
+                case ADD:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleSettingsAdded", SettingsInfo.class);
+                default:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleSettingsPostModified", SettingsInfo.class);
+            }
         } else if (LoggingInfo.class.isAssignableFrom(clazz)) {
             subj = gs.getLogging();
-            notifyMethod =
-                    ConfigurationListener.class.getMethod(
-                            "handlePostLoggingChange", LoggingInfo.class);
+            switch (ce.getChangeType()) {
+                case MODIFY:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleLoggingChange", LoggingInfo.class);
+                default:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handlePostLoggingChange", LoggingInfo.class);
+            }
         } else if (ServiceInfo.class.isAssignableFrom(clazz)) {
             subj = gs.getService(id, (Class<ServiceInfo>) clazz);
-            notifyMethod =
-                    ConfigurationListener.class.getMethod(
-                            "handlePostServiceChange", ServiceInfo.class);
+            switch (ce.getChangeType()) {
+                case MODIFY:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handleServiceChange", ServiceInfo.class);
+                default:
+                    notifyMethod =
+                            ConfigurationListener.class.getMethod(
+                                    "handlePostServiceChange", ServiceInfo.class);
+            }
         } else {
             throw new IllegalStateException("Unknown event type " + clazz);
         }
