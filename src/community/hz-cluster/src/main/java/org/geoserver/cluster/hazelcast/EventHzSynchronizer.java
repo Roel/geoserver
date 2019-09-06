@@ -292,6 +292,7 @@ public class EventHzSynchronizer extends HzSynchronizer {
                                     List.class,
                                     List.class);
                     extraArguments = true;
+                    break;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -311,15 +312,18 @@ public class EventHzSynchronizer extends HzSynchronizer {
                                     List.class,
                                     List.class);
                     extraArguments = true;
+                    break;
                 case REMOVE:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
                                     "handleSettingsRemoved", SettingsInfo.class);
+                    break;
 
                 case ADD:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
                                     "handleSettingsAdded", SettingsInfo.class);
+                    break;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -337,6 +341,7 @@ public class EventHzSynchronizer extends HzSynchronizer {
                                     List.class,
                                     List.class);
                     extraArguments = true;
+                    break;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
@@ -354,6 +359,7 @@ public class EventHzSynchronizer extends HzSynchronizer {
                                     List.class,
                                     List.class);
                     extraArguments = true;
+                    break;
                 default:
                     notifyMethod =
                             ConfigurationListener.class.getMethod(
