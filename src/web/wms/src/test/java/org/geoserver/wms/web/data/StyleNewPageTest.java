@@ -74,6 +74,9 @@ public class StyleNewPageTest extends GeoServerWicketTestSupport {
                 "styleForm:context:panel:legendPanel:externalGraphicContainer:list:onlineResource",
                 TextField.class);
         tester.assertComponent(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:list:chooseImage",
+                GeoServerAjaxFormLink.class);
+        tester.assertComponent(
                 "styleForm:context:panel:legendPanel:externalGraphicContainer:list:width",
                 TextField.class);
         tester.assertComponent(
@@ -461,8 +464,7 @@ public class StyleNewPageTest extends GeoServerWicketTestSupport {
                 "styleForm:styleEditor:editorContainer:toolbar:custom-buttons:1",
                 GeoServerAjaxFormLink.class);
         tester.clickLink("styleForm:styleEditor:editorContainer:toolbar:custom-buttons:1");
-        tester.assertComponent(
-                "dialog:dialog:content:form:userPanel", AbstractStylePage.ChooseImagePanel.class);
+        tester.assertComponent("dialog:dialog:content:form:userPanel", ChooseImagePanel.class);
         tester.assertComponent("dialog:dialog:content:form:userPanel:image", DropDownChoice.class);
         tester.assertInvisible("dialog:dialog:content:form:userPanel:display");
         @SuppressWarnings("unchecked")
@@ -514,6 +516,73 @@ public class StyleNewPageTest extends GeoServerWicketTestSupport {
         assertTrue(matcher.find());
         assertEquals("GeoServer_75.png", matcher.group(1));
         assertEquals("image/png", matcher.group(2));
+
+        file.delete();
+    }
+
+    @Test
+    public void testLegendChooseImage() throws Exception {
+        // create some fake images
+        GeoServerDataDirectory dd =
+                GeoServerApplication.get().getBeanOfType(GeoServerDataDirectory.class);
+        dd.getStyles().get("somepicture.png").out().close();
+        dd.getStyles().get("otherpicture.jpg").out().close();
+        dd.getStyles().get("vector.svg").out().close();
+
+        // Load the legend
+        tester.executeAjaxEvent(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:showhide:show",
+                "click");
+
+        // choose image
+        tester.executeAjaxEvent(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:list:chooseImage",
+                "click");
+
+        tester.assertComponent("dialog:dialog:content:form:userPanel", ChooseImagePanel.class);
+        tester.assertComponent("dialog:dialog:content:form:userPanel:image", DropDownChoice.class);
+        tester.assertInvisible("dialog:dialog:content:form:userPanel:display");
+        @SuppressWarnings("unchecked")
+        List<? extends String> choices =
+                ((DropDownChoice<String>)
+                                tester.getComponentFromLastRenderedPage(
+                                        "dialog:dialog:content:form:userPanel:image"))
+                        .getChoices();
+        assertEquals(4, choices.size());
+        assertEquals("otherpicture.jpg", choices.get(1));
+        assertEquals("somepicture.png", choices.get(2));
+        assertEquals("vector.svg", choices.get(3));
+
+        FormTester formTester = tester.newFormTester("dialog:dialog:content:form");
+        formTester.select("userPanel:image", 2);
+
+        tester.executeAjaxEvent("dialog:dialog:content:form:userPanel:image", "change");
+        tester.assertVisible("dialog:dialog:content:form:userPanel:display");
+
+        formTester.submit("submit");
+
+        tester.assertModelValue(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:list:onlineResource",
+                "somepicture.png");
+
+        // test uploading
+        tester.executeAjaxEvent(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:list:chooseImage",
+                "click");
+        formTester = tester.newFormTester("dialog:dialog:content:form");
+        org.apache.wicket.util.file.File file =
+                new org.apache.wicket.util.file.File(
+                        getClass().getResource("GeoServer_75.png").getFile());
+        formTester.setFile("userPanel:upload", file, "image/png");
+        formTester.submit("submit");
+
+        assertTrue(Resources.exists(dd.getStyles().get("GeoServer_75.png")));
+
+        tester.assertModelValue(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:list:onlineResource",
+                "GeoServer_75.png");
+
+        file.delete();
     }
 
     //    Cannot make this one to work, the sld text area is not filled in the test

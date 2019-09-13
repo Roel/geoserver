@@ -162,6 +162,9 @@ public class StyleEditPageTest extends GeoServerWicketTestSupport {
                 "styleForm:context:panel:legendPanel:externalGraphicContainer:list:onlineResource",
                 TextField.class);
         tester.assertComponent(
+                "styleForm:context:panel:legendPanel:externalGraphicContainer:list:chooseImage",
+                GeoServerAjaxFormLink.class);
+        tester.assertComponent(
                 "styleForm:context:panel:legendPanel:externalGraphicContainer:list:width",
                 TextField.class);
         tester.assertComponent(
@@ -212,8 +215,7 @@ public class StyleEditPageTest extends GeoServerWicketTestSupport {
                 "styleForm:styleEditor:editorContainer:toolbar:custom-buttons:1",
                 GeoServerAjaxFormLink.class);
         tester.clickLink("styleForm:styleEditor:editorContainer:toolbar:custom-buttons:1");
-        tester.assertComponent(
-                "dialog:dialog:content:form:userPanel", AbstractStylePage.ChooseImagePanel.class);
+        tester.assertComponent("dialog:dialog:content:form:userPanel", ChooseImagePanel.class);
         tester.assertComponent("dialog:dialog:content:form:userPanel:image", DropDownChoice.class);
         tester.assertInvisible("dialog:dialog:content:form:userPanel:display");
         @SuppressWarnings("unchecked")
@@ -313,8 +315,7 @@ public class StyleEditPageTest extends GeoServerWicketTestSupport {
                 "styleForm:styleEditor:editorContainer:toolbar:custom-buttons:1",
                 GeoServerAjaxFormLink.class);
         tester.clickLink("styleForm:styleEditor:editorContainer:toolbar:custom-buttons:1");
-        tester.assertComponent(
-                "dialog:dialog:content:form:userPanel", AbstractStylePage.ChooseImagePanel.class);
+        tester.assertComponent("dialog:dialog:content:form:userPanel", ChooseImagePanel.class);
         tester.assertComponent("dialog:dialog:content:form:userPanel:image", DropDownChoice.class);
 
         FormTester formTester = tester.newFormTester("dialog:dialog:content:form");
