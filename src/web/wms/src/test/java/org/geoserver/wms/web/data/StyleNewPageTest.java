@@ -517,7 +517,7 @@ public class StyleNewPageTest extends GeoServerWicketTestSupport {
         assertEquals("GeoServer_75.png", matcher.group(1));
         assertEquals("image/png", matcher.group(2));
 
-        file.delete();
+        dd.getStyles().get("GeoServer_75.png").delete();
     }
 
     @Test
@@ -582,7 +582,7 @@ public class StyleNewPageTest extends GeoServerWicketTestSupport {
                 "styleForm:context:panel:legendPanel:externalGraphicContainer:list:onlineResource",
                 "GeoServer_75.png");
 
-        file.delete();
+        dd.getStyles().get("GeoServer_75.png").delete();
     }
 
     //    Cannot make this one to work, the sld text area is not filled in the test
