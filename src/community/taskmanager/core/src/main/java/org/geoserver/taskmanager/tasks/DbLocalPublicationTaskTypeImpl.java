@@ -246,9 +246,4 @@ public class DbLocalPublicationTaskTypeImpl implements TaskType {
             return o;
         }
     }
-
-    @Override
-    public boolean templateOnly() {
-        return true;
-    }
 }
