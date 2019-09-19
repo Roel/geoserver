@@ -67,8 +67,7 @@ public class ConfigurationImpl extends BaseImpl implements Configuration {
         fetch = FetchType.LAZY,
         targetEntity = TaskImpl.class,
         mappedBy = "configuration",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+        cascade = CascadeType.ALL
     )
     @OrderBy("id")
     @MapKey(name = "name")
