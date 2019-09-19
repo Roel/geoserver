@@ -326,7 +326,6 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
         if (configNamePattern != null) {
             criteria.createAlias("configuration", "configuration")
                     .add(Restrictions.like("configuration.name", configNamePattern))
-                    .add(Restrictions.not(Restrictions.like("name", "@%")))
                     .add(Restrictions.like("name", namePattern))
                     .add(Restrictions.eq("configuration.removeStamp", 0L))
                     .add(Restrictions.eq("configuration.template", false))

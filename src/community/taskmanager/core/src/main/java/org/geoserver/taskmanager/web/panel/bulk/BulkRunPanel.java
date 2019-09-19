@@ -99,7 +99,7 @@ public class BulkRunPanel extends Panel {
                         if (batches.size() == 0) {
                             error(
                                     new StringResourceModel("noBatches", BulkRunPanel.this)
-                                            .toString());
+                                            .getString());
                             ((GeoServerBasePage) getPage()).addFeedbackPanels(target);
                         } else {
                             dialog.showOkCancel(
