@@ -437,7 +437,8 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                                         id,
                                         sb.toString(),
                                         new ParamResourceModel("cleanUp", getPage()).getString(),
-                                        shouldCleanupModel);
+                                        shouldCleanupModel,
+                                        !configurationModel.getObject().isTemplate());
                             }
 
                             @Override

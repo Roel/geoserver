@@ -233,7 +233,8 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                             new ParamResourceModel(
                                                                             "cleanUp", getPage())
                                                                     .getString(),
-                                                            shouldCleanupModel);
+                                                            shouldCleanupModel,
+                                                            !templates);
                                                 }
 
                                                 @Override
