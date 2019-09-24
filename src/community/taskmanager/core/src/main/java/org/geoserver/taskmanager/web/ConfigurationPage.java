@@ -420,7 +420,7 @@ public class ConfigurationPage extends GeoServerSecuredPage {
 
                             private static final long serialVersionUID = -5552087037163833563L;
 
-                            private IModel<Boolean> shouldCleanupModel = new Model<Boolean>();
+                            private IModel<Boolean> shouldCleanupModel = new Model<Boolean>(false);
 
                             @Override
                             protected Component getContents(String id) {
