@@ -9,7 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+import org.geoserver.catalog.ResourceInfo;
+import org.geoserver.config.GeoServer;
+import org.geoserver.metadata.data.model.MetadataTemplate;
 import org.geoserver.metadata.data.service.MetaDataBulkService;
+import org.geoserver.metadata.data.service.MetadataTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +28,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class MetaDataRestService {
 
     @Autowired private MetaDataBulkService bulkService;
+
+    @Autowired private MetadataTemplateService templateService;
+
+    @Autowired private GeoServer geoServer;
 
     @DeleteMapping
     public void clearAll(
@@ -60,6 +68,25 @@ public class MetaDataRestService {
     public void importAndLink(
             @RequestParam(required = false) String geonetwork, @RequestBody String csvFile) {
         bulkService.importAndLink(geonetwork, csvFile);
+    }
+
+    @GetMapping("linkedlayers")
+    public String getLinkedLayers(@RequestParam String template) {
+        MetadataTemplate mdt = templateService.findByName(template);
+        StringBuilder layers = new StringBuilder();
+        for (String resourceId : mdt.getLinkedLayers()) {
+            if (layers.length() > 0) {
+                layers.append("\n");
+            }
+            ResourceInfo resource =
+                    geoServer.getCatalog().getResource(resourceId, ResourceInfo.class);
+            if (resource != null) {
+                layers.append(resource.prefixedName());
+            } else {
+                layers.append(resourceId);
+            }
+        }
+        return layers.toString();
     }
 
     private List<Integer> convertToList(String indexes) {
