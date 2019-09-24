@@ -690,6 +690,11 @@ public class Resources {
                                 public OutputStream getOutputStream() throws IOException {
                                     return res.out();
                                 }
+
+                                @Override
+                                public String getContentType() {
+                                    return URLConnection.guessContentTypeFromName(res.name());
+                                }
                             };
                         }
                     });

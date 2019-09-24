@@ -286,7 +286,7 @@ public class ExternalGraphicPanel extends Panel {
                     @Override
                     public void onClick(AjaxRequestTarget target, Form<?> form) {
 
-                        URLConnection conn = getExternalGraphic(target, form);
+                        URLConnection conn = getExternalGraphic(target, form, styleModel);
                         if (conn == null) {
                             ValidationError error = new ValidationError();
                             error.setMessage("Unable to access image");
@@ -414,7 +414,8 @@ public class ExternalGraphicPanel extends Panel {
      * @param form
      * @return URLConnection to the External Graphic file
      */
-    protected URLConnection getExternalGraphic(AjaxRequestTarget target, Form<?> form) {
+    protected URLConnection getExternalGraphic(
+            AjaxRequestTarget target, Form<?> form, IModel<StyleInfo> styleModel) {
         onlineResource.processInput();
         if (onlineResource.getModelObject() != null) {
             URL url = null;
@@ -424,24 +425,24 @@ public class ExternalGraphicPanel extends Panel {
 
                 URI uri = new URI(external);
                 if (uri.isAbsolute()) {
-                    url = uri.toURL();
-                    if (!external.startsWith(baseUrl)) {
-                        form.warn("Recommend use of styles directory at " + baseUrl);
+                    // convert relative to styles directory
+                    if (baseUrl != null && external.startsWith(baseUrl + "styles/")) {
+                        // convert relative to styles durectory
+                        external = external.substring(baseUrl.length() + 7);
                     }
-                } else {
-                    WorkspaceInfo wsInfo = ((StyleInfo) getDefaultModelObject()).getWorkspace();
-                    if (wsInfo != null) {
-                        url =
-                                new URL(
-                                        ResponseUtils.appendPath(
-                                                baseUrl, "styles", wsInfo.getName(), external));
-                    } else {
-                        url = new URL(ResponseUtils.appendPath(baseUrl, "styles", external));
-                    }
+                }
+                if (!uri.isAbsolute()) {
+                    // not absolute, try relative to the style if available, otherwise search
+                    // in the styles directory
+                    GeoServerDataDirectory dd =
+                            GeoServerApplication.get().getBeanOfType(GeoServerDataDirectory.class);
+                    Resource styleParentResource = dd.get(styleModel.getObject());
+                    url = Resources.toURL(styleParentResource.get(external));
                 }
 
                 URLConnection conn = url.openConnection();
-                if ("text/html".equals(conn.getContentType())) {
+                if (conn.getContentType() == null
+                        || conn.getContentType().startsWith("text/html")) {
                     form.error("Unable to access url");
                     return null; // error message back!
                 }
