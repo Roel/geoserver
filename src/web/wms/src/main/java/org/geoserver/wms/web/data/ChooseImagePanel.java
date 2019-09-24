@@ -71,7 +71,7 @@ class ChooseImagePanel extends Panel {
                                     private static final long serialVersionUID =
                                             9031811973994305485L;
 
-                                    InputStream is;
+                                    transient InputStream is;
 
                                     @Override
                                     public InputStream getInputStream()
