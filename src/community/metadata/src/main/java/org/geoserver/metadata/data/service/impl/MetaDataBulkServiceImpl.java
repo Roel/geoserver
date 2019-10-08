@@ -96,6 +96,12 @@ public class MetaDataBulkServiceImpl implements MetaDataBulkService {
                 // save timestamp
                 complex.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
             }
+            // custom-to-native mapping
+            for (LayerInfo layer : catalog.getLayers(info)) {
+                nativeToCustomService.mapCustomToNative(layer);
+                catalog.save(layer);
+            }
+
             catalog.save(info);
             if (progressKey != null) {
                 globalModelService.put(progressKey, ((float) counter++) / resources.size());

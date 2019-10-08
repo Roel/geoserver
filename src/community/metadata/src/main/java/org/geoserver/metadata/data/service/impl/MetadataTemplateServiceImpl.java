@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.ResourceInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerDataDirectory;
@@ -31,6 +32,7 @@ import org.geoserver.metadata.data.model.MetadataTemplate;
 import org.geoserver.metadata.data.model.impl.ComplexMetadataMapImpl;
 import org.geoserver.metadata.data.model.impl.MetadataTemplateImpl;
 import org.geoserver.metadata.data.service.ComplexMetadataService;
+import org.geoserver.metadata.data.service.CustomNativeMappingService;
 import org.geoserver.metadata.data.service.GlobalModelService;
 import org.geoserver.metadata.data.service.MetadataTemplateService;
 import org.geoserver.platform.resource.Resource;
@@ -60,6 +62,8 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
     @Autowired private GeoServerDataDirectory dataDirectory;
 
     @Autowired private ComplexMetadataService metadataService;
+
+    @Autowired private CustomNativeMappingService nativeToCustomService;
 
     @Autowired private GlobalModelService globalModelService;
 
@@ -284,10 +288,19 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
                                     .computeIfAbsent(
                                             MetadataConstants.DERIVED_KEY, key -> new HashMap<>());
             metadataService.merge(model, sources, derivedAtts);
+            // derived atts
+            metadataService.derive(model);
             // update timestamp
             model.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
 
             resource.getMetadata().put(MetadataConstants.DERIVED_KEY, derivedAtts);
+
+            // custom-to-native mapping
+            for (LayerInfo layer : geoServer.getCatalog().getLayers(resource)) {
+                nativeToCustomService.mapCustomToNative(layer);
+                geoServer.getCatalog().save(layer);
+            }
+
             geoServer.getCatalog().save(resource);
         }
     }
