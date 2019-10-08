@@ -25,6 +25,7 @@ import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
 import com.thoughtworks.xstream.converters.reflection.SortableFieldKeySorter;
 import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
 import com.thoughtworks.xstream.core.ClassLoaderReference;
+import com.thoughtworks.xstream.core.util.HierarchicalStreams;
 import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
 import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
@@ -857,6 +858,10 @@ public class XStreamPersister {
                 if (entry.getValue() != null) {
                     Object value = entry.getValue();
                     String complexTypeId = getComplexTypeId(value.getClass());
+                    if (complexTypeId == null && value.getClass() != String.class) {
+                        // fall-back
+                        complexTypeId = mapper().serializedClass(value.getClass());
+                    }
                     if (complexTypeId == null) {
                         String str = Converters.convert(value, String.class);
                         if (str == null) {
@@ -902,7 +907,11 @@ public class XStreamPersister {
                         if (reader.hasMoreChildren()) {
                             reader.moveDown();
                             String typeId = reader.getNodeName();
-                            value = context.convertAnother(null, getComplexTypeClass(typeId));
+                            Class<?> type = getComplexTypeClass(typeId);
+                            if (type == null) { // fall-back
+                                type = HierarchicalStreams.readClassType(reader, mapper());
+                            }
+                            value = context.convertAnother(null, type);
                             reader.moveUp();
                         } else {
                             value = reader.getValue();
