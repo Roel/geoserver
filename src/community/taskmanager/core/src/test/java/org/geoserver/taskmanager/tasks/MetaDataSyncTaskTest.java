@@ -22,7 +22,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import org.geoserver.catalog.CoverageInfo;
 import org.geoserver.catalog.LayerInfo;
+import org.geoserver.catalog.LegendInfo;
 import org.geoserver.catalog.StyleInfo;
+import org.geoserver.catalog.impl.LegendInfoImpl;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
 import org.geoserver.taskmanager.data.Batch;
@@ -88,10 +90,15 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
     public boolean setupDataDirectory() throws Exception {
         DATA_DIRECTORY.addStyle(STYLE, getClass().getResource(STYLE + ".sld"));
         DATA_DIRECTORY.addStyle(SECOND_STYLE, getClass().getResource(SECOND_STYLE + ".sld"));
-        File imgDir = new File(DATA_DIRECTORY.getDataDirectoryRoot(), "styles/img/");
+        File imgDir = new File(DATA_DIRECTORY.getDataDirectoryRoot(), "styles/");
         imgDir.mkdirs();
         try (InputStream is = getClass().getResource("img/grass_fill.png").openStream()) {
             try (OutputStream os = new FileOutputStream(new File(imgDir, "grass_fill.png"))) {
+                IOUtils.copy(is, os);
+            }
+        }
+        try (InputStream is = getClass().getResource("img/grass_fill.png").openStream()) {
+            try (OutputStream os = new FileOutputStream(new File(imgDir, "grass_bill.png"))) {
                 IOUtils.copy(is, os);
             }
         }
@@ -169,6 +176,13 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
         LayerInfo li = geoServer.getCatalog().getLayerByName("DEM");
         StyleInfo si = geoServer.getCatalog().getStyleByName(STYLE);
         li.setDefaultStyle(si);
+        LegendInfo legendInfo = new LegendInfoImpl();
+        legendInfo.setWidth(100);
+        legendInfo.setHeight(100);
+        legendInfo.setFormat("image/png");
+        legendInfo.setOnlineResource("grass_bill.png");
+        si.setLegend(legendInfo);
+        geoServer.getCatalog().save(si);
         geoServer.getCatalog().save(li);
 
         dataUtil.setConfigurationAttribute(config, ATT_LAYER, "DEM");

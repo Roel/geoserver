@@ -8,6 +8,7 @@ package org.geoserver.taskmanager.util;
 import com.thoughtworks.xstream.io.xml.JDomWriter;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
+import it.geosolutions.geoserver.rest.encoder.GSStyleEncoder;
 import it.geosolutions.geoserver.rest.encoder.coverage.GSCoverageEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
 import java.io.File;
@@ -17,6 +18,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -156,6 +158,18 @@ public class CatalogUtil {
         return re;
     }
 
+    public GSStyleEncoder syncStyle(StyleInfo styleInfo) {
+        GSStyleEncoder encoder = new GSStyleEncoder();
+        if (styleInfo.getLegend() != null) {
+            encoder.setLegendGraphic(
+                    styleInfo.getLegend().getOnlineResource(),
+                    styleInfo.getLegend().getFormat(),
+                    styleInfo.getLegend().getWidth(),
+                    styleInfo.getLegend().getHeight());
+        }
+        return encoder;
+    }
+
     public static String wsName(WorkspaceInfo ws) {
         return ws == null ? null : ws.getName();
     }
@@ -199,6 +213,16 @@ public class CatalogUtil {
                             }
                         }
                     });
+            if (style.getLegend() != null) {
+                String legendGraphic = style.getLegend().getOnlineResource();
+                try {
+                    if (!new URI(legendGraphic).isAbsolute()) {
+                        pictures.add(legendGraphic);
+                    }
+                } catch (URISyntaxException e) {
+                    LOGGER.log(Level.WARNING, e.getMessage(), e);
+                }
+            }
             // subdirectories for pictures
             Set<String> dirs = new HashSet<>();
             for (String picturePath : pictures) {

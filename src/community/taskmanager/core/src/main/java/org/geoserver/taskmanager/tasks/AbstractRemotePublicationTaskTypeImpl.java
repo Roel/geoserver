@@ -236,6 +236,14 @@ public abstract class AbstractRemotePublicationTaskTypeImpl implements TaskType 
                                 si.getName())) {
                     throw new TaskException("Failed to create style " + si.getName());
                 }
+                if (!restManager
+                        .getStyleManager()
+                        .updateStyleInWorkspace(
+                                CatalogUtil.wsName(si.getWorkspace()),
+                                catalogUtil.syncStyle(si),
+                                si.getName())) {
+                    throw new TaskException("Failed to sync style " + si.getName());
+                }
             }
 
             // config layer
