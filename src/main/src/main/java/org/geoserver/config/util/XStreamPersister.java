@@ -8,6 +8,7 @@ package org.geoserver.config.util;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.ConversionException;
 import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.MarshallingContext;
@@ -38,6 +39,7 @@ import com.thoughtworks.xstream.mapper.DefaultMapper;
 import com.thoughtworks.xstream.mapper.DynamicProxyMapper;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.PackageAliasingMapper;
+import com.thoughtworks.xstream.mapper.SecurityMapper;
 import java.awt.geom.AffineTransform;
 import java.io.IOException;
 import java.io.InputStream;
@@ -861,6 +863,13 @@ public class XStreamPersister {
                     if (complexTypeId == null && value.getClass() != String.class) {
                         // fall-back
                         complexTypeId = mapper().serializedClass(value.getClass());
+                        try {
+                            // verify permission and support
+                            mapper().lookupMapperOfType(SecurityMapper.class)
+                                    .realClass(complexTypeId);
+                        } catch (XStreamException e) {
+                            complexTypeId = null;
+                        }
                     }
                     if (complexTypeId == null) {
                         String str = Converters.convert(value, String.class);
@@ -908,8 +917,12 @@ public class XStreamPersister {
                             reader.moveDown();
                             String typeId = reader.getNodeName();
                             Class<?> type = getComplexTypeClass(typeId);
-                            if (type == null) { // fall-back
-                                type = HierarchicalStreams.readClassType(reader, mapper());
+                            if (type == null) { // fall-back attempt
+                                try {
+                                    type = HierarchicalStreams.readClassType(reader, mapper());
+                                } catch (XStreamException e) {
+                                    type = null;
+                                }
                             }
                             value = context.convertAnother(null, type);
                             reader.moveUp();
