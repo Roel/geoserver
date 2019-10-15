@@ -77,18 +77,52 @@ public class TimestampTaskTypeImpl implements TaskType {
         final LayerInfo layer = (LayerInfo) ctx.getParameterValues().get(PARAM_LAYER);
         final ResourceInfo rInfo = layer.getResource();
 
-        // we'll do it at commit time
+        Object oldTimestampValue;
+        Object oldMetadataTimestampValue;
+
+        Date currentTime = new Date();
+        try {
+            if (dataTimestampProperty != null) {
+                oldTimestampValue =
+                        PropertyUtils.getProperty(rInfo.getMetadata(), dataTimestampProperty);
+                PropertyUtils.setProperty(rInfo.getMetadata(), dataTimestampProperty, currentTime);
+                if (metadataTimestampProperty != null) {
+                    oldMetadataTimestampValue =
+                            PropertyUtils.getProperty(
+                                    rInfo.getMetadata(), metadataTimestampProperty);
+                    PropertyUtils.setProperty(
+                            rInfo.getMetadata(), metadataTimestampProperty, currentTime);
+                } else {
+                    oldMetadataTimestampValue = null;
+                }
+                catalog.save(rInfo);
+            } else {
+                oldTimestampValue = null;
+                oldMetadataTimestampValue = null;
+            }
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            LOGGER.log(Level.WARNING, e.getMessage(), e);
+            throw new TaskException(e);
+        }
+
         return new TaskResult() {
             @Override
             public void commit() throws TaskException {
-                Date currentTime = new Date();
+                // do nothing
+            }
+
+            @Override
+            public void rollback() throws TaskException {
+                // put old values back
                 try {
                     if (dataTimestampProperty != null) {
                         PropertyUtils.setProperty(
-                                rInfo.getMetadata(), dataTimestampProperty, currentTime);
+                                rInfo.getMetadata(), dataTimestampProperty, oldTimestampValue);
                         if (metadataTimestampProperty != null) {
                             PropertyUtils.setProperty(
-                                    rInfo.getMetadata(), metadataTimestampProperty, currentTime);
+                                    rInfo.getMetadata(),
+                                    metadataTimestampProperty,
+                                    oldMetadataTimestampValue);
                         }
                         catalog.save(rInfo);
                     }
@@ -98,11 +132,6 @@ public class TimestampTaskTypeImpl implements TaskType {
                     LOGGER.log(Level.WARNING, e.getMessage(), e);
                     throw new TaskException(e);
                 }
-            }
-
-            @Override
-            public void rollback() throws TaskException {
-                // do nothing
             }
         };
     }

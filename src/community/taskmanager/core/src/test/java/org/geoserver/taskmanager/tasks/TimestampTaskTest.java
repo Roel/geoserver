@@ -1,13 +1,19 @@
 package org.geoserver.taskmanager.tasks;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import org.geoserver.catalog.CoverageInfo;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
+import org.geoserver.taskmanager.beans.TestTaskTypeImpl;
 import org.geoserver.taskmanager.data.Batch;
 import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.data.Task;
@@ -28,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TimestampTaskTest extends AbstractTaskManagerTest {
 
     private static final String ATT_LAYER = "layer";
+    private static final String ATT_FAIL = "fail";
 
     @Autowired private TaskManagerDao dao;
 
@@ -84,7 +91,7 @@ public class TimestampTaskTest extends AbstractTaskManagerTest {
     }
 
     @Test
-    public void test() throws SchedulerException, SQLException, IOException {
+    public void testSuccess() throws SchedulerException, SQLException, IOException {
         // create metadata map
         CoverageInfo ci = geoServer.getCatalog().getCoverageByName("DEM");
         ci.getMetadata().put("custom", new HashMap<>());
@@ -102,6 +109,41 @@ public class TimestampTaskTest extends AbstractTaskManagerTest {
         ci = geoServer.getCatalog().getCoverageByName("DEM");
         assertNotNull(ci.getMetadata().get("revisionDate"));
         assertNotNull(((Map<?, ?>) ci.getMetadata().get("custom")).get("_timestamp"));
+        geoServer.getCatalog().save(ci);
+    }
+
+    @Test
+    public void testRollback() throws SchedulerException, SQLException, MalformedURLException {
+
+        // create metadata map
+        Date oldTime = new GregorianCalendar(2001, 1, 1).getTime();
+        CoverageInfo ci = geoServer.getCatalog().getCoverageByName("DEM");
+        ci.getMetadata().put("custom", new HashMap<>());
+        ci.getMetadata().put("revisionDate", oldTime);
+        geoServer.getCatalog().save(ci);
+
+        Task task2 = fac.createTask();
+        task2.setName("task2");
+        task2.setType(TestTaskTypeImpl.NAME);
+        dataUtil.setTaskParameterToAttribute(task2, TestTaskTypeImpl.PARAM_FAIL, ATT_FAIL);
+        dataUtil.addTaskToConfiguration(config, task2);
+
+        dataUtil.setConfigurationAttribute(config, ATT_LAYER, "DEM");
+        dataUtil.setConfigurationAttribute(config, ATT_FAIL, Boolean.TRUE.toString());
+        config = dao.save(config);
+        task2 = config.getTasks().get("task2");
+        dataUtil.addBatchElement(batch, task2);
+        batch = bjService.saveAndSchedule(batch);
+
+        Trigger trigger =
+                TriggerBuilder.newTrigger().forJob(batch.getId().toString()).startNow().build();
+        scheduler.scheduleJob(trigger);
+
+        while (scheduler.getTriggerState(trigger.getKey()) != TriggerState.NONE) {}
+
+        ci = geoServer.getCatalog().getCoverageByName("DEM");
+        assertEquals(oldTime, ci.getMetadata().get("revisionDate"));
+        assertNull(((Map<?, ?>) ci.getMetadata().get("custom")).get("_timestamp"));
         geoServer.getCatalog().save(ci);
     }
 }
