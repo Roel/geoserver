@@ -1014,6 +1014,9 @@ public class RenderedImageMapOutputFormat extends AbstractMapOutputFormat {
                                 .getFeatures()
                                 .features()
                                 .next();
+                if (feature.getProperty("grid") == null) {
+                    return null;
+                }
                 final GridCoverage2DReader reader =
                         (GridCoverage2DReader) feature.getProperty("grid").getValue();
                 // render via grid coverage renderer, that will apply the advanced projection
