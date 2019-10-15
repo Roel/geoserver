@@ -93,13 +93,15 @@ public class MetaDataBulkServiceImpl implements MetaDataBulkService {
                 metadataService.clean(complex);
                 metadataService.init(complex);
                 metadataService.derive(complex);
+
+                // custom-to-native mapping
+                for (LayerInfo layer : catalog.getLayers(info)) {
+                    nativeToCustomService.mapCustomToNative(layer);
+                    catalog.save(layer);
+                }
+
                 // save timestamp
                 complex.get(Date.class, MetadataConstants.TIMESTAMP_KEY).setValue(new Date());
-            }
-            // custom-to-native mapping
-            for (LayerInfo layer : catalog.getLayers(info)) {
-                nativeToCustomService.mapCustomToNative(layer);
-                catalog.save(layer);
             }
 
             catalog.save(info);
