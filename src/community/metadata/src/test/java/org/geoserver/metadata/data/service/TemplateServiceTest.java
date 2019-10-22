@@ -37,8 +37,9 @@ public class TemplateServiceTest extends AbstractMetadataTest {
     @Autowired private GeoServerDataDirectory dataDirectory;
 
     @After
-    public void after() throws IOException {
+    public void after() throws Exception {
         restoreTemplates();
+        restoreLayers();
     }
 
     @Test
