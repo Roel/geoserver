@@ -96,6 +96,7 @@ public class MetaDataBulkServiceImpl implements MetaDataBulkService {
 
                 // custom-to-native mapping
                 for (LayerInfo layer : catalog.getLayers(info)) {
+                    layer.setResource(info);
                     nativeToCustomService.mapCustomToNative(layer);
                     catalog.save(layer);
                 }

@@ -297,6 +297,7 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
 
             // custom-to-native mapping
             for (LayerInfo layer : geoServer.getCatalog().getLayers(resource)) {
+                layer.setResource(resource);
                 nativeToCustomService.mapCustomToNative(layer);
                 geoServer.getCatalog().save(layer);
             }
