@@ -32,6 +32,7 @@ import org.geoserver.web.wicket.GeoServerTablePanel;
 import org.geoserver.web.wicket.ParamResourceModel;
 import org.geoserver.web.wicket.SimpleAjaxLink;
 import org.geotools.util.logging.Logging;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AbstractConfigurationsPage extends GeoServerSecuredPage {
 
@@ -102,7 +103,14 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                     TaskManagerBeans.get()
                                                             .getDao()
                                                             .getConfigurations(true)) {
-                                                list.add(template.getName());
+                                                if (TaskManagerBeans.get()
+                                                        .getSecUtil()
+                                                        .isReadable(
+                                                                SecurityContextHolder.getContext()
+                                                                        .getAuthentication(),
+                                                                template)) {
+                                                    list.add(template.getName());
+                                                }
                                             }
                                             panel =
                                                     new DropDownPanel(
