@@ -66,6 +66,7 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridCoverage2DReader;
 import org.geotools.data.Query;
 import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.gce.imagemosaic.ImageMosaicFormat;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.image.ImageWorker;
@@ -1006,15 +1007,12 @@ public class RenderedImageMapOutputFormat extends AbstractMapOutputFormat {
                 //
                 // Get the reader
                 //
-                final Feature feature =
-                        mapContent
-                                .layers()
-                                .get(0)
-                                .getFeatureSource()
-                                .getFeatures()
-                                .features()
-                                .next();
-                if (feature.getProperty("grid") == null) {
+                final Feature feature;
+                try (FeatureIterator<?> it =
+                        mapContent.layers().get(0).getFeatureSource().getFeatures().features()) {
+                    feature = it.next();
+                }
+                if (feature == null || feature.getProperty("grid") == null) {
                     return null;
                 }
                 final GridCoverage2DReader reader =
