@@ -4,6 +4,9 @@
  */
 package org.geoserver.taskmanager.web;
 
+import com.thoughtworks.xstream.XStreamException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,8 +23,10 @@ import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.taskmanager.data.BatchElement;
 import org.geoserver.taskmanager.data.Configuration;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
+import org.geoserver.taskmanager.util.XStreamUtil;
 import org.geoserver.taskmanager.web.model.ConfigurationsModel;
 import org.geoserver.taskmanager.web.panel.DropDownPanel;
+import org.geoserver.taskmanager.web.panel.ImportPanel;
 import org.geoserver.taskmanager.web.panel.MultiLabelCheckBoxPanel;
 import org.geoserver.web.ComponentAuthorizer;
 import org.geoserver.web.GeoServerApplication;
@@ -366,6 +371,60 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                         });
         copy.setOutputMarkupId(true);
         copy.setEnabled(false);
+
+        add(
+                new AjaxLink<Object>("import") {
+                    private static final long serialVersionUID = 6122970349448584029L;
+
+                    @Override
+                    public void onClick(AjaxRequestTarget target) {
+                        dialog.setTitle(new ParamResourceModel("importDialog.title", getPage()));
+
+                        dialog.showOkCancel(
+                                target,
+                                new GeoServerDialog.DialogDelegate() {
+
+                                    private static final long serialVersionUID =
+                                            -5552087037163833563L;
+
+                                    private ImportPanel panel;
+
+                                    @Override
+                                    protected Component getContents(String id) {
+                                        return panel = new ImportPanel(id);
+                                    }
+
+                                    @Override
+                                    protected boolean onSubmit(
+                                            AjaxRequestTarget target, Component contents) {
+                                        Configuration configuration;
+                                        try (InputStream is =
+                                                panel.getFileUpload()
+                                                        .getFileUpload()
+                                                        .getInputStream()) {
+                                            configuration =
+                                                    (Configuration) XStreamUtil.xs().fromXML(is);
+                                            configuration.setTemplate(templates);
+
+                                            setResponsePage(new ConfigurationPage(configuration));
+
+                                            return true;
+                                        } catch (IOException
+                                                | XStreamException
+                                                | ClassCastException e) {
+                                            Throwable rootCause = ExceptionUtils.getRootCause(e);
+                                            error(
+                                                    rootCause == null
+                                                            ? e.getLocalizedMessage()
+                                                            : rootCause.getLocalizedMessage());
+                                            target.add(panel.getFeedbackPanel());
+
+                                            return false;
+                                        }
+                                    }
+                                });
+                    }
+                });
 
         // the panel
         add(

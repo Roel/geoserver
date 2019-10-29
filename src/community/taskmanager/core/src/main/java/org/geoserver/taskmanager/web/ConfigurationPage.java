@@ -4,6 +4,8 @@
  */
 package org.geoserver.taskmanager.web;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.http.entity.ContentType;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.RestartResponseException;
@@ -27,11 +30,14 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.geoserver.catalog.WorkspaceInfo;
@@ -45,6 +51,7 @@ import org.geoserver.taskmanager.schedule.ParameterType;
 import org.geoserver.taskmanager.util.InitConfigUtil;
 import org.geoserver.taskmanager.util.TaskManagerBeans;
 import org.geoserver.taskmanager.util.ValidationError;
+import org.geoserver.taskmanager.util.XStreamUtil;
 import org.geoserver.taskmanager.web.action.Action;
 import org.geoserver.taskmanager.web.model.AttributesModel;
 import org.geoserver.taskmanager.web.model.TasksModel;
@@ -169,6 +176,8 @@ public class ConfigurationPage extends GeoServerSecuredPage {
         form.add(saveButton);
         AjaxSubmitLink applyButton = saveOrApplyButton("apply", false);
         form.add(applyButton);
+
+        form.add(exportButton());
 
         form.add(
                 new TextField<String>(
@@ -530,6 +539,37 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                         });
             }
         };
+    }
+
+    private ResourceLink<Object> exportButton() {
+        return new ResourceLink<Object>(
+                "export",
+                new AbstractResource() {
+                    private static final long serialVersionUID = 184195260939749675L;
+
+                    @Override
+                    protected ResourceResponse newResourceResponse(Attributes attributes) {
+                        ResourceResponse response = new ResourceResponse();
+                        response.setContentType(ContentType.APPLICATION_XML.getMimeType());
+                        response.setContentDisposition(ContentDisposition.ATTACHMENT);
+                        response.setFileName(configurationModel.getObject().getName() + ".xml");
+                        response.setWriteCallback(
+                                new WriteCallback() {
+
+                                    @Override
+                                    public void writeData(Attributes attributes)
+                                            throws IOException {
+                                        OutputStream outputStream =
+                                                attributes.getResponse().getOutputStream();
+                                        outputStream.write(
+                                                XStreamUtil.xs()
+                                                        .toXML(configurationModel.getObject())
+                                                        .getBytes());
+                                    }
+                                });
+                        return response;
+                    }
+                });
     }
 
     protected GeoServerTablePanel<Task> tasksPanel() {
