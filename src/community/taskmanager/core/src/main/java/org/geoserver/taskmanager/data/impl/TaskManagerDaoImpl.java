@@ -24,12 +24,12 @@ import org.hibernate.LockMode;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.sql.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -128,8 +128,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
         Criteria criteria =
                 getSession()
                         .createCriteria(BatchImpl.class)
-                        .createAlias(
-                                "configuration", "configuration", CriteriaSpecification.LEFT_JOIN)
+                        .createAlias("configuration", "configuration", JoinType.LEFT_OUTER_JOIN)
                         .setFetchMode("elements", FetchMode.JOIN)
                         .add(Restrictions.eq("removeStamp", 0L))
                         .add(
@@ -149,7 +148,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                         .createAlias(
                                 "outerBatch.configuration",
                                 "configuration",
-                                CriteriaSpecification.LEFT_JOIN)
+                                JoinType.LEFT_OUTER_JOIN)
                         .add(Restrictions.eq("outerBatch.removeStamp", 0L));
         criteria.add(
                 Restrictions.or(
@@ -176,7 +175,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
 
         return getSession()
                 .createCriteria(BatchImpl.class)
-                .createAlias("configuration", "configuration", CriteriaSpecification.LEFT_JOIN)
+                .createAlias("configuration", "configuration", JoinType.LEFT_OUTER_JOIN)
                 .add(Restrictions.eq("removeStamp", 0L))
                 .add(
                         Restrictions.or(
@@ -200,7 +199,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                         .createAlias(
                                 "outerBatch.configuration",
                                 "configuration",
-                                CriteriaSpecification.LEFT_JOIN)
+                                JoinType.LEFT_OUTER_JOIN)
                         .add(Restrictions.eq("outerBatch.removeStamp", 0L));
         criteria.add(Restrictions.eq("configuration.id", config.getId()));
         criteria.add(
@@ -277,7 +276,7 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                 getSession()
                         .createCriteria(TaskImpl.class)
                         .createAlias("configuration", "configuration")
-                        .createAlias("batchElements", "batchElements", Criteria.LEFT_JOIN)
+                        .createAlias("batchElements", "batchElements", JoinType.LEFT_OUTER_JOIN)
                         .add(Restrictions.eq("removeStamp", 0L))
                         .add(Restrictions.eq("configuration.removeStamp", 0L))
                         .add(Subqueries.propertyNotIn("id", alreadyInBatch));
@@ -391,11 +390,12 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                         .add(
                                 Restrictions.in(
                                         "status",
-                                        new Run.Status[] {
-                                            Run.Status.RUNNING,
-                                            Run.Status.READY_TO_COMMIT,
-                                            Run.Status.COMMITTING
-                                        }))
+                                        (Object[])
+                                                new Run.Status[] {
+                                                    Run.Status.RUNNING,
+                                                    Run.Status.READY_TO_COMMIT,
+                                                    Run.Status.COMMITTING
+                                                }))
                         .setProjection(Projections.groupProperty("batchRun"))
                         .list());
     }
@@ -411,11 +411,12 @@ public class TaskManagerDaoImpl implements TaskManagerDao {
                         .add(
                                 Restrictions.in(
                                         "status",
-                                        new Run.Status[] {
-                                            Run.Status.RUNNING,
-                                            Run.Status.READY_TO_COMMIT,
-                                            Run.Status.COMMITTING
-                                        }))
+                                        (Object[])
+                                                new Run.Status[] {
+                                                    Run.Status.RUNNING,
+                                                    Run.Status.READY_TO_COMMIT,
+                                                    Run.Status.COMMITTING
+                                                }))
                         .setProjection(Projections.groupProperty("batchRun"))
                         .list());
     }

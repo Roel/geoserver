@@ -64,7 +64,7 @@ public class FileServiceDataTest extends AbstractTaskManagerTest {
         boolean fileExists = service.checkFileExists(filename);
         Assert.assertTrue(fileExists);
 
-        String actualContent = IOUtils.toString(service.read(filename));
+        String actualContent = IOUtils.toString(service.read(filename), "UTF-8");
         Assert.assertEquals(content, actualContent);
 
         service.delete(filename);
@@ -99,7 +99,7 @@ public class FileServiceDataTest extends AbstractTaskManagerTest {
         boolean fileExists = service.checkFileExists(filename);
         Assert.assertTrue(fileExists);
 
-        String actualContent = IOUtils.toString(service.read(filename));
+        String actualContent = IOUtils.toString(service.read(filename), "UTF-8");
         // verify extra text!
         Assert.assertEquals(content + "extra text\n", actualContent);
 
