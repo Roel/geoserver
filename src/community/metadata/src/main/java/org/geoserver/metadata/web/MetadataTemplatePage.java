@@ -41,7 +41,7 @@ import org.geoserver.metadata.web.panel.MetadataPanel;
 import org.geoserver.metadata.web.panel.ProgressPanel;
 import org.geoserver.web.ComponentAuthorizer;
 import org.geoserver.web.GeoServerApplication;
-import org.geoserver.web.GeoServerBasePage;
+import org.geoserver.web.GeoServerSecuredPage;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.ParamResourceModel;
 import org.geotools.util.logging.Logging;
@@ -52,7 +52,7 @@ import org.geotools.util.logging.Logging;
  * @author Timothy De Bock - timothy.debock.github@gmail.com
  * @author Niels Charlier
  */
-public class MetadataTemplatePage extends GeoServerBasePage {
+public class MetadataTemplatePage extends GeoServerSecuredPage {
 
     private static final Logger LOGGER = Logging.getLogger(MetadataTemplatePage.class);
 

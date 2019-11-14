@@ -44,7 +44,10 @@ public class LinkedLayersDataProvider extends GeoServerDataProvider<ResourceInfo
                         .getCatalog();
         List<ResourceInfo> list = new ArrayList<>();
         for (String id : metadataTemplateModel.getObject().getLinkedLayers()) {
-            list.add(catalog.getResource(id, ResourceInfo.class));
+            ResourceInfo ri = catalog.getResource(id, ResourceInfo.class);
+            if (ri != null) {
+                list.add(ri);
+            }
         }
 
         return list;

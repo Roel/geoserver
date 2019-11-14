@@ -21,9 +21,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.ResourceInfo;
-import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerDataDirectory;
 import org.geoserver.config.util.XStreamPersister;
 import org.geoserver.config.util.XStreamPersisterFactory;
@@ -67,7 +67,7 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
 
     @Autowired private GlobalModelService globalModelService;
 
-    @Autowired private GeoServer geoServer;
+    @Autowired private Catalog rawCatalog;
 
     private List<MetadataTemplate> templates = new ArrayList<>();
 
@@ -158,7 +158,7 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
         // update layers
         Set<String> deletedLayers = new HashSet<>();
         for (String key : template.getLinkedLayers()) {
-            ResourceInfo resource = geoServer.getCatalog().getResource(key, ResourceInfo.class);
+            ResourceInfo resource = rawCatalog.getResource(key, ResourceInfo.class);
 
             if (resource == null) {
                 // remove the link because the layer cannot be found.
@@ -253,8 +253,7 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
             if (progressKey != null) {
                 globalModelService.put(progressKey, ((float) counter++) / resourceIds.size());
             }
-            ResourceInfo resource =
-                    geoServer.getCatalog().getResource(resourceId, ResourceInfo.class);
+            ResourceInfo resource = rawCatalog.getResource(resourceId, ResourceInfo.class);
 
             if (resource != null) {
                 update(resource);
@@ -296,13 +295,13 @@ public class MetadataTemplateServiceImpl implements MetadataTemplateService, Res
             resource.getMetadata().put(MetadataConstants.DERIVED_KEY, derivedAtts);
 
             // custom-to-native mapping
-            for (LayerInfo layer : geoServer.getCatalog().getLayers(resource)) {
+            for (LayerInfo layer : rawCatalog.getLayers(resource)) {
                 layer.setResource(resource);
                 nativeToCustomService.mapCustomToNative(layer);
-                geoServer.getCatalog().save(layer);
+                rawCatalog.save(layer);
             }
 
-            geoServer.getCatalog().save(resource);
+            rawCatalog.save(resource);
         }
     }
 
