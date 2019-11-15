@@ -97,7 +97,7 @@ public class TemplatesPageTest extends AbstractWicketMetadataTest {
         tester.assertComponent("form:name", TextField.class);
         tester.assertComponent("form:description", TextField.class);
 
-        tester.assertComponent("form:metadataTemplatePanel", MetadataPanel.class);
+        tester.assertComponent("form:metadataTabs:panel", MetadataPanel.class);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TemplatesPageTest extends AbstractWicketMetadataTest {
         tester.assertModelValue("form:name", "simple fields");
         tester.assertModelValue("form:description", "Only basic fields");
 
-        tester.assertComponent("form:metadataTemplatePanel", MetadataPanel.class);
+        tester.assertComponent("form:metadataTabs:panel", MetadataPanel.class);
     }
 
     @SuppressWarnings("unchecked")
