@@ -42,7 +42,7 @@ public abstract class CopyFromLayerPanel extends Panel {
         super.onInitialize();
 
         GeoServerDialog dialog = new GeoServerDialog("copyFromLayerDialog");
-        dialog.setInitialHeight(100);
+        dialog.setInitialHeight(120);
         add(dialog);
 
         DropDownChoice<String> dropDown = createDropDown();

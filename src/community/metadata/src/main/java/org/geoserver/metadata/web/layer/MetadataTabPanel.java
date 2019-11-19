@@ -186,6 +186,10 @@ public class MetadataTabPanel extends PublishedEditTabPanel<LayerInfo> {
                                 }
                             }
 
+                            ResourceInfo resource = getPublishedInfo().getResource();
+                            resource.setAbstract(res.getAbstract());
+                            resource.setTitle(res.getTitle());
+
                             updateAndRefresh(target, resource);
                         }
                     }
