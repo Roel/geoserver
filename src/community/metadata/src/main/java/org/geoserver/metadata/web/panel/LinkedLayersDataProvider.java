@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.wicket.model.IModel;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.ResourceInfo;
-import org.geoserver.config.GeoServer;
 import org.geoserver.metadata.data.model.MetadataTemplate;
 import org.geoserver.web.GeoServerApplication;
 import org.geoserver.web.wicket.GeoServerDataProvider;
@@ -37,14 +36,11 @@ public class LinkedLayersDataProvider extends GeoServerDataProvider<ResourceInfo
 
     @Override
     protected List<ResourceInfo> getItems() {
-        Catalog catalog =
-                GeoServerApplication.get()
-                        .getApplicationContext()
-                        .getBean(GeoServer.class)
-                        .getCatalog();
+        Catalog rawCatalog =
+                (Catalog) GeoServerApplication.get().getApplicationContext().getBean("rawCatalog");
         List<ResourceInfo> list = new ArrayList<>();
         for (String id : metadataTemplateModel.getObject().getLinkedLayers()) {
-            ResourceInfo ri = catalog.getResource(id, ResourceInfo.class);
+            ResourceInfo ri = rawCatalog.getResource(id, ResourceInfo.class);
             if (ri != null) {
                 list.add(ri);
             }

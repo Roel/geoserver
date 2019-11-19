@@ -346,10 +346,10 @@ public class MetadataTemplatesPage extends GeoServerSecuredPage {
             if (layers.length() > 0) {
                 layers.append(",\n");
             }
-            Catalog catalog = GeoServerApplication.get().getGeoServer().getCatalog();
-            ResourceInfo resource = catalog.getResource(resourceId, ResourceInfo.class);
+            Catalog rawCatalog = (Catalog) GeoServerApplication.get().getBean("rawCatalog");
+            ResourceInfo resource = rawCatalog.getResource(resourceId, ResourceInfo.class);
             if (resource != null) {
-                layers.append(resource.getName());
+                layers.append(resource.prefixedName());
             } else {
                 layers.append(resourceId);
             }
