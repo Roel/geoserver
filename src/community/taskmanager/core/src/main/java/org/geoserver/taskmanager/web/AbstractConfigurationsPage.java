@@ -17,6 +17,7 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.markup.repeater.DefaultItemReuseStrategy;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.geoserver.catalog.WorkspaceInfo;
@@ -223,7 +224,7 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                                 private String error = null;
 
                                                 private IModel<Boolean> shouldCleanupModel =
-                                                        new Model<Boolean>();
+                                                        new Model<Boolean>(false);
 
                                                 @Override
                                                 protected Component getContents(String id) {
@@ -484,6 +485,7 @@ public class AbstractConfigurationsPage extends GeoServerSecuredPage {
                                 return null;
                             }
                         });
+        configurationsPanel.setItemReuseStrategy(DefaultItemReuseStrategy.getInstance());
         configurationsPanel.setOutputMarkupId(true);
     }
 }

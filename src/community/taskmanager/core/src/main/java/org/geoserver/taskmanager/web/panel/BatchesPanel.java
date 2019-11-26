@@ -25,6 +25,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.DefaultItemReuseStrategy;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.PackageResourceReference;
 import org.geoserver.taskmanager.data.Batch;
@@ -445,6 +446,7 @@ public class BatchesPanel extends Panel {
                                                 }
                                             }
                                         }));
+        batchesPanel.setItemReuseStrategy(DefaultItemReuseStrategy.getInstance());
         batchesPanel.setOutputMarkupId(true);
     }
 

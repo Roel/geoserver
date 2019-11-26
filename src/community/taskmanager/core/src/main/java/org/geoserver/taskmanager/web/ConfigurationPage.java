@@ -944,6 +944,8 @@ public class ConfigurationPage extends GeoServerSecuredPage {
                         oldBatches = new HashMap<>(configurationModel.getObject().getBatches());
                         form.success(new ParamResourceModel("success", getPage()).getString());
                         target.add(batchesPanel);
+                        attributesModel.refresh();
+                        target.add(attributesPanel);
                         ((MarkupContainer)
                                         batchesPanel.get("form:batchesPanel:listContainer:items"))
                                 .removeAll();
