@@ -167,7 +167,7 @@ public abstract class AbstractBatchesPanelTest<T extends Page>
                 ((CheckBox)
                         tester.getComponentFromLastRenderedPage(
                                 prefix()
-                                        + "batchesPanel:form:batchesPanel:listContainer:items:1:selectItemContainer:selectItem"));
+                                        + "batchesPanel:form:batchesPanel:listContainer:items:5:selectItemContainer:selectItem"));
         tester.getRequest().setParameter(selector.getInputName(), "true");
         tester.executeAjaxEvent(selector, "click");
 
