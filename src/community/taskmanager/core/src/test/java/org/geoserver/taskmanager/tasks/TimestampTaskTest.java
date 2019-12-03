@@ -9,7 +9,6 @@ import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Map;
 import org.geoserver.catalog.CoverageInfo;
 import org.geoserver.taskmanager.AbstractTaskManagerTest;
@@ -94,7 +93,7 @@ public class TimestampTaskTest extends AbstractTaskManagerTest {
     public void testSuccess() throws SchedulerException, SQLException, IOException {
         // create metadata map
         CoverageInfo ci = geoServer.getCatalog().getCoverageByName("DEM");
-        ci.getMetadata().put("custom", new HashMap<>());
+        // ci.getMetadata().put("custom", new HashMap<>());
         geoServer.getCatalog().save(ci);
 
         dataUtil.setConfigurationAttribute(config, ATT_LAYER, "DEM");
@@ -118,7 +117,6 @@ public class TimestampTaskTest extends AbstractTaskManagerTest {
         // create metadata map
         Date oldTime = new GregorianCalendar(2001, 1, 1).getTime();
         CoverageInfo ci = geoServer.getCatalog().getCoverageByName("DEM");
-        ci.getMetadata().put("custom", new HashMap<>());
         ci.getMetadata().put("revisionDate", oldTime);
         geoServer.getCatalog().save(ci);
 

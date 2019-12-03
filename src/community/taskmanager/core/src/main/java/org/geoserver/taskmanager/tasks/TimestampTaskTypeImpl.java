@@ -6,12 +6,16 @@ package org.geoserver.taskmanager.tasks;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.beanutils.expression.DefaultResolver;
+import org.apache.commons.beanutils.expression.Resolver;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.ResourceInfo;
@@ -85,8 +89,10 @@ public class TimestampTaskTypeImpl implements TaskType {
             if (dataTimestampProperty != null) {
                 oldTimestampValue =
                         PropertyUtils.getProperty(rInfo.getMetadata(), dataTimestampProperty);
+                initSubmaps(rInfo.getMetadata(), dataTimestampProperty);
                 PropertyUtils.setProperty(rInfo.getMetadata(), dataTimestampProperty, currentTime);
                 if (metadataTimestampProperty != null) {
+                    initSubmaps(rInfo.getMetadata(), metadataTimestampProperty);
                     oldMetadataTimestampValue =
                             PropertyUtils.getProperty(
                                     rInfo.getMetadata(), metadataTimestampProperty);
@@ -155,5 +161,21 @@ public class TimestampTaskTypeImpl implements TaskType {
 
     public void setMetadataTimestampProperty(String metadataTimestampProperty) {
         this.metadataTimestampProperty = metadataTimestampProperty;
+    }
+
+    /** Initialize submaps * */
+    private static void initSubmaps(Object bean, String name)
+            throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Resolver resolver = new DefaultResolver();
+        while (resolver.hasNested(name)) {
+            String next = resolver.next(name);
+            Object nestedBean = BeanUtils.getProperty(bean, next);
+            if (bean instanceof Map && nestedBean == null) {
+                nestedBean = new HashMap<>();
+                BeanUtils.setProperty(bean, next, nestedBean);
+            }
+            bean = nestedBean;
+            name = resolver.remove(name);
+        }
     }
 }
