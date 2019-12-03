@@ -29,6 +29,7 @@
     <modules>
         <module>core</module>
         <module>s3</module>
+        <module>metadata</module>
     </modules>
 
 </project>

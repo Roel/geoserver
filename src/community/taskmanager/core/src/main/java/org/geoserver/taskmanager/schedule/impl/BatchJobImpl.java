@@ -152,12 +152,13 @@ public class BatchJobImpl implements Job {
                         Run runPop = runStack.pop();
                         runPop.setStatus(Run.Status.ROLLING_BACK);
                         runPop = beans.getDao().save(runPop);
+                        TaskResult result = resultStack.pop();
                         try {
-                            resultStack.pop().rollback();
+                            result.rollback();
                             runPop.setStatus(Run.Status.ROLLED_BACK);
                         } catch (Exception e) {
                             Task popTask = runPop.getBatchElement().getTask();
-                            runPop.setMessage(e.getMessage());
+                            runPop.setMessage(e.getMessage() + "; " + result.successMessage());
                             runPop.setStatus(Run.Status.NOT_ROLLED_BACK);
                             LOGGER.log(
                                     Level.SEVERE,
@@ -191,8 +192,10 @@ public class BatchJobImpl implements Job {
                 }
                 runPop = runTemp;
                 try {
-                    resultStack.pop().commit();
+                    TaskResult result = resultStack.pop();
+                    result.commit();
                     runPop.setStatus(Run.Status.COMMITTED);
+                    runPop.setMessage(result.successMessage());
                 } catch (Exception e) {
                     Task task = runPop.getBatchElement().getTask();
                     LOGGER.log(
