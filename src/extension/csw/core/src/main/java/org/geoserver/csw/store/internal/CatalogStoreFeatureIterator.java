@@ -34,14 +34,10 @@ import org.geoserver.csw.records.GenericRecordBuilder;
 import org.geoserver.csw.records.RecordBuilder;
 import org.geoserver.csw.records.RecordDescriptor;
 import org.geoserver.platform.GeoServerExtensions;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.Feature;
 import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
 
 /**
@@ -50,8 +46,6 @@ import org.opengis.filter.sort.SortBy;
  * @author Niels Charlier
  */
 class CatalogStoreFeatureIterator implements Iterator<Feature> {
-
-    protected static final FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
 
     static final Logger LOGGER = Logging.getLogger(CatalogStoreFeatureIterator.class);
 
@@ -89,35 +83,6 @@ class CatalogStoreFeatureIterator implements Iterator<Feature> {
         this.filter = filter;
         catalogFacade = catalog.getFacade();
         this.mapping = mapping;
-
-        // ignore catalog info's without id
-        filter = ff.and(filter, ff.not(ff.isNull(mapping.getIdentifierElement().getContent())));
-
-        // build filter compatible with layergroups and resources
-        filter =
-                ff.or(
-                        /* Layergroup Filter */
-                        ff.and(ff.isNull(ff.property("advertised")), filter),
-                        /* Resource Filter */
-                        ff.and(
-                                ff.equals(ff.property("advertised"), ff.literal(true)),
-                                (Filter)
-                                        filter.accept(
-                                                new DuplicatingFilterVisitor() {
-
-                                                    public Object visit(
-                                                            PropertyName expression,
-                                                            Object extraData) {
-                                                        return getFactory(extraData)
-                                                                .property(
-                                                                        "resource."
-                                                                                + expression
-                                                                                        .getPropertyName(),
-                                                                        expression
-                                                                                .getNamespaceContext());
-                                                    }
-                                                },
-                                                null)));
 
         it = catalogFacade.list(PublishedInfo.class, filter, offset, count, sortOrder);
 

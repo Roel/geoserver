@@ -11,15 +11,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.geoserver.catalog.Catalog;
+import org.geoserver.catalog.PublishedInfo;
 import org.geoserver.csw.feature.AbstractFeatureCollection;
 import org.geoserver.csw.feature.MemoryFeatureCollection;
 import org.geoserver.csw.records.CSWRecordDescriptor;
 import org.geoserver.csw.records.RecordDescriptor;
 import org.geotools.data.store.FilteringFeatureCollection;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.filter.visitor.DuplicatingFilterVisitor;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
 
 /**
@@ -30,6 +35,8 @@ import org.opengis.filter.sort.SortBy;
  * @author Niels Charlier
  */
 class CatalogStoreFeatureCollection extends AbstractFeatureCollection<FeatureType, Feature> {
+
+    protected static final FilterFactory2 ff = CommonFactoryFinder.getFilterFactory2();
 
     protected int offset, count;
     protected SortBy[] sortOrder;
@@ -76,7 +83,7 @@ class CatalogStoreFeatureCollection extends AbstractFeatureCollection<FeatureTyp
                 offset,
                 count,
                 sortOrder,
-                filter,
+                catalogFilter(),
                 catalog,
                 mapping,
                 rdOutput,
@@ -96,5 +103,48 @@ class CatalogStoreFeatureCollection extends AbstractFeatureCollection<FeatureTyp
         List<Feature> features = new ArrayList<Feature>();
         MemoryFeatureCollection memory = new MemoryFeatureCollection(getSchema(), features);
         return memory.sort(order);
+    }
+
+    private Filter catalogFilter() {
+
+        // ignore catalog info's without id
+        Filter result =
+                ff.and(filter, ff.not(ff.isNull(mapping.getIdentifierElement().getContent())));
+
+        // build filter compatible with layergroups and resources
+        result =
+                ff.or(
+                        /* Layergroup Filter */
+                        ff.and(ff.isNull(ff.property("advertised")), result),
+                        /* Resource Filter */
+                        ff.and(
+                                ff.equals(ff.property("advertised"), ff.literal(true)),
+                                (Filter)
+                                        result.accept(
+                                                new DuplicatingFilterVisitor() {
+
+                                                    public Object visit(
+                                                            PropertyName expression,
+                                                            Object extraData) {
+                                                        return getFactory(extraData)
+                                                                .property(
+                                                                        "resource."
+                                                                                + expression
+                                                                                        .getPropertyName(),
+                                                                        expression
+                                                                                .getNamespaceContext());
+                                                    }
+                                                },
+                                                null)));
+        return result;
+    }
+
+    @Override
+    public int size() {
+        return Math.min(
+                count,
+                Math.max(
+                        0,
+                        catalog.getFacade().count(PublishedInfo.class, catalogFilter()) - offset));
     }
 }
