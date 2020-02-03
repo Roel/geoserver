@@ -167,6 +167,8 @@ public class CatalogUtil {
                     styleInfo.getLegend().getWidth(),
                     styleInfo.getLegend().getHeight());
         }
+        encoder.setFormat(styleInfo.getFormat());
+        encoder.setLanguageVersion(styleInfo.getFormatVersion().toString());
         return encoder;
     }
 

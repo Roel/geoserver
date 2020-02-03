@@ -13,6 +13,8 @@ import static org.junit.Assert.assertTrue;
 import it.geosolutions.geoserver.rest.GeoServerRESTManager;
 import it.geosolutions.geoserver.rest.decoder.RESTCoverage;
 import it.geosolutions.geoserver.rest.decoder.RESTLayer;
+import it.geosolutions.geoserver.rest.decoder.RESTStyle;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,6 +41,7 @@ import org.geoserver.taskmanager.util.LookupService;
 import org.geoserver.taskmanager.util.TaskManagerDataUtil;
 import org.geoserver.taskmanager.util.TaskManagerTaskUtil;
 import org.geoserver.util.IOUtils;
+import org.geotools.util.Version;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Before;
@@ -183,6 +186,7 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
         legendInfo.setFormat("image/png");
         legendInfo.setOnlineResource("grass_bill.png");
         si.setLegend(legendInfo);
+        si.setFormatVersion(new Version("1.1"));
         geoServer.getCatalog().save(si);
         geoServer.getCatalog().save(li);
 
@@ -262,8 +266,11 @@ public class MetaDataSyncTaskTest extends AbstractTaskManagerTest {
         assertEquals(1, layer.getStyles().size());
         assertEquals(SECOND_STYLE, layer.getStyles().get(0).getName());
 
-        String style = restManager.getStyleManager().getSLD(STYLE);
-        assertTrue(style.indexOf("CHANGED VERSION") > 0);
+        RESTStyle style = restManager.getStyleManager().getStyle(STYLE);
+        assertEquals("1.1", style.getVersion());
+        
+        String sld = restManager.getStyleManager().getSLD(STYLE);
+        assertTrue(sld.indexOf("CHANGED VERSION") > 0);
 
         // clean-up
 
